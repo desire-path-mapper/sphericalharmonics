@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spherical Harmonics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .logo {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        .contact {
+            background: #f7f7f7;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .contact a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .contact a:hover {
+            text-decoration: underline;
+        }
+
+        .funding {
+            background: #fff9e6;
+            padding: 1.5rem;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            margin-top: 2rem;
+        }
+
+        .image-gallery {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background: #fafafa;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .gallery-grid img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-grid img:hover {
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: #333;
+            color: white;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="logo_sh_cropped.png" alt="Spherical Harmonics Logo" class="logo">
+        <h1>Spherical Harmonics</h1>
+    </header>
+
+    <div class="container">
+        <section>
+            <h2>Our Mission</h2>
+            <p>
+                Communities know their streets need change but have no way to independently create the technical maps that city planners need to move projects forward.
+            </p>
+            <p>
+                We're developing a free and open-source platform where community members can propose and vote on bike lane, sidewalk, roadway, parking, and greenway improvements following NYC Street Design Manual guidelines.
+            </p>
+            <p>
+                Each proposal generates downloadable design drawings and maps from community-driven input that anyone can submit to DOT, share with community boards, or use for local organizing.
+            </p>
+        </section>
+
+        <section>
+            <h2>About Us</h2>
+            <p>
+                <strong>Eric Bolton</strong> is a software engineer specializing in data visualization, collaborative platforms, and community consensus tools.
+            </p>
+            <p>
+                <strong>Brook Constantz</strong> is a landscape ecologist with a background in urban forestry, geographic information systems, and green infrastructure.
+            </p>
+
+            <div class="contact">
+                <strong>Contact us:</strong> <a href="mailto:brook.constantz@gmail.com">brook.constantz@gmail.com</a>
+            </div>
+        </section>
+
+        <section>
+            <div class="funding">
+                <strong>Funding:</strong> This project is funded by a Magic Grant from the Brown Institute for Media Innovation, a joint initiative of Stanford Engineering and Columbia Journalism School.
+            </div>
+        </section>
+    </div>
+
+    <div class="image-gallery">
+        <h2 style="text-align: center; margin-bottom: 2rem; color: #667eea;">Photo Gallery</h2>
+        <div class="gallery-grid">
+            <img src="IMG_2981 2.jpg" alt="Project image 1">
+            <img src="IMG_2987 2.jpg" alt="Project image 2">
+            <img src="IMG_2990 2.jpg" alt="Project image 3">
+            <img src="IMG_2992 2.jpg" alt="Project image 4">
+            <img src="IMG_3002 2.jpg" alt="Project image 5">
+            <img src="IMG_3019 2.jpg" alt="Project image 6">
+            <img src="IMG_3025 2.jpg" alt="Project image 7">
+            <img src="IMG_3036 2.jpg" alt="Project image 8">
+            <img src="IMG_3071 2.jpg" alt="Project image 9">
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Spherical Harmonics Inc. All rights reserved.</p>
+    </footer>
+</body>
+</html>
