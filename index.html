@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spherical Harmonics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -18,8 +21,8 @@
         }
 
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: rgb(232, 232, 232);
+            color: #333;
             padding: 2rem 1rem;
             text-align: center;
         }
@@ -30,15 +33,39 @@
             margin-bottom: 1rem;
         }
 
+        h1, h2, .subtitle {
+            font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
+            font-weight: 300;
+        }
+
         h1 {
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
+            font-weight: 300;
         }
 
         .subtitle {
             font-size: 1.5rem;
             font-weight: 300;
-            opacity: 0.95;
+            opacity: 0.85;
+        }
+
+        .demo-banner {
+            background: rgb(168, 107, 60);
+            padding: 0.8rem 1.5rem;
+            text-align: center;
+        }
+
+        .demo-banner a {
+            color: white;
+            font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .demo-banner a:hover {
+            text-decoration: underline;
         }
 
         .container {
@@ -53,10 +80,11 @@
 
         h2 {
             font-size: 1.8rem;
-            color: #667eea;
+            color: rgb(168, 107, 60);
             margin-bottom: 1rem;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid rgb(168, 107, 60);
             padding-bottom: 0.5rem;
+            font-weight: 300;
         }
 
         p {
@@ -73,12 +101,28 @@
         }
 
         .contact a {
-            color: #667eea;
+            color: rgb(168, 107, 60);
             text-decoration: none;
             font-weight: 500;
         }
 
         .contact a:hover {
+            text-decoration: underline;
+        }
+
+        .demo-section {
+            background: #faf6f2;
+            padding: 1.5rem;
+            border-left: 4px solid rgb(168, 107, 60);
+            border-radius: 4px;
+        }
+
+        .demo-section a {
+            color: rgb(168, 107, 60);
+            font-weight: 500;
+        }
+
+        .demo-section a:hover {
             text-decoration: underline;
         }
 
@@ -143,9 +187,13 @@
 </head>
 <body>
     <header>
-        <img src="logo_sh_cropped.png" alt="Spherical Harmonics Logo" class="logo">
+        <img src="sphericalharmonica" alt="Spherical Harmonics Logo" class="logo">
         <h1>Spherical Harmonics</h1>
     </header>
+
+    <div class="demo-banner">
+        <a href="https://demo.sphericalharmonics.org/">Try the Desire Path Mapper Demo &rarr;</a>
+    </div>
 
     <div class="container">
         <section>
@@ -159,6 +207,15 @@
             <p>
                 Each proposal generates downloadable design drawings and maps from community-driven input that anyone can submit to DOT, share with community boards, or use for local organizing.
             </p>
+        </section>
+
+        <section>
+            <h2>Demo</h2>
+            <div class="demo-section">
+                <p>
+                    The <a href="https://demo.sphericalharmonics.org/">Desire Path Mapper</a> is our interactive demo for community-driven street redesign. It lets users draw proposed infrastructure changes directly onto a map, placing bike lanes, sidewalks, greenways, and other streetscape elements on real city streets. Community members can sketch out the changes they want to see in their neighborhoods, vote on proposals from others, and generate shareable design maps that follow established urban planning guidelines. The tool turns local knowledge about where people actually walk, bike, and need safer infrastructure into the kind of technical visual proposals that city agencies can act on.
+                </p>
+            </div>
         </section>
 
         <section>
@@ -183,7 +240,7 @@
     </div>
 
     <div class="image-gallery">
-        <h2 style="text-align: center; margin-bottom: 2rem; color: #667eea;">Photo Gallery</h2>
+        <h2 style="text-align: center; margin-bottom: 2rem; color: rgb(168, 107, 60);">Photo Gallery</h2>
         <div class="gallery-grid">
             <img src="IMG_2981 2.jpg" alt="Project image 1">
             <img src="IMG_2987 2.jpg" alt="Project image 2">
