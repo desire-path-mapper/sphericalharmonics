@@ -21,11 +21,55 @@
         }
 
         header {
-            background: rgb(232, 232, 232);
-            color: #333;
-            padding: 2rem 1rem;
-            text-align: center;
             position: relative;
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+            overflow: hidden;
+            min-height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-collage {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            z-index: 0;
+        }
+
+        .header-collage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .header-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(40, 25, 15, 0.55);
+            z-index: 1;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-content h1 {
+            color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header-collage {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+            }
         }
 
         .donate-btn {
@@ -206,9 +250,23 @@
 </head>
 <body>
     <header>
-        <img src="sphericalharmonica" alt="Spherical Harmonics Logo" class="logo">
-        <h1>Spherical Harmonics</h1>
-        <a href="https://donorbox.org/support-spherical-harmonics" class="donate-btn">Donate Now</a>
+        <div class="header-collage">
+            <img src="IMG_2981 2.jpg" alt="">
+            <img src="IMG_2987 2.jpg" alt="">
+            <img src="IMG_2990 2.jpg" alt="">
+            <img src="IMG_2992 2.jpg" alt="">
+            <img src="IMG_3002 2.jpg" alt="">
+            <img src="IMG_3019 2.jpg" alt="">
+            <img src="IMG_3025 2.jpg" alt="">
+            <img src="IMG_3036 2.jpg" alt="">
+            <img src="IMG_3071 2.jpg" alt="">
+        </div>
+        <div class="header-overlay"></div>
+        <div class="header-content">
+            <img src="sphericalharmonica" alt="Spherical Harmonics Logo" class="logo">
+            <h1>Spherical Harmonics</h1>
+            <a href="https://donorbox.org/support-spherical-harmonics" class="donate-btn">Donate Now</a>
+        </div>
     </header>
 
     <div class="demo-banner">
@@ -275,7 +333,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2025 Spherical Harmonics Inc. All rights reserved.</p>
+        <p>&copy; 2026 Spherical Harmonics Inc. All rights reserved.</p>
     </footer>
 </body>
 </html>
