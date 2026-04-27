@@ -95,18 +95,22 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 3.5rem 1rem;
+            padding: 2rem 0;
             margin-bottom: 1rem;
         }
 
         .logo-wrapper::before {
             content: '';
             position: absolute;
-            inset: 0;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100vw;
             background: linear-gradient(to top, rgb(234, 234, 234), rgb(227, 227, 227));
-            -webkit-mask-image: radial-gradient(ellipse 140% 100% at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0.55) 100%);
-            mask-image: radial-gradient(ellipse 140% 100% at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0.55) 100%);
-            filter: blur(15px);
+            -webkit-mask-image: radial-gradient(ellipse 25% 100% at center, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0.3) 100%);
+            mask-image: radial-gradient(ellipse 25% 100% at center, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0.3) 100%);
+            filter: blur(20px);
             z-index: 0;
             pointer-events: none;
         }
