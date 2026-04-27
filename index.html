@@ -90,10 +90,32 @@
             background: rgb(138, 87, 45);
         }
 
+        .logo-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgb(234, 234, 234), rgb(227, 227, 227));
+            -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 65%);
+            mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 65%);
+            filter: blur(15px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
         .logo {
+            position: relative;
+            z-index: 1;
             max-width: 200px;
             height: auto;
-            margin-bottom: 1rem;
         }
 
         h1, h2, .subtitle {
@@ -263,7 +285,9 @@
         </div>
         <div class="header-overlay"></div>
         <div class="header-content">
-            <img src="sphericalharmonica" alt="Spherical Harmonics Logo" class="logo">
+            <div class="logo-wrapper">
+                <img src="sphericalharmonica" alt="Spherical Harmonics Logo" class="logo">
+            </div>
             <h1>Spherical Harmonics</h1>
             <a href="https://donorbox.org/support-spherical-harmonics" class="donate-btn">Donate Now</a>
         </div>
