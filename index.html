@@ -15,7 +15,8 @@
     <meta property="og:url" content="https://sphericalharmonics.org">
     <meta property="og:image" content="https://sphericalharmonics.org/logo_sh_cropped.png">
     <meta name="twitter:card" content="summary">
-    <link rel="icon" type="image/png" href="logo_sh_cropped.png">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         * {
             margin: 0;
@@ -36,7 +37,7 @@
 
         header {
             position: relative;
-            color: #3b2314;
+            color: #fff;
             padding: 1.5rem 1rem;
             text-align: center;
             overflow: hidden;
@@ -46,16 +47,13 @@
             justify-content: center;
         }
 
-        .header-collage {
+        .header-banner {
             position: absolute;
             inset: 0;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
             z-index: 0;
         }
 
-        .header-collage img {
+        .header-banner img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -65,17 +63,15 @@
         .header-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(40, 25, 15, 0.55);
+            background: rgba(40, 25, 15, 0.3);
             z-index: 1;
         }
 
         .logo-halo {
             position: absolute;
-            inset: -60px 0;
-            background: linear-gradient(to top, rgb(234, 234, 234), rgb(227, 227, 227));
-            -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 1) 35%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.3) 100%);
-            mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 1) 35%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.3) 100%);
-            filter: blur(20px);
+            inset: -35px 28%;
+            background: linear-gradient(to right, transparent 0%, rgba(230, 230, 230, 0.5) 20%, rgba(230, 230, 230, 1) 40%, rgba(230, 230, 230, 1) 60%, rgba(230, 230, 230, 0.5) 80%, transparent 100%);
+            filter: blur(35px);
             z-index: 1;
             pointer-events: none;
         }
@@ -86,14 +82,8 @@
         }
 
         .header-content h1 {
-            color: #3b2314;
-        }
-
-        @media (max-width: 768px) {
-            .header-collage {
-                grid-template-columns: repeat(3, 1fr);
-                grid-template-rows: repeat(3, 1fr);
-            }
+            color: rgb(168, 107, 60);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .donate-btn {
@@ -128,7 +118,7 @@
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             margin-bottom: 0.5rem;
             font-weight: 300;
             text-wrap: balance;
@@ -277,21 +267,13 @@
 </head>
 <body>
     <header>
-        <div class="header-collage">
-            <img src="IMG_2981 2.jpg" alt="">
-            <img src="IMG_2987 2.jpg" alt="">
-            <img src="IMG_2990 2.jpg" alt="">
-            <img src="IMG_2992 2.jpg" alt="">
-            <img src="IMG_3002 2.jpg" alt="">
-            <img src="IMG_3019 2.jpg" alt="">
-            <img src="IMG_3025 2.jpg" alt="">
-            <img src="IMG_3036 2.jpg" alt="">
-            <img src="IMG_3071 2.jpg" alt="">
+        <div class="header-banner">
+            <img src="banner.png" alt="City street redesign concept">
         </div>
         <div class="header-overlay"></div>
         <div class="logo-halo"></div>
         <div class="header-content">
-            <img src="sphericalharmonica" alt="Spherical Harmonics Logo" class="logo">
+            <img src="logo_header.png" alt="Spherical Harmonics Logo" class="logo">
             <h1>Spherical Harmonics</h1>
             <a href="https://donorbox.org/support-spherical-harmonics" class="donate-btn">Donate Now</a>
         </div>
