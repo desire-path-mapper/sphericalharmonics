@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Edit shirt | Spherical Harmonics Shop</title>
+    <meta name="description" content="A black City Edit shirt with a scannable code on the back. Scan it, pick the street you'd fix, and the shirt remembers. Sizes S, M, L and XL.">
+    <meta name="theme-color" content="#faf3e5">
+    <meta property="og:title" content="City Edit shirt | Spherical Harmonics">
+    <meta property="og:description" content="Wear the city you want to see. Every shirt carries its own scannable City Edit code.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sphericalharmonics.org/shop/">
+    <meta property="og:image" content="https://sphericalharmonics.org/shop/shirt-og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Front artwork of the City Edit shirt: green City Edit letters standing on grey isometric city blocks, above the words Redraw your city.">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://sphericalharmonics.org/shop/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&amp;family=Public+Sans:ital,wght@0,400..700;1,400..700&amp;family=Spline+Sans+Mono:wght@400..600&amp;display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../favicon.png?v=2">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico?v=2">
+    <!-- ===== BEGIN SHOP CSS: the page's only styles. Swap this block for assets/site.css plus the shop-only rules. ===== -->
+    <style>
+        /* Duplicates the homepage, replaceable by site.css: tokens, reset, Masthead, Story sections, Footer,
+           and their rules under Responsive.
+           Shop-only, keep: --city-green, --shirt, Product (hero, tees, price, sizes), and in Story sections
+           .flats, .blur-tag, .specs, .steps, .aside-note, .photo-slots/.slot. */
+        /* Tokens and type match index.html; --city-green and --shirt come from the print. */
+        :root {
+            --paper: #faf3e5;
+            --paper-deep: #f2e7d2;
+            --ink: #231a0f;
+            --ink-soft: #5c4f3b;
+            --sienna: #a86b3c;
+            --sienna-deep: #7e4a20;
+            --lane-green: #3f7a38;
+            --city-green: #7cbb64;
+            --road-yellow: #f2c230;
+            --shirt: #171717;
+            --hairline: rgba(35, 26, 15, 0.25);
+            --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+            --sans: 'Public Sans', -apple-system, 'Helvetica Neue', sans-serif;
+            --mono: 'Spline Sans Mono', 'SF Mono', Menlo, monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--sans);
+            line-height: 1.65;
+            color: var(--ink);
+            background: var(--paper);
+            border-top: 4px solid var(--ink);
+        }
+
+        img { max-width: 100%; }
+        ::selection { background: var(--road-yellow); color: var(--ink); }
+        :focus-visible { outline: 2px solid var(--sienna-deep); outline-offset: 2px; }
+
+        /* ---------- Masthead (same as the homepage) ---------- */
+        .masthead { text-align: center; padding: 1.1rem 1.25rem 0.9rem; }
+
+        .masthead-lockup {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .masthead .logo {
+            width: 72px;
+            height: auto;
+            filter: drop-shadow(0 6px 12px rgba(35, 26, 15, 0.18));
+        }
+
+        .masthead .wordmark {
+            font-family: var(--serif);
+            font-optical-sizing: auto;
+            font-size: clamp(2.1rem, 6vw, 3.6rem);
+            font-weight: 420;
+            letter-spacing: -0.015em;
+            line-height: 1.05;
+        }
+
+        .rule-wrap { padding: 0 1.25rem; }
+
+        .double-rule {
+            max-width: 1080px;
+            margin: 0 auto;
+            border-top: 3px solid var(--ink);
+            border-bottom: 1px solid var(--ink);
+            height: 7px;
+        }
+
+        .section-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.25rem 2.25rem;
+            padding: 0.7rem 1.25rem;
+            border-bottom: 1px solid var(--hairline);
+            font-family: var(--mono);
+            font-size: 0.74rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .section-nav a {
+            color: var(--ink);
+            text-decoration: none;
+            padding: 0.15rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .section-nav a:hover,
+        .section-nav a[aria-current="page"] { border-bottom-color: var(--road-yellow); }
+        .section-nav a[aria-current="page"] { font-weight: 600; }
+
+        .section-nav a.nav-donate {
+            background: var(--road-yellow);
+            font-weight: 600;
+            padding: 0.15rem 0.7rem;
+            border: 1px solid var(--ink);
+            box-shadow: 2px 2px 0 var(--ink);
+            transition: box-shadow 0.15s ease, transform 0.15s ease;
+        }
+
+        .section-nav a.nav-donate:hover {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 var(--ink);
+        }
+
+        /* ---------- Product ---------- */
+        .container { max-width: 1080px; margin: 0 auto; padding: 2.25rem 1.25rem 0.5rem; }
+
+        .kicker {
+            font-family: var(--mono);
+            font-size: 0.74rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--sienna-deep);
+        }
+
+        .product {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+            grid-template-areas:
+                "art head"
+                "art lede"
+                "art buy";
+            grid-template-rows: auto auto 1fr;
+            gap: 0 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-head { grid-area: head; padding-top: 0.5rem; }
+        .product-buy { grid-area: buy; }
+
+        .product-head h1 {
+            font-family: var(--serif);
+            font-optical-sizing: auto;
+            font-size: clamp(2.5rem, 5.6vw, 4.2rem);
+            font-weight: 450;
+            line-height: 1;
+            letter-spacing: -0.025em;
+            margin: 0.5rem 0 1rem;
+            text-wrap: balance;
+        }
+
+        .lede { grid-area: lede; font-size: 1.1rem; max-width: 40ch; }
+
+        .showcase {
+            grid-area: art;
+            align-self: start;
+            margin: 0;
+            border: 1px solid var(--ink);
+            background: var(--paper-deep);
+            box-shadow: 8px 8px 0 var(--city-green);
+        }
+
+        .tees {
+            display: grid;
+            padding: clamp(1rem, 3vw, 1.75rem) clamp(0.75rem, 3vw, 1.75rem) 0.9rem;
+        }
+
+        /* Both tees share one grid cell: the back hangs behind, up and to the right. */
+        .tee { grid-area: 1 / 1; margin: 0; }
+        .tee img { display: block; width: 100%; height: auto; }
+        .tee-back { width: 56%; justify-self: end; align-self: start; text-align: right; }
+        .tee-front {
+            position: relative;
+            width: 72%;
+            margin-top: 17%;
+            text-align: center;
+        }
+        .tee-front img { filter: drop-shadow(6px 6px 0 rgba(35, 26, 15, 0.16)); }
+
+        .tee figcaption,
+        .flat figcaption {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            padding-top: 0.35rem;
+        }
+
+        .showcase > figcaption {
+            border-top: 1px solid var(--ink);
+            background: var(--shirt);
+            color: #d9d4ca;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            padding: 0.6rem 0.9rem;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.9rem;
+            margin: 1.6rem 0 1.1rem;
+            padding-top: 1rem;
+            border-top: 3px solid var(--ink);
+        }
+
+        .price {
+            font-family: var(--serif);
+            font-size: 1.9rem;
+            font-weight: 500;
+            line-height: 1.1;
+        }
+
+        .price.is-pending {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            background: var(--road-yellow);
+            border: 1px solid var(--ink);
+            padding: 0.2rem 0.6rem;
+        }
+
+        .price-note { font-size: 0.92rem; color: var(--ink-soft); }
+
+        .size-label {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            margin-bottom: 0.55rem;
+        }
+
+        .sizes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.7rem;
+            list-style: none;
+        }
+
+        .size {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 4.2rem;
+            padding: 0.5rem 0.25rem;
+            border: 1px solid var(--ink);
+            background: var(--city-green);
+            color: var(--ink);
+            text-decoration: none;
+            box-shadow: 3px 3px 0 var(--ink);
+            transition: box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease;
+        }
+
+        .size:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--ink); background: #8fcb77; }
+        .size:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+
+        .size b {
+            font-family: var(--serif);
+            font-size: 1.6rem;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        .size span {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-top: 0.3rem;
+        }
+
+        .order-note {
+            margin-top: 1.1rem;
+            font-size: 0.95rem;
+            color: var(--ink-soft);
+            max-width: 44ch;
+        }
+
+        .order-note a { color: var(--lane-green); font-weight: 600; }
+
+        /* ---------- Story sections (same grid as the homepage) ---------- */
+        section.story {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 1.25rem 3rem;
+            border-top: 3px solid var(--ink);
+            padding-top: 0.85rem;
+            margin-bottom: 2.75rem;
+        }
+
+        .story h2 {
+            font-family: var(--serif);
+            font-optical-sizing: auto;
+            font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+            font-weight: 450;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            margin-bottom: 1.1rem;
+            text-wrap: balance;
+        }
+
+        .story p { font-size: 1.06rem; max-width: 62ch; margin-bottom: 1rem; }
+        .story p:last-child { margin-bottom: 0; }
+
+        .story a {
+            color: var(--lane-green);
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 2px solid rgba(63, 122, 56, 0.35);
+        }
+
+        .story a:hover { border-bottom-color: var(--road-yellow); background: rgba(242, 194, 48, 0.25); }
+
+        .flats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .flat { margin: 0; }
+        .flat .frame { position: relative; border: 1px solid var(--ink); background: var(--shirt); }
+        .flat img { display: block; width: 100%; height: auto; }
+
+        .blur-tag {
+            position: absolute;
+            left: 50%;
+            top: 51.4%;
+            transform: translate(-50%, -50%);
+            max-width: 72%;
+            background: var(--paper);
+            border: 1px solid var(--ink);
+            box-shadow: 2px 2px 0 var(--ink);
+            font-family: var(--mono);
+            font-size: 0.64rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            line-height: 1.35;
+            text-align: center;
+            text-transform: uppercase;
+            padding: 0.3rem 0.55rem;
+        }
+
+        .specs {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: 0.45rem 1.5rem;
+            border-top: 1px solid var(--hairline);
+            padding-top: 1rem;
+            max-width: 62ch;
+        }
+
+        .specs dt {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--sienna-deep);
+            padding-top: 0.2rem;
+        }
+
+        .steps {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin: 0.5rem 0 1.5rem;
+        }
+
+        .steps li {
+            border-top: 1px solid var(--hairline);
+            padding-top: 0.8rem;
+        }
+
+        .steps .num {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            color: var(--lane-green);
+        }
+
+        .steps h3 {
+            font-family: var(--serif);
+            font-size: 1.3rem;
+            font-weight: 500;
+            line-height: 1.2;
+            margin: 0.2rem 0 0.4rem;
+        }
+
+        .steps p { font-size: 0.98rem; color: var(--ink-soft); margin: 0; }
+
+        .aside-note {
+            border: 1px solid var(--ink);
+            border-left: 6px solid var(--city-green);
+            background: var(--paper-deep);
+            padding: 1rem 1.25rem;
+            box-shadow: 4px 4px 0 rgba(35, 26, 15, 0.14);
+            max-width: 62ch;
+        }
+
+        .story .aside-note p { font-size: 0.98rem; }
+
+        /* Photo slots: replace a .slot with a <figure> holding the photo when one arrives. */
+        .photo-slots {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .slot {
+            aspect-ratio: 4 / 5;
+            border: 1px dashed var(--ink-soft);
+            background:
+                repeating-linear-gradient(135deg, transparent 0 14px, rgba(35, 26, 15, 0.05) 14px 15px),
+                var(--paper-deep);
+            display: flex;
+            align-items: flex-end;
+            padding: 0.6rem 0.75rem;
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+        }
+
+        /* ---------- Footer (same as the homepage) ---------- */
+        footer {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 2rem 1.25rem 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .footer-inner {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .footer-inner .wordmark { font-family: var(--serif); font-size: 1.6rem; font-weight: 450; }
+
+        .footer-inner .foot-tag {
+            font-size: 0.9rem;
+            color: rgba(250, 243, 229, 0.65);
+            max-width: 34ch;
+            margin-top: 0.4rem;
+        }
+
+        .foot-head {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--road-yellow);
+            margin-bottom: 0.6rem;
+        }
+
+        footer a { color: var(--paper); text-decoration: none; border-bottom: 1px solid rgba(250, 243, 229, 0.35); }
+        footer a:hover { border-bottom-color: var(--road-yellow); }
+        footer li { list-style: none; font-size: 0.92rem; margin-bottom: 0.4rem; }
+
+        .copyright {
+            max-width: 1080px;
+            margin: 1.75rem auto 0;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(250, 243, 229, 0.2);
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(250, 243, 229, 0.55);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 900px) {
+            .footer-inner { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 880px) {
+            .product {
+                grid-template-columns: 1fr;
+                grid-template-areas: "head" "art" "buy" "lede";
+                grid-template-rows: auto;
+            }
+            .product-head { padding-top: 0; }
+            .product-head h1 { margin-bottom: 0; }
+            .lede { margin-top: 1.25rem; }
+            .showcase { margin: 1.1rem 0 0.4rem; box-shadow: 6px 6px 0 var(--city-green); }
+            section.story { grid-template-columns: 1fr; gap: 0.9rem; }
+        }
+
+        @media (max-width: 620px) {
+            .steps { grid-template-columns: 1fr; gap: 1rem; }
+            .photo-slots { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            .photo-slots .slot:nth-child(3) { display: none; }
+        }
+
+        @media (max-width: 540px) {
+            .container { padding-top: 1.5rem; }
+            .masthead { padding: 0.8rem 1rem 0.7rem; }
+            .masthead-lockup { gap: 0.6rem; }
+            .masthead .logo { width: 40px; }
+            .masthead .wordmark { font-size: 1.75rem; }
+            .tees { padding: 0.9rem 0.75rem 0.5rem; }
+            .price-row { padding-top: 0.8rem; }
+            .section-nav { gap: 0.2rem 1.25rem; }
+            .footer-inner { grid-template-columns: 1fr; }
+            .lede { font-size: 1.02rem; }
+            .price-row { margin-top: 1rem; margin-bottom: 0.8rem; }
+            .sizes { gap: 0.55rem; }
+            .flats { gap: 0.75rem; }
+            .blur-tag { font-size: 0.52rem; padding: 0.25rem 0.4rem; }
+            .specs { grid-template-columns: 1fr; gap: 0.1rem; }
+            .specs dd { margin-bottom: 0.6rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { transition: none !important; }
+        }
+    </style>
+    <!-- ===== END SHOP CSS ===== -->
+</head>
+<body>
+    <header class="masthead">
+        <a class="masthead-lockup" href="../">
+            <img src="../logo_header.png" alt="" class="logo" width="72" height="72">
+            <span class="wordmark">Spherical Harmonics</span>
+        </a>
+    </header>
+
+    <div class="rule-wrap"><div class="double-rule"></div></div>
+
+    <nav class="section-nav" aria-label="Site">
+        <a href="../#mission">Mission</a>
+        <a href="../#demo">City Edit</a>
+        <a href="../#newsletter">Newsletter</a>
+        <a href="../#people">People</a>
+        <a href="./" aria-current="page">Shop</a>
+        <a href="mailto:brook@sphericalharmonics.org">Contact</a>
+        <a class="nav-donate" href="https://donorbox.org/support-spherical-harmonics">Donate</a>
+    </nav>
+
+    <main class="container">
+        <section class="product" aria-labelledby="product-title">
+            <div class="product-head">
+                <p class="kicker">The City Edit shirt</p>
+                <h1 id="product-title">Wear the city you want to see.</h1>
+            </div>
+            <p class="lede">A black tee with a green-and-white city on the front. On the back: “I love this city, but I have one note,” above a code that belongs to your shirt alone.</p>
+
+            <figure class="showcase">
+                <div class="tees">
+                    <figure class="tee tee-front">
+                        <img src="tee-front-700.webp" srcset="tee-front-700.webp 700w, tee-front-1200.webp 1200w" sizes="(max-width: 880px) 66vw, 420px" width="700" height="602" alt="Front of the black shirt: green City Edit letters standing on grey isometric city blocks with trees, above the words Redraw your city and cityedit.org." fetchpriority="high">
+                        <figcaption>Front</figcaption>
+                    </figure>
+                    <figure class="tee tee-back">
+                        <img src="tee-back-700.webp" srcset="tee-back-700.webp 700w, tee-back-1200.webp 1200w" sizes="(max-width: 880px) 52vw, 330px" width="700" height="602" alt="Back of the black shirt: I heart this city, but I have one note, above a scannable code drawn as a ring of isometric blocks. The code is blurred here.">
+                        <figcaption>Back</figcaption>
+                    </figure>
+                </div>
+                <figcaption>Artwork as printed, shown on a plain tee. Not a photo.</figcaption>
+            </figure>
+
+            <div class="product-buy" id="order">
+                <div class="price-row">
+                    <p class="price is-pending" id="price">Price coming</p>
+                    <p class="price-note" id="price-note">We are setting it now.</p>
+                </div>
+
+                <p class="size-label" id="size-label">Choose a size</p>
+                <ul class="sizes" aria-labelledby="size-label">
+                    <li><a class="size" data-size="S" href="mailto:eric@sphericalharmonics.org?subject=City%20Edit%20shirt%20%E2%80%94%20size%20S&amp;body=Hi%20Eric%2C%0A%0AI%20would%20like%20a%20City%20Edit%20shirt%20in%20size%20S.%0A%0AMy%20name%3A%0APickup%20at%20the%20next%20Urbanism%20Adventure%2C%20or%20shipping%3F%20%28If%20shipping%2C%20my%20address%29%3A%0A%0AThanks"><b>S</b><span>Small</span></a></li>
+                    <li><a class="size" data-size="M" href="mailto:eric@sphericalharmonics.org?subject=City%20Edit%20shirt%20%E2%80%94%20size%20M&amp;body=Hi%20Eric%2C%0A%0AI%20would%20like%20a%20City%20Edit%20shirt%20in%20size%20M.%0A%0AMy%20name%3A%0APickup%20at%20the%20next%20Urbanism%20Adventure%2C%20or%20shipping%3F%20%28If%20shipping%2C%20my%20address%29%3A%0A%0AThanks"><b>M</b><span>Medium</span></a></li>
+                    <li><a class="size" data-size="L" href="mailto:eric@sphericalharmonics.org?subject=City%20Edit%20shirt%20%E2%80%94%20size%20L&amp;body=Hi%20Eric%2C%0A%0AI%20would%20like%20a%20City%20Edit%20shirt%20in%20size%20L.%0A%0AMy%20name%3A%0APickup%20at%20the%20next%20Urbanism%20Adventure%2C%20or%20shipping%3F%20%28If%20shipping%2C%20my%20address%29%3A%0A%0AThanks"><b>L</b><span>Large</span></a></li>
+                    <li><a class="size" data-size="XL" href="mailto:eric@sphericalharmonics.org?subject=City%20Edit%20shirt%20%E2%80%94%20size%20XL&amp;body=Hi%20Eric%2C%0A%0AI%20would%20like%20a%20City%20Edit%20shirt%20in%20size%20XL.%0A%0AMy%20name%3A%0APickup%20at%20the%20next%20Urbanism%20Adventure%2C%20or%20shipping%3F%20%28If%20shipping%2C%20my%20address%29%3A%0A%0AThanks"><b>XL</b><span>X-Large</span></a></li>
+                </ul>
+
+                <p class="order-note" id="order-note">Online checkout is not open yet. Tapping a size starts an email to Eric with the details filled in. He will write back with the price and ask whether you want to pick the shirt up in New York or have it shipped.</p>
+            </div>
+        </section>
+
+        <section class="story" id="scan">
+            <div class="kicker">The code</div>
+            <div class="section-body">
+                <h2>Scan it, pick the street you’d fix, and the shirt remembers.</h2>
+                <p>Every shirt in the run carries a different code on its back. The first vote cast through it ties that shirt to one street and one proposal. From then on, anyone who scans your back sees the change you asked for.</p>
+                <ol class="steps">
+                    <li>
+                        <span class="num">01</span>
+                        <h3>Scan the back</h3>
+                        <p>Any phone camera reads it. City Edit opens on the map.</p>
+                    </li>
+                    <li>
+                        <span class="num">02</span>
+                        <h3>Pick the street</h3>
+                        <p>Choose the block you would fix and vote for the change.</p>
+                    </li>
+                    <li>
+                        <span class="num">03</span>
+                        <h3>The shirt remembers</h3>
+                        <p>Every later scan opens that same proposal, wherever the shirt goes.</p>
+                    </li>
+                </ol>
+                <div class="aside-note">
+                    <p>That is why the code in our pictures is blurred. The unblurred one belongs to a shirt someone will wear.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="story" id="artwork">
+            <div class="kicker">The artwork</div>
+            <div class="section-body">
+                <h2>Two inks, one city, printed on black.</h2>
+                <div class="flats">
+                    <figure class="flat">
+                        <div class="frame">
+                            <img src="shirt-front-800.webp" srcset="shirt-front-800.webp 800w, shirt-front-1600.webp 1600w" sizes="(max-width: 880px) 46vw, 380px" width="800" height="945" loading="lazy" alt="Flat front artwork: green City Edit letters on grey isometric blocks lined with trees and small figures, over the words Redraw your city and cityedit.org.">
+                        </div>
+                        <figcaption>Front · print file</figcaption>
+                    </figure>
+                    <figure class="flat">
+                        <div class="frame">
+                            <img src="shirt-back-800.webp" srcset="shirt-back-800.webp 800w, shirt-back-1600.webp 1600w" sizes="(max-width: 880px) 46vw, 380px" width="800" height="945" loading="lazy" alt="Flat back artwork: I heart this city, but I have one note, over a code drawn as a ring of isometric city blocks with trees, and cityedit.org at the bottom. The center of the code is blurred.">
+                            <span class="blur-tag">Blurred here. Yours is unique.</span>
+                        </div>
+                        <figcaption>Back · print file</figcaption>
+                    </figure>
+                </div>
+                <dl class="specs">
+                    <dt>Shirt</dt><dd>Black tee</dd>
+                    <dt>Ink</dt><dd>Two spot colors, green and white</dd>
+                    <dt>Print</dt><dd>11 × 13 in artwork, the same size on every shirt</dd>
+                    <dt>Sizes</dt><dd>S, M, L, XL</dd>
+                </dl>
+            </div>
+        </section>
+
+        <section class="story" id="why">
+            <div class="kicker">Why a shirt</div>
+            <div class="section-body">
+                <h2>A poster stays on one lamppost. A shirt walks around.</h2>
+                <p>We started with City Edit codes on posters. A poster only reaches the people on that block. A shirt goes where you go: the community board meeting, the block party, the line at the bodega.</p>
+                <p>Each scan adds a little community signal about what a street could be. Enough of it, drawn to scale, is something a planner can act on.</p>
+            </div>
+        </section>
+
+        <section class="story" id="worn">
+            <div class="kicker">Worn</div>
+            <div class="section-body">
+                <h2>Photos from the first wearers are coming soon.</h2>
+                <p>Everything above is drawn from the print file. Once the shirts are out in the city, their photos go here. Wearing one? <a href="mailto:eric@sphericalharmonics.org?subject=City%20Edit%20shirt%20photo">Send us a picture</a>.</p>
+                <!-- To add a photo: replace one .slot div with
+                     <figure class="flat"><div class="frame"><img src="worn-01.webp" width="…" height="…" loading="lazy" alt="…"></div><figcaption>Fig. 01 · Place</figcaption></figure> -->
+                <div class="photo-slots" aria-hidden="true">
+                    <div class="slot">Fig. 01</div>
+                    <div class="slot">Fig. 02</div>
+                    <div class="slot">Fig. 03</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <div>
+                <div class="wordmark">Spherical Harmonics</div>
+                <p class="foot-tag">A civic technology nonprofit building open tools for community-driven street redesign.</p>
+            </div>
+            <div>
+                <div class="foot-head">Get Involved</div>
+                <ul>
+                    <li><a href="https://demo.cityedit.org/">City Edit demo</a></li>
+                    <li><a href="https://sphericalharmonics.substack.com/">Newsletter</a></li>
+                    <li><a href="./">Shop</a></li>
+                    <li><a href="https://donorbox.org/support-spherical-harmonics">Donate</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="foot-head">Contact</div>
+                <ul>
+                    <li><a href="mailto:brook@sphericalharmonics.org">brook@sphericalharmonics.org</a></li>
+                    <li><a href="mailto:eric@sphericalharmonics.org">eric@sphericalharmonics.org</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <span>&copy; 2026 Spherical Harmonics Inc. All rights reserved.</span>
+            <span>New York City</span>
+        </div>
+    </footer>
+
+    <script>
+        // ---- Checkout switch ------------------------------------------------------
+        // Leave everything empty and the size buttons stay as email links.
+        // price: the text to show, e.g. '$30'.
+        // paymentLinks: a Stripe Payment Link URL per size. If one link asks for the
+        // size at checkout, paste that same URL into all four.
+        const SHOP = {
+            price: '',
+            paymentLinks: { S: '', M: '', L: '', XL: '' }
+        };
+
+        if (SHOP.price) {
+            const price = document.getElementById('price');
+            price.textContent = SHOP.price;
+            price.classList.remove('is-pending');
+            document.getElementById('price-note').hidden = true;
+        }
+
+        let stripeLive = false;
+        document.querySelectorAll('.size[data-size]').forEach((link) => {
+            const url = SHOP.paymentLinks[link.dataset.size];
+            if (url) {
+                link.href = url;
+                stripeLive = true;
+            }
+        });
+
+        if (stripeLive) {
+            document.getElementById('order-note').textContent =
+                'Checkout is handled by Stripe. We will email you about pickup in New York or shipping.';
+        }
+    </script>
+</body>
+</html>
