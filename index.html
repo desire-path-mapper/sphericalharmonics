@@ -4,11 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spherical Harmonics</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Public+Sans:ital,wght@0,400..700;1,400..700&family=Spline+Sans+Mono:wght@400..600&display=swap" rel="stylesheet">
+    <link rel="preload" href="assets/fonts/cmu-serif-500-roman.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/cmu-serif-700-roman.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/site.css?v=20260930b">
     <meta name="description" content="Free, open-source platform for community-driven street redesign. Propose and vote on bike lanes, sidewalks, and greenways in your neighborhood.">
     <meta name="theme-color" content="#faf3e5">
+    <meta name="color-scheme" content="light">
+    <script>
+        // Light by default; a reader's own choice (the toggle, top right) is
+        // remembered in this browser and applied before first paint.
+        (function () {
+            var theme = 'light';
+            try { if (localStorage.getItem('sh-theme') === 'dark') theme = 'dark'; } catch (e) {}
+            document.documentElement.dataset.theme = theme;
+            if (theme === 'dark') {
+                document.querySelector('meta[name="theme-color"]').content = '#18130d';
+                document.querySelector('meta[name="color-scheme"]').content = 'dark';
+            }
+        })();
+    </script>
     <meta property="og:title" content="Spherical Harmonics">
     <meta property="og:description" content="Free, open-source platform for community-driven street redesign.">
     <meta property="og:type" content="website">
@@ -18,587 +32,37 @@
     <link rel="alternate" type="application/rss+xml" title="Spherical Harmonics newsletter" href="https://sphericalharmonics.substack.com/feed">
     <link rel="icon" type="image/png" href="favicon.png?v=2">
     <link rel="icon" type="image/x-icon" href="favicon.ico?v=2">
-    <style>
-        :root {
-            --paper: #faf3e5;
-            --paper-deep: #f2e7d2;
-            --ink: #231a0f;
-            --ink-soft: #5c4f3b;
-            --sienna: #a86b3c;
-            --sienna-deep: #7e4a20;
-            --lane-green: #3f7a38;
-            --road-yellow: #f2c230;
-            --hairline: rgba(35, 26, 15, 0.25);
-            --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
-            --sans: 'Public Sans', -apple-system, 'Helvetica Neue', sans-serif;
-            --mono: 'Spline Sans Mono', 'SF Mono', Menlo, monospace;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: var(--sans);
-            line-height: 1.65;
-            color: var(--ink);
-            background: var(--paper);
-        }
-
-        ::selection {
-            background: var(--road-yellow);
-            color: var(--ink);
-        }
-
-        :focus-visible {
-            outline: 2px solid var(--sienna-deep);
-            outline-offset: 2px;
-        }
-
-        body {
-            border-top: 4px solid var(--ink);
-        }
-
-        /* ---------- Masthead ---------- */
-        .masthead {
-            text-align: center;
-            padding: 1.1rem 1.25rem 0.9rem;
-        }
-
-        .masthead-lockup {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.25rem;
-        }
-
-        .masthead .logo {
-            width: 72px;
-            height: auto;
-            filter: drop-shadow(0 6px 12px rgba(35, 26, 15, 0.18));
-        }
-
-        .masthead h1 {
-            font-family: var(--serif);
-            font-optical-sizing: auto;
-            font-size: clamp(2.1rem, 6vw, 3.6rem);
-            font-weight: 420;
-            letter-spacing: -0.015em;
-            line-height: 1.05;
-            text-wrap: balance;
-        }
-
-        .double-rule {
-            max-width: 1080px;
-            margin: 0 auto;
-            border-top: 3px solid var(--ink);
-            border-bottom: 1px solid var(--ink);
-            height: 7px;
-        }
-
-        .rule-wrap {
-            padding: 0 1.25rem;
-        }
-
-        /* ---------- Section nav ---------- */
-        .section-nav {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 0.25rem 2.25rem;
-            padding: 0.7rem 1.25rem;
-            border-bottom: 1px solid var(--hairline);
-            font-family: var(--mono);
-            font-size: 0.74rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-        }
-
-        .section-nav a {
-            color: var(--ink);
-            text-decoration: none;
-            padding: 0.15rem 0;
-            border-bottom: 2px solid transparent;
-        }
-
-        .section-nav a:hover {
-            border-bottom-color: var(--road-yellow);
-        }
-
-        .section-nav a.nav-donate {
-            background: var(--road-yellow);
-            font-weight: 600;
-            padding: 0.15rem 0.7rem;
-            border: 1px solid var(--ink);
-            box-shadow: 2px 2px 0 var(--ink);
-            transition: box-shadow 0.15s ease, transform 0.15s ease;
-        }
-
-        .section-nav a.nav-donate:hover {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0 var(--ink);
-            border-bottom-color: var(--ink);
-        }
-
-        /* ---------- Lead art ---------- */
-        .lead-art {
-            margin: 0;
-        }
-
-        .lead-art img {
-            display: block;
-            width: 100%;
-            height: clamp(240px, 42vw, 460px);
-            object-fit: cover;
-        }
-
-        /* ---------- Demo bar ---------- */
-        .demo-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 0.6rem 1rem;
-            background: var(--ink);
-            color: var(--paper);
-            text-decoration: none;
-            padding: 0.85rem 1.25rem;
-        }
-
-        .demo-bar .chip {
-            font-family: var(--mono);
-            font-size: 0.68rem;
-            font-weight: 600;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            background: var(--road-yellow);
-            color: var(--ink);
-            padding: 0.18rem 0.6rem;
-        }
-
-        .demo-bar .demo-line {
-            font-family: var(--serif);
-            font-size: 1.15rem;
-            font-weight: 450;
-        }
-
-        .demo-bar .demo-arrow {
-            transition: transform 0.2s ease;
-            display: inline-block;
-        }
-
-        .demo-bar:hover .demo-arrow {
-            transform: translateX(5px);
-        }
-
-        /* ---------- Sections ---------- */
-        .container {
-            max-width: 1080px;
-            margin: 0 auto;
-            padding: 2.25rem 1.25rem 0.5rem;
-        }
-
-        section.story {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 1.25rem 3rem;
-            border-top: 3px solid var(--ink);
-            padding-top: 0.85rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .kicker {
-            font-family: var(--mono);
-            font-size: 0.74rem;
-            font-weight: 600;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--sienna-deep);
-        }
-
-        .story h2 {
-            font-family: var(--serif);
-            font-optical-sizing: auto;
-            font-size: clamp(1.7rem, 3.4vw, 2.4rem);
-            font-weight: 450;
-            line-height: 1.15;
-            letter-spacing: -0.01em;
-            margin-bottom: 1.1rem;
-            text-wrap: balance;
-        }
-
-        .story p {
-            font-size: 1.06rem;
-            max-width: 62ch;
-            margin-bottom: 1rem;
-        }
-
-        .story p:last-child {
-            margin-bottom: 0;
-        }
-
-        p.drop::first-letter {
-            font-family: var(--serif);
-            font-weight: 500;
-            font-size: 3.4em;
-            float: left;
-            line-height: 0.82;
-            padding: 0.08em 0.12em 0 0;
-            color: var(--sienna);
-        }
-
-        .story a:not(.btn) {
-            color: var(--lane-green);
-            font-weight: 600;
-            text-decoration: none;
-            border-bottom: 2px solid rgba(63, 122, 56, 0.35);
-        }
-
-        .story a:not(.btn):hover {
-            border-bottom-color: var(--road-yellow);
-            background: rgba(242, 194, 48, 0.25);
-        }
-
-        /* Demo card */
-        .demo-card {
-            border: 1px solid var(--ink);
-            border-left: 6px solid var(--lane-green);
-            background: var(--paper-deep);
-            padding: 1.5rem 1.75rem;
-            box-shadow: 4px 4px 0 rgba(35, 26, 15, 0.14);
-        }
-
-        .demo-card p {
-            max-width: none;
-        }
-
-        .btn {
-            display: inline-block;
-            font-family: var(--mono);
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            text-decoration: none;
-            padding: 0.7rem 1.3rem;
-            border: 1px solid var(--ink);
-            transition: box-shadow 0.15s ease, transform 0.15s ease;
-        }
-
-        .btn-primary {
-            background: var(--sienna);
-            color: #fff;
-            box-shadow: 3px 3px 0 var(--ink);
-            margin-top: 0.75rem;
-        }
-
-        .btn-primary:hover {
-            transform: translate(1px, 1px);
-            box-shadow: 2px 2px 0 var(--ink);
-        }
-
-        /* Newsletter */
-        .post-card {
-            border: 1px solid var(--ink);
-            border-left: 6px solid var(--sienna);
-            background: var(--paper-deep);
-            padding: 1.25rem 1.5rem;
-            box-shadow: 4px 4px 0 rgba(35, 26, 15, 0.14);
-        }
-
-        .post-card .dateline {
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--sienna-deep);
-        }
-
-        .post-card h3 {
-            font-family: var(--serif);
-            font-size: clamp(1.25rem, 2.6vw, 1.6rem);
-            font-weight: 500;
-            line-height: 1.2;
-            margin: 0.25rem 0 0.4rem;
-            text-wrap: balance;
-        }
-
-        .story .post-card h3 a:not(.btn) {
-            color: var(--ink);
-            border-bottom: 2px solid rgba(168, 107, 60, 0.45);
-        }
-
-        .story .post-card h3 a:not(.btn):hover {
-            border-bottom-color: var(--road-yellow);
-        }
-
-        .post-card p {
-            max-width: none;
-            color: var(--ink-soft);
-        }
-
-        .archive-line {
-            font-family: var(--mono);
-            font-size: 0.74rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-top: 0.9rem;
-        }
-
-        /* People */
-        .people-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .person {
-            border-top: 1px solid var(--hairline);
-            padding-top: 0.9rem;
-        }
-
-        .person h3 {
-            font-family: var(--serif);
-            font-size: 1.3rem;
-            font-weight: 500;
-        }
-
-        .person .role {
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--sienna-deep);
-            margin: 0.2rem 0 0.6rem;
-        }
-
-        .person p {
-            font-size: 0.98rem;
-            color: var(--ink-soft);
-        }
-
-        .contact-note {
-            font-size: 1rem;
-            border-top: 1px solid var(--hairline);
-            padding-top: 1rem;
-        }
-
-        /* Funding note */
-        .funding-note {
-            text-align: center;
-            max-width: 620px;
-            margin: 0 auto 2.5rem;
-            padding: 0 1.25rem;
-        }
-
-        .funding-note p {
-            font-family: var(--serif);
-            font-style: italic;
-            font-size: 1.05rem;
-            color: var(--ink-soft);
-        }
-
-        .funding-note strong {
-            color: var(--ink);
-            font-weight: 550;
-        }
-
-        /* ---------- Gallery ---------- */
-        .gallery {
-            background: var(--paper-deep);
-            border-top: 1px solid var(--hairline);
-            padding: 2rem 0 2.5rem;
-        }
-
-        .gallery-inner {
-            max-width: 1080px;
-            margin: 0 auto;
-            padding: 0 1.25rem;
-        }
-
-        .gallery-head {
-            border-top: 3px solid var(--ink);
-            padding-top: 0.85rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .gallery-head h2 {
-            font-family: var(--serif);
-            font-size: clamp(1.7rem, 3.4vw, 2.4rem);
-            font-weight: 450;
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.25rem;
-        }
-
-        .gallery-grid figure {
-            margin: 0;
-        }
-
-        .gallery-grid img {
-            width: 100%;
-            height: 240px;
-            object-fit: cover;
-            display: block;
-            border: 1px solid var(--ink);
-            filter: saturate(0.92);
-            transition: filter 0.25s ease;
-        }
-
-        .gallery-grid figure:hover img {
-            filter: saturate(1.1);
-        }
-
-        .gallery-grid figcaption {
-            font-family: var(--mono);
-            font-size: 0.68rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--ink-soft);
-            padding-top: 0.4rem;
-        }
-
-        /* ---------- Footer ---------- */
-        footer {
-            background: var(--ink);
-            color: var(--paper);
-            padding: 2rem 1.25rem 1.5rem;
-        }
-
-        .footer-inner {
-            max-width: 1080px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 2rem;
-        }
-
-        .footer-inner .wordmark {
-            font-family: var(--serif);
-            font-size: 1.6rem;
-            font-weight: 450;
-        }
-
-        .footer-inner .foot-tag {
-            font-size: 0.9rem;
-            color: rgba(250, 243, 229, 0.65);
-            max-width: 34ch;
-            margin-top: 0.4rem;
-        }
-
-        .foot-head {
-            font-family: var(--mono);
-            font-size: 0.68rem;
-            font-weight: 600;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--road-yellow);
-            margin-bottom: 0.6rem;
-        }
-
-        footer a {
-            color: var(--paper);
-            text-decoration: none;
-            border-bottom: 1px solid rgba(250, 243, 229, 0.35);
-        }
-
-        footer a:hover {
-            border-bottom-color: var(--road-yellow);
-        }
-
-        footer li {
-            list-style: none;
-            font-size: 0.92rem;
-            margin-bottom: 0.4rem;
-        }
-
-        .copyright {
-            max-width: 1080px;
-            margin: 1.75rem auto 0;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(250, 243, 229, 0.2);
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: rgba(250, 243, 229, 0.55);
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        /* ---------- Responsive ---------- */
-        @media (max-width: 900px) {
-            .gallery-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .footer-inner {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 880px) {
-            section.story {
-                grid-template-columns: 1fr;
-                gap: 0.9rem;
-            }
-        }
-
-        @media (max-width: 620px) {
-            .people-grid {
-                grid-template-columns: 1fr;
-                gap: 1.25rem;
-            }
-        }
-
-        @media (max-width: 540px) {
-            .gallery-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .footer-inner {
-                grid-template-columns: 1fr;
-            }
-
-            .masthead-lockup {
-                gap: 0.8rem;
-            }
-
-            .masthead .logo {
-                width: 52px;
-            }
-
-            .demo-bar .demo-line {
-                font-size: 1.02rem;
-                text-align: center;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
-            }
-
-            *, *::before, *::after {
-                transition: none !important;
-            }
-        }
-    </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <!-- City Edit's two-line tile logo (assets/logos/city-edit-2line.svg, made by make_city_edit_2line.py),
+         drawn once here and reused wherever the demo is mentioned; it takes the colour of the text around it. -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <symbol id="ce-logo" viewBox="0 0 442 214">
+<rect x="2.75" y="2.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
+<path d="M50.60714285714286 75.78571428571429Q44.964285714285715 75.78571428571429 40.42857142857143 72.78571428571429Q35.892857142857146 69.78571428571429 33.214285714285715 64.03571428571429Q30.535714285714285 58.28571428571429 30.535714285714285 50.0Q30.535714285714285 41.714285714285715 33.214285714285715 35.964285714285715Q35.892857142857146 30.214285714285715 40.42857142857143 27.214285714285715Q44.964285714285715 24.214285714285715 50.60714285714286 24.214285714285715Q55.10714285714286 24.214285714285715 58.964285714285715 26.214285714285715Q62.82142857142857 28.214285714285715 65.57142857142857 32.03571428571429Q68.32142857142857 35.85714285714286 69.46428571428572 41.35714285714286L58.67857142857143 44.142857142857146Q58.035714285714285 39.642857142857146 55.85714285714286 37.392857142857146Q53.67857142857143 35.142857142857146 50.964285714285715 35.142857142857146Q48.67857142857143 35.142857142857146 46.85714285714286 36.642857142857146Q45.035714285714285 38.142857142857146 43.96428571428571 41.392857142857146Q42.89285714285714 44.642857142857146 42.89285714285714 50.0Q42.89285714285714 55.28571428571429 43.96428571428571 58.57142857142858Q45.035714285714285 61.85714285714286 46.85714285714286 63.35714285714286Q48.67857142857143 64.85714285714286 50.964285714285715 64.85714285714286Q53.67857142857143 64.85714285714286 55.85714285714286 62.60714285714286Q58.035714285714285 60.35714285714286 58.67857142857143 55.85714285714286L69.46428571428572 58.64285714285714Q68.32142857142857 64.07142857142857 65.57142857142857 67.92857142857143Q62.82142857142857 71.78571428571429 58.964285714285715 73.78571428571429Q55.10714285714286 75.78571428571429 50.60714285714286 75.78571428571429Z" fill="currentColor"/>
+<rect x="116.75" y="2.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
+<path d="M145.71428571428572 75.0V64.71428571428572H157.85714285714286V35.285714285714285H145.71428571428572V25.0H182.2857142857143V35.285714285714285H170.14285714285717V64.71428571428572H182.2857142857143V75.0Z" fill="currentColor"/>
+<rect x="230.75" y="2.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
+<path d="M271.85714285714283 75.0V35.285714285714285H257.57142857142856V25.0H298.4285714285714V35.285714285714285H284.1428571428571V75.0Z" fill="currentColor"/>
+<rect x="344.75" y="2.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
+<path d="M385.85714285714283 75.0V54.5L370.2142857142857 25.0H383.2857142857143L392.35714285714283 43.0L401.5 25.0H413.7857142857143L398.1428571428571 54.5V75.0Z" fill="currentColor"/>
+<rect x="2.75" y="116.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
+<path d="M32.57142857142857 189.0V139.0H67.14285714285714V149.28571428571428H44.857142857142854V158.78571428571428H58.92857142857143V168.78571428571428H44.857142857142854V178.71428571428572H67.42857142857142V189.0Z" fill="currentColor"/>
+<rect x="116.75" y="116.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
+<path d="M157.57142857142856 178.71428571428572H160.2142857142857Q163.07142857142856 178.71428571428572 165.35714285714283 177.07142857142856Q167.6428571428571 175.42857142857142 168.99999999999997 172.17857142857144Q170.35714285714283 168.92857142857144 170.35714285714283 164.0Q170.35714285714283 159.07142857142858 168.99999999999997 155.82142857142858Q167.6428571428571 152.57142857142858 165.35714285714283 150.92857142857144Q163.07142857142856 149.28571428571428 160.2142857142857 149.28571428571428H157.57142857142856ZM145.28571428571428 189.0V139.0H161.1428571428571Q167.2142857142857 139.0 172.07142857142856 141.96428571428572Q176.92857142857142 144.92857142857144 179.82142857142856 150.53571428571428Q182.7142857142857 156.14285714285714 182.7142857142857 164.0Q182.7142857142857 171.85714285714286 179.82142857142856 177.46428571428572Q176.92857142857142 183.07142857142858 172.07142857142856 186.03571428571428Q167.2142857142857 189.0 161.1428571428571 189.0Z" fill="currentColor"/>
+<rect x="230.75" y="116.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
+<path d="M259.7142857142857 189.0V178.71428571428572H271.85714285714283V149.28571428571428H259.7142857142857V139.0H296.2857142857143V149.28571428571428H284.1428571428571V178.71428571428572H296.2857142857143V189.0Z" fill="currentColor"/>
+<rect x="344.75" y="116.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
+<path d="M385.85714285714283 189.0V149.28571428571428H371.57142857142856V139.0H412.4285714285714V149.28571428571428H398.1428571428571V189.0Z" fill="currentColor"/>
+        </symbol>
+    </svg>
+
     <header class="masthead">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Dark mode" title="Dark mode">
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
+        </button>
         <div class="masthead-lockup">
             <img src="logo_header.png" alt="Spherical Harmonics logo: a carved wooden sphere with a brass harmonica at its equator" class="logo">
             <h1>Spherical Harmonics</h1>
@@ -613,116 +77,176 @@
         <a href="#newsletter">Newsletter</a>
         <a href="#people">People</a>
         <a href="#gallery">Gallery</a>
+        <a href="shop/">Shop</a>
         <a href="mailto:brook@sphericalharmonics.org">Contact</a>
         <a class="nav-donate" href="https://donorbox.org/support-spherical-harmonics">Donate</a>
     </nav>
 
     <figure class="lead-art">
-        <img src="banner.png" alt="A redesigned city street with a protected green bike lane, wide planted sidewalk, and outdoor seating beside a wide arterial road">
+        <!-- Banner: assets/banner/massing/ (three.js massing model with City Edit's tree and street-furniture models, rendered in headless Chrome, then print.py's halftone; see its README). Previous: banner-e2-persp-*, banner-d-street-*, banner.png. -->
+        <picture class="art-light">
+            <source srcset="assets/banner/banner-e3-print-light.webp" type="image/webp">
+            <img src="assets/banner/banner-e3-print-light.png" width="3000" height="1200" alt="A city street as a clay model printed in newspaper halftone dots, rebuilt from left to right: in grey, four lanes of stalled traffic and parked cars; then crews, cones and a green bike lane being laid; then, in colour, a protected bike lane with cyclists, street trees, bike racks, café tables on a widened sidewalk, a raised crosswalk, and a bus at its shelter in a red bus lane.">
+        </picture>
+        <picture class="art-dark">
+            <source srcset="assets/banner/banner-e3-print-dark.webp" type="image/webp">
+            <img src="assets/banner/banner-e3-print-dark.png" width="3000" height="1200" alt="The same street at night, printed in light halftone dots on dark paper: on the grey left, white-lit windows and the white head and tail lights of stalled traffic; on the coloured right, warm-lit windows and cafés, street trees, a protected bike lane, and a lit bus at its shelter in a red bus lane." loading="lazy">
+        </picture>
     </figure>
 
-    <a class="demo-bar" href="https://demo.cityedit.org/">
-        <span class="chip">Live demo</span>
-        <span class="demo-line">City Edit &mdash; draw the street you want to see <span class="demo-arrow">&rarr;</span></span>
-    </a>
+    <aside class="demo-bar" aria-label="City Edit demo">
+        <p class="demo-copy">
+            <svg class="ce-logo demo-logo" role="img" aria-label="City Edit"><use href="#ce-logo"/></svg>
+            <span class="demo-line">Propose a change to your block. Vote on your neighbors&rsquo; proposals.</span>
+        </p>
+        <a class="demo-button" href="https://demo.cityedit.org/">Demo</a>
+    </aside>
 
-    <main class="container">
-        <section class="story" id="mission">
-            <div class="kicker">Mission</div>
-            <div class="section-body">
-                <h2>Streets, redesigned by the people who use them</h2>
-                <p class="drop">
-                    Communities know their streets need change but have no way to independently create the technical maps that city planners need to move projects forward.
-                </p>
-                <p>
-                    We're developing a free and open-source platform where community members can propose and vote on bike lane, sidewalk, roadway, parking, and greenway improvements following NYC Street Design Manual guidelines.
-                </p>
-                <p>
-                    Each proposal generates downloadable design drawings and maps from community-driven input that anyone can submit to DOT, share with community boards, or use for local organizing.
-                </p>
+    <main class="container" id="main">
+        <!-- The one block that is always open: who funds and works with us.
+             Labels state the relationship exactly as it stands; do not upgrade
+             "invited" to "funded" or "participant" to "partner". Sources: assets/logos/SOURCES.md -->
+        <section class="credits" aria-labelledby="credits-head">
+            <div class="credits-head">
+                <h2 class="kicker" id="credits-head">Funders &amp; affiliations</h2>
             </div>
+            <ul class="logo-row">
+                <li>
+                    <a href="https://brown.columbia.edu/" aria-label="Brown Institute for Media Innovation, Magic Grant funder">
+                        <span class="mark"><img src="assets/logos/brown-institute.png" alt="The Brown Institute for Media Innovation" width="520" height="141"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://treefund.org/" aria-label="TREE Fund, invited to full proposal, 2026">
+                        <span class="mark"><img src="assets/logos/tree-fund.png" alt="TREE Fund" width="399" height="122"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.citycamp.nyc/" aria-label="CityCamp NYC 2026, session selected for the unconference">
+                        <span class="mark"><img src="assets/logos/city-camp-nyc.png" alt="CityCamp NYC" width="1177" height="184"></span>
+                    </a>
+                </li>
+                <!-- TODO(Eric): City of Sacramento — no relationship on record yet. Uncomment with the right label once confirmed.
+                <li>
+                    <a href="https://www.cityofsacramento.gov/">
+                        <span class="mark"><img src="assets/logos/city-of-sacramento.png" alt="City of Sacramento" width="300" height="73"></span>
+                    </a>
+                </li>
+                -->
+            </ul>
         </section>
 
-        <section class="story" id="demo">
-            <div class="kicker">Demo</div>
-            <div class="section-body">
-                <h2>City Edit: local knowledge, drawn to scale</h2>
-                <div class="demo-card">
-                    <p>
-                        <a href="https://demo.cityedit.org/">City Edit</a> is our interactive demo for community-driven street redesign. It lets users draw proposed infrastructure changes directly onto a map, placing bike lanes, sidewalks, greenways, and other streetscape elements on real city streets. Community members can sketch out the changes they want to see in their neighborhoods, vote on proposals from others, and generate shareable design maps that follow established urban planning guidelines. The tool turns local knowledge about where people actually walk, bike, and need safer infrastructure into the kind of technical visual proposals that city agencies can act on.
+        <div class="toolbar">
+            <span class="kicker">Contents</span>
+            <button type="button" id="toggle-all" aria-controls="sections">Expand all</button>
+        </div>
+
+        <div id="sections">
+            <details class="sec" id="mission">
+                <summary><span class="num">&sect;1</span><h2><span class="title">Mission</span> <span class="gist">Streets, redesigned by the people who use them</span></h2></summary>
+                <div class="sec-body">
+                    <p class="drop">
+                        Communities know their streets need change but have no way to independently create the technical maps that city planners need to move projects forward.
                     </p>
-                    <a href="https://demo.cityedit.org/" class="btn btn-primary">Open the demo &rarr;</a>
+                    <p>
+                        We're developing a free and open-source platform where community members can propose and vote on bike lane, sidewalk, roadway, parking, and greenway improvements following NYC Street Design Manual guidelines.
+                    </p>
+                    <p>
+                        Each proposal generates downloadable design drawings and maps from community-driven input that anyone can submit to DOT, share with community boards, or use for local organizing.
+                    </p>
                 </div>
-            </div>
-        </section>
+            </details>
 
-        <section class="story" id="newsletter">
-            <div class="kicker">Newsletter</div>
-            <div class="section-body">
-                <h2>Dispatches from the street</h2>
-                <p>
-                    We write about what we're building, what we're learning from neighbors, and what happens when you hand people the tools to redraw their own block. Read it on <a href="https://sphericalharmonics.substack.com/">Substack</a>.
-                </p>
-                <!-- LATEST-POST:START -->
+            <details class="sec" id="demo">
+                <summary><span class="num">&sect;2</span><h2><span class="title">Demo</span> <span class="gist">City Edit: local knowledge, drawn to scale</span></h2></summary>
+                <div class="sec-body">
+                    <div class="demo-card">
+                        <a class="demo-card-logo" href="https://demo.cityedit.org/"><svg class="ce-logo" role="img" aria-label="City Edit"><use href="#ce-logo"/></svg></a>
+                        <p>
+                            <a href="https://demo.cityedit.org/">City Edit</a> is our interactive demo for community-driven street redesign. It lets users draw proposed infrastructure changes directly onto a map, placing bike lanes, sidewalks, greenways, and other streetscape elements on real city streets. Community members can sketch out the changes they want to see in their neighborhoods, vote on proposals from others, and generate shareable design maps that follow established urban planning guidelines. The tool turns local knowledge about where people actually walk, bike, and need safer infrastructure into the kind of technical visual proposals that city agencies can act on.
+                        </p>
+                        <a href="https://demo.cityedit.org/" class="btn btn-primary">Open City Edit</a>
+                    </div>
+                </div>
+            </details>
+
+            <details class="sec" id="newsletter">
+                <summary><span class="num">&sect;3</span><h2><span class="title">Newsletter</span> <span class="gist">Dispatches from the street</span></h2></summary>
+                <div class="sec-body">
+                    <p>
+                        We write about what we're building, what we're learning from neighbors, and what happens when you hand people the tools to redraw their own block. Read it on <a href="https://sphericalharmonics.substack.com/">Substack</a>.
+                    </p>
+                    <!-- LATEST-POST:START -->
                 <div class="post-card">
                     <p class="dateline">Latest post &middot; September 24, 2026</p>
                     <h3><a href="https://blog.sphericalharmonics.org/p/you-can-just-clean-your-streets">You Can Just Clean Your Streets</a></h3>
                     <p>Bushwick voted trash its biggest problem, so we picked up 65 pounds of it.</p>
                 </div>
                 <!-- LATEST-POST:END -->
-                <p class="archive-line">
-                    <a href="https://sphericalharmonics.substack.com/archive">All posts</a> &middot; <a href="https://sphericalharmonics.substack.com/subscribe">Subscribe</a>
-                </p>
-            </div>
-        </section>
+                    <p class="archive-line">
+                        <a href="https://sphericalharmonics.substack.com/archive">All posts</a> &middot; <a href="https://sphericalharmonics.substack.com/subscribe">Subscribe</a>
+                    </p>
+                </div>
+            </details>
 
-        <section class="story" id="people">
-            <div class="kicker">People</div>
-            <div class="section-body">
-                <h2>Who we are</h2>
-                <div class="people-grid">
-                    <div class="person">
-                        <h3>Eric Bolton</h3>
-                        <p class="role">Software Engineering</p>
-                        <p>Software engineer specializing in data visualization, collaborative platforms, and community consensus tools.</p>
+            <details class="sec" id="people">
+                <summary><span class="num">&sect;4</span><h2><span class="title">People</span> <span class="gist">Who we are</span></h2></summary>
+                <div class="sec-body">
+                    <div class="people-grid">
+                        <div class="person">
+                            <h3>Eric Bolton</h3>
+                            <p class="role">Software Engineering</p>
+                            <p>Software engineer specializing in data visualization, collaborative platforms, and community consensus tools.</p>
+                        </div>
+                        <div class="person">
+                            <h3>Brook Constantz</h3>
+                            <p class="role">Urban Ecology</p>
+                            <p>Urban ecologist with a background in forest restoration, geographic information systems, and green infrastructure.</p>
+                        </div>
                     </div>
-                    <div class="person">
-                        <h3>Brook Constantz</h3>
-                        <p class="role">Urban Ecology</p>
-                        <p>Urban ecologist with a background in forest restoration, geographic information systems, and green infrastructure.</p>
+                    <p class="contact-note aside">
+                        <strong>Contact us:</strong> <a href="mailto:brook@sphericalharmonics.org">brook@sphericalharmonics.org</a> &middot; <a href="mailto:eric@sphericalharmonics.org">eric@sphericalharmonics.org</a>
+                    </p>
+                </div>
+            </details>
+
+            <details class="sec" id="acknowledgements">
+                <summary><span class="num">&sect;5</span><h2><span class="title">Acknowledgements</span> <span class="gist">Funding and affiliations</span></h2></summary>
+                <div class="sec-body">
+                    <div class="funding-note">
+                        <p>
+                            This project is funded by a <strong>Magic Grant</strong> from the <strong>Brown Institute for Media Innovation</strong>, a joint initiative of Stanford Engineering and Columbia Journalism School.
+                        </p>
+                    </div>
+                    <ul class="relations">
+                        <li><span class="relation">Funded by</span><span>Brown Institute for Media Innovation &mdash; Magic Grant, for the Desire Path Mapper.</span></li>
+                        <li><span class="relation">Invited to full proposal</span><span>TREE Fund &mdash; letter of inquiry approved, September 2026.</span></li>
+                        <li><span class="relation">Session selected</span><span>CityCamp NYC 2026, Hunter College &mdash; our session was voted for by attendees and selected for the unconference.</span></li>
+                        <!-- TODO(Eric): confirm before showing.
+                        <li><span class="relation">In conversation</span><span>In conversation with NYC DOT.</span></li>
+                        -->
+                    </ul>
+                </div>
+            </details>
+
+            <details class="sec" id="gallery">
+                <summary><span class="num">&sect;6</span><h2><span class="title">Gallery</span> <span class="gist">Figures 1&ndash;9, from the field</span></h2></summary>
+                <div class="sec-body wide">
+                    <div class="gallery-grid">
+                        <figure><img src="IMG_2981 2.jpg" alt="Project field photo 1" loading="lazy"><figcaption>Fig. 01</figcaption></figure>
+                        <figure><img src="IMG_2987 2.jpg" alt="Project field photo 2" loading="lazy"><figcaption>Fig. 02</figcaption></figure>
+                        <figure><img src="IMG_2990 2.jpg" alt="Project field photo 3" loading="lazy"><figcaption>Fig. 03</figcaption></figure>
+                        <figure><img src="IMG_2992 2.jpg" alt="Project field photo 4" loading="lazy"><figcaption>Fig. 04</figcaption></figure>
+                        <figure><img src="IMG_3002 2.jpg" alt="Project field photo 5" loading="lazy"><figcaption>Fig. 05</figcaption></figure>
+                        <figure><img src="IMG_3019 2.jpg" alt="Project field photo 6" loading="lazy"><figcaption>Fig. 06</figcaption></figure>
+                        <figure><img src="IMG_3025 2.jpg" alt="Project field photo 7" loading="lazy"><figcaption>Fig. 07</figcaption></figure>
+                        <figure><img src="IMG_3036 2.jpg" alt="Project field photo 8" loading="lazy"><figcaption>Fig. 08</figcaption></figure>
+                        <figure><img src="IMG_3071 2.jpg" alt="Project field photo 9" loading="lazy"><figcaption>Fig. 09</figcaption></figure>
                     </div>
                 </div>
-                <p class="contact-note">
-                    <strong>Contact us:</strong> <a href="mailto:brook@sphericalharmonics.org">brook@sphericalharmonics.org</a> &middot; <a href="mailto:eric@sphericalharmonics.org">eric@sphericalharmonics.org</a>
-                </p>
-            </div>
-        </section>
-    </main>
-
-    <div class="funding-note">
-        <p>
-            This project is funded by a <strong>Magic Grant</strong> from the <strong>Brown Institute for Media Innovation</strong>, a joint initiative of Stanford Engineering and Columbia Journalism School.
-        </p>
-    </div>
-
-    <div class="gallery" id="gallery">
-        <div class="gallery-inner">
-            <div class="gallery-head">
-                <h2>Gallery</h2>
-            </div>
-            <div class="gallery-grid">
-                <figure><img src="IMG_2981 2.jpg" alt="Project field photo 1" loading="lazy"><figcaption>Fig. 01</figcaption></figure>
-                <figure><img src="IMG_2987 2.jpg" alt="Project field photo 2" loading="lazy"><figcaption>Fig. 02</figcaption></figure>
-                <figure><img src="IMG_2990 2.jpg" alt="Project field photo 3" loading="lazy"><figcaption>Fig. 03</figcaption></figure>
-                <figure><img src="IMG_2992 2.jpg" alt="Project field photo 4" loading="lazy"><figcaption>Fig. 04</figcaption></figure>
-                <figure><img src="IMG_3002 2.jpg" alt="Project field photo 5" loading="lazy"><figcaption>Fig. 05</figcaption></figure>
-                <figure><img src="IMG_3019 2.jpg" alt="Project field photo 6" loading="lazy"><figcaption>Fig. 06</figcaption></figure>
-                <figure><img src="IMG_3025 2.jpg" alt="Project field photo 7" loading="lazy"><figcaption>Fig. 07</figcaption></figure>
-                <figure><img src="IMG_3036 2.jpg" alt="Project field photo 8" loading="lazy"><figcaption>Fig. 08</figcaption></figure>
-                <figure><img src="IMG_3071 2.jpg" alt="Project field photo 9" loading="lazy"><figcaption>Fig. 09</figcaption></figure>
-            </div>
+            </details>
         </div>
-    </div>
+    </main>
 
     <footer>
         <div class="footer-inner">
@@ -733,8 +257,9 @@
             <div>
                 <div class="foot-head">Get Involved</div>
                 <ul>
-                    <li><a href="https://demo.cityedit.org/">City Edit demo</a></li>
+                    <li><a class="foot-demo" href="https://demo.cityedit.org/"><svg class="ce-logo foot-logo" aria-hidden="true" focusable="false"><use href="#ce-logo"/></svg>City Edit demo</a></li>
                     <li><a href="https://sphericalharmonics.substack.com/">Newsletter</a></li>
+                    <li><a href="shop/">Shop</a></li>
                     <li><a href="https://donorbox.org/support-spherical-harmonics">Donate</a></li>
                 </ul>
             </div>
@@ -752,5 +277,70 @@
         </div>
     </footer>
 
+    <script>
+        // Theme toggle, top right. Light unless the reader picks dark.
+        (function () {
+            var root = document.documentElement;
+            var button = document.getElementById('theme-toggle');
+            function apply(theme) {
+                root.dataset.theme = theme;
+                var dark = theme === 'dark';
+                button.setAttribute('aria-pressed', dark ? 'true' : 'false');
+                button.setAttribute('aria-label', dark ? 'Light mode' : 'Dark mode');
+                button.title = dark ? 'Light mode' : 'Dark mode';
+                document.querySelector('meta[name="theme-color"]').content = dark ? '#18130d' : '#faf3e5';
+                document.querySelector('meta[name="color-scheme"]').content = dark ? 'dark' : 'light';
+            }
+            apply(root.dataset.theme === 'dark' ? 'dark' : 'light');
+            button.addEventListener('click', function () {
+                var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+                apply(next);
+                try { localStorage.setItem('sh-theme', next); } catch (e) {}
+            });
+        })();
+    </script>
+    <script>
+        // Sections are closed by default; a #hash opens the section it names
+        // (or the section containing that element) and scrolls to it.
+        (function () {
+            var sections = Array.prototype.slice.call(document.querySelectorAll('details.sec'));
+            var toggle = document.getElementById('toggle-all');
+
+            function syncToggle() {
+                var allOpen = sections.every(function (d) { return d.open; });
+                toggle.textContent = allOpen ? 'Collapse all' : 'Expand all';
+            }
+
+            function openFromHash() {
+                var id = decodeURIComponent(location.hash.slice(1));
+                var target = id && document.getElementById(id);
+                var sec = target && target.closest('details.sec');
+                if (!sec) return;
+                sec.open = true;
+                target.scrollIntoView();
+            }
+
+            toggle.addEventListener('click', function () {
+                var open = !sections.every(function (d) { return d.open; });
+                sections.forEach(function (d) { d.open = open; });
+            });
+
+            sections.forEach(function (d) {
+                d.addEventListener('toggle', syncToggle);
+            });
+
+            // A link to the hash already in the URL fires no hashchange, so open on click too.
+            document.addEventListener('click', function (e) {
+                var a = e.target.closest('a[href^="#"]');
+                var target = a && document.getElementById(a.getAttribute('href').slice(1));
+                var sec = target && target.closest('details.sec');
+                if (sec) sec.open = true;
+            });
+
+            window.addEventListener('hashchange', openFromHash);
+            openFromHash();
+            syncToggle();
+        })();
+    </script>
 </body>
 </html>

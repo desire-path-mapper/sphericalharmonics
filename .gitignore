@@ -1,3 +1,12 @@
 *.HEIC
 *.heic
 .DS_Store
+
+# Working content managed by actogon's goal skills. This repo's root is served at
+# sphericalharmonics.org, so drafts and raw vlog media must never be committed.
+drafts/
+vlog/
+
+# Compatibility symlinks (2026-09-14): drafts/ and vlog/ now live in ../work/spherical-harmonics/
+drafts
+vlog
