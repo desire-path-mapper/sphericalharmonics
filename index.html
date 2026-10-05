@@ -6,7 +6,7 @@
     <title>Spherical Harmonics</title>
     <link rel="preload" href="assets/fonts/cmu-serif-500-roman.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/cmu-serif-700-roman.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="assets/site.css?v=20260930b">
+    <link rel="stylesheet" href="assets/site.css?v=20261004">
     <meta name="description" content="Spherical Harmonics is a New York civic-tech nonprofit. City Edit, our free open-source map, lets neighbors propose and vote on street changes — bike lanes, trees, plazas, safer crossings — block by block.">
     <meta name="theme-color" content="#faf3e5">
     <meta name="color-scheme" content="light">
@@ -46,7 +46,7 @@
     <!-- City Edit's two-line tile logo (assets/logos/city-edit-2line.svg, made by make_city_edit_2line.py),
          drawn once here and reused wherever the demo is mentioned; it takes the colour of the text around it. -->
     <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-        <symbol id="ce-logo" viewBox="0 0 442 214">
+        <symbol id="ce-logo" viewBox="-9 -9 460 232">
 <rect x="2.75" y="2.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
 <path d="M50.60714285714286 75.78571428571429Q44.964285714285715 75.78571428571429 40.42857142857143 72.78571428571429Q35.892857142857146 69.78571428571429 33.214285714285715 64.03571428571429Q30.535714285714285 58.28571428571429 30.535714285714285 50.0Q30.535714285714285 41.714285714285715 33.214285714285715 35.964285714285715Q35.892857142857146 30.214285714285715 40.42857142857143 27.214285714285715Q44.964285714285715 24.214285714285715 50.60714285714286 24.214285714285715Q55.10714285714286 24.214285714285715 58.964285714285715 26.214285714285715Q62.82142857142857 28.214285714285715 65.57142857142857 32.03571428571429Q68.32142857142857 35.85714285714286 69.46428571428572 41.35714285714286L58.67857142857143 44.142857142857146Q58.035714285714285 39.642857142857146 55.85714285714286 37.392857142857146Q53.67857142857143 35.142857142857146 50.964285714285715 35.142857142857146Q48.67857142857143 35.142857142857146 46.85714285714286 36.642857142857146Q45.035714285714285 38.142857142857146 43.96428571428571 41.392857142857146Q42.89285714285714 44.642857142857146 42.89285714285714 50.0Q42.89285714285714 55.28571428571429 43.96428571428571 58.57142857142858Q45.035714285714285 61.85714285714286 46.85714285714286 63.35714285714286Q48.67857142857143 64.85714285714286 50.964285714285715 64.85714285714286Q53.67857142857143 64.85714285714286 55.85714285714286 62.60714285714286Q58.035714285714285 60.35714285714286 58.67857142857143 55.85714285714286L69.46428571428572 58.64285714285714Q68.32142857142857 64.07142857142857 65.57142857142857 67.92857142857143Q62.82142857142857 71.78571428571429 58.964285714285715 73.78571428571429Q55.10714285714286 75.78571428571429 50.60714285714286 75.78571428571429Z" fill="currentColor"/>
 <rect x="116.75" y="2.75" width="94.50" height="94.50" fill="none" stroke="currentColor" stroke-width="5.5"/>
@@ -91,14 +91,14 @@
     </nav>
 
     <figure class="lead-art">
-        <!-- Banner: assets/banner/massing/ (three.js massing model with City Edit's tree and street-furniture models, rendered in headless Chrome, then print.py's halftone; see its README). Previous: banner-e2-persp-*, banner-d-street-*, banner.png. -->
+        <!-- Banner: assets/banner/massing/ (three.js massing model with City Edit's tree and street-furniture models, rendered in headless Chrome, then print.py's halftone; see its README). Previous: banner-e3-print-*, banner-e2-persp-*, banner-d-street-*, banner.png. -->
         <picture class="art-light">
-            <source srcset="assets/banner/banner-e3-print-light.webp" type="image/webp">
-            <img src="assets/banner/banner-e3-print-light.png" width="3000" height="1200" alt="A city street as a clay model printed in newspaper halftone dots, rebuilt from left to right: in grey, four lanes of stalled traffic and parked cars; then crews, cones and a green bike lane being laid; then, in colour, a protected bike lane with cyclists, street trees, bike racks, café tables on a widened sidewalk, a raised crosswalk, and a bus at its shelter in a red bus lane.">
+            <source srcset="assets/banner/banner-e4-print-light.webp" type="image/webp">
+            <img src="assets/banner/banner-e4-print-light.png" width="3000" height="1200" alt="A city street as a clay model printed in newspaper halftone dots, rebuilt from left to right: in grey, four lanes of stalled traffic and parked cars; then crews, cones and a green bike lane being laid; then, in colour, a protected bike lane with cyclists, street trees, bike racks, café tables on a widened sidewalk, a raised crosswalk, and a bus at its shelter in a red bus lane.">
         </picture>
         <picture class="art-dark">
-            <source srcset="assets/banner/banner-e3-print-dark.webp" type="image/webp">
-            <img src="assets/banner/banner-e3-print-dark.png" width="3000" height="1200" alt="The same street at night, printed in light halftone dots on dark paper: on the grey left, white-lit windows and the white head and tail lights of stalled traffic; on the coloured right, warm-lit windows and cafés, street trees, a protected bike lane, and a lit bus at its shelter in a red bus lane." loading="lazy">
+            <source srcset="assets/banner/banner-e4-print-dark.webp" type="image/webp">
+            <img src="assets/banner/banner-e4-print-dark.png" width="3000" height="1200" alt="The same street at night, printed in light halftone dots on dark paper: on the grey left, white-lit windows and the white head and tail lights of stalled traffic; on the coloured right, warm-lit windows and cafés, street trees, a protected bike lane, and a lit bus at its shelter in a red bus lane." loading="lazy">
         </picture>
     </figure>
 
@@ -125,8 +125,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="https://treefund.org/" aria-label="TREE Fund, invited to full proposal, 2026">
-                        <span class="mark"><img src="assets/logos/tree-fund.png" alt="TREE Fund" width="399" height="122"></span>
+                    <a href="https://forestforall.nyc/" aria-label="Forest for All NYC, coalition member">
+                        <span class="mark"><img src="assets/logos/forest-for-all-nyc-mono.png" alt="Forest for All NYC" width="371" height="372"></span>
                     </a>
                 </li>
                 <li>
@@ -228,7 +228,7 @@
                     </div>
                     <ul class="relations">
                         <li><span class="relation">Funded by</span><span>Brown Institute for Media Innovation &mdash; Magic Grant, for the Desire Path Mapper.</span></li>
-                        <li><span class="relation">Invited to full proposal</span><span>TREE Fund &mdash; letter of inquiry approved, September 2026.</span></li>
+                        <li><span class="relation">Coalition member</span><span>Forest for All NYC &mdash; the coalition working to protect and grow New York City&rsquo;s urban forest.</span></li>
                         <li><span class="relation">Session selected</span><span>CityCamp NYC 2026, Hunter College &mdash; our session was voted for by attendees and selected for the unconference.</span></li>
                         <!-- TODO(Eric): confirm before showing.
                         <li><span class="relation">In conversation</span><span>In conversation with NYC DOT.</span></li>

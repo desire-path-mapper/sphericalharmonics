@@ -321,7 +321,10 @@ a {
 }
 
 /* City Edit's two-line tile logo (an inline <symbol>, see index.html); it
-   draws in currentColor, so it follows the page ink in light and dark. */
+   draws in currentColor, so it follows the page ink in light and dark. Its
+   viewBox carries a 9-unit empty margin, so WebKit's whole-pixel clip can't
+   shave the outer strokes. Heights are the old ones x 232/214, which keeps the
+   tiles the same size. */
 .ce-logo {
     display: inline-block;
     color: var(--ink);
@@ -330,8 +333,8 @@ a {
 
 .demo-bar .demo-logo {
     width: auto;
-    height: 2.3rem;
-    aspect-ratio: 442 / 214;
+    height: 2.49rem;
+    aspect-ratio: 460 / 232;
     align-self: center;
 }
 
@@ -341,8 +344,8 @@ a {
 }
 
 .demo-card-logo .ce-logo {
-    height: 3rem;
-    aspect-ratio: 442 / 214;
+    height: 3.25rem;
+    aspect-ratio: 460 / 232;
 }
 
 .foot-demo {
@@ -352,8 +355,8 @@ a {
 }
 
 .foot-logo {
-    height: 1.65rem;
-    aspect-ratio: 442 / 214;
+    height: 1.79rem;
+    aspect-ratio: 460 / 232;
     color: currentColor;
 }
 
