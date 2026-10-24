@@ -1,0 +1,65 @@
+{
+ "origin": {
+  "lat": 40.81765,
+  "lon": -73.961037
+ },
+ "classes": [
+  "none",
+  "asphalt",
+  "concrete",
+  "grass",
+  "leaf-litter",
+  "water"
+ ],
+ "paletteStep": 40,
+ "rasters": [
+  {
+   "file": "surfaces.png",
+   "gzFile": "surfaces.png.gz",
+   "cellM": 0.5,
+   "width": 2206,
+   "height": 2817,
+   "bounds": [
+    -811.1447148399608,
+    -1079.4600760004078,
+    291.8552851600392,
+    329.03992399959236
+   ],
+   "shares": {
+    "none": 0.3006,
+    "asphalt": 0.1091,
+    "concrete": 0.064,
+    "grass": 0.0312,
+    "leaf-litter": 0.0878,
+    "water": 0.4073
+   }
+  },
+  {
+   "file": "surfaces-middle.png",
+   "gzFile": "surfaces-middle.png.gz",
+   "cellM": 1.0,
+   "width": 3223,
+   "height": 3443,
+   "bounds": [
+    -1921.0167772585216,
+    -2440.7944480000133,
+    1301.9832227414784,
+    1002.2055519999867
+   ],
+   "shares": {
+    "none": 0.6861,
+    "asphalt": 0.0449,
+    "concrete": 0.0301,
+    "grass": 0.0225,
+    "leaf-litter": 0.0408,
+    "water": 0.1755
+   }
+  }
+ ],
+ "sources": {
+  "asphalt, concrete": "NYC Planimetrics i36f-5ih7 (https://data.cityofnewyork.us/resource/i36f-5ih7.geojson); NYC Planimetrics 52n9-sdep (https://data.cityofnewyork.us/resource/52n9-sdep.geojson); NYC Planimetrics ees7-4ufv (https://data.cityofnewyork.us/resource/ees7-4ufv.geojson)",
+  "grass, leaf litter, water": "OpenStreetMap features in 10-fetch-the-ground/data/site.json",
+  "lidar": "NYC 2021 LiDAR classes 5 (high vegetation), 9 (water), 6 (building), from data/tiles/",
+  "river": "the flat water level of 10-fetch-the-ground's cleaned DEM"
+ }
+}
