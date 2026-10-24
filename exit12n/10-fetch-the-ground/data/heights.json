@@ -39,7 +39,6 @@
  "role": "inner",
  "regionFile": "region.json",
  "coarserFiles": [
-  "heights-middle.json",
-  "heights-context.json"
+  "heights-middle.json"
  ]
 }

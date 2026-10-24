@@ -30,6 +30,7 @@
   1611,
   1721
  ],
+ "orthoWebFile": "ortho-middle-web.jpg",
  "despiked": true,
  "sources": {
   "dem": "USGS 3DEP 1 m bare earth via 3DEPElevation ImageServer exportImage",

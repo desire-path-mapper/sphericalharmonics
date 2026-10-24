@@ -1,0 +1,1738 @@
+{
+ "origin": {
+  "lat": 40.81765,
+  "lon": -73.961037
+ },
+ "encoding": "delta",
+ "classes": [
+  "roadbed",
+  "median",
+  "sidewalk",
+  "footway",
+  "lawn",
+  "water",
+  "curb"
+ ],
+ "fields": [
+  "x",
+  "y",
+  "z",
+  "class"
+ ],
+ "vertexFile": "surfaces-ground.i16",
+ "indexFile": "surfaces-ground.u16",
+ "vertexCount": 1041652,
+ "triangleCount": 1154288,
+ "trianglesByClass": {
+  "roadbed": 384470,
+  "median": 15942,
+  "sidewalk": 294678,
+  "footway": 21018,
+  "lawn": 158796,
+  "water": 62348,
+  "curb": 217036
+ },
+ "tiles": [
+  {
+   "origin": [
+    -1839.87,
+    -2032.21,
+    -0.58
+   ],
+   "vertexOffset": 0,
+   "vertexCount": 80,
+   "indexOffset": 0,
+   "indexCount": 363
+  },
+  {
+   "origin": [
+    -1836.58,
+    -1933.78,
+    -0.58
+   ],
+   "vertexOffset": 80,
+   "vertexCount": 116,
+   "indexOffset": 363,
+   "indexCount": 531
+  },
+  {
+   "origin": [
+    -1700.0,
+    -2087.64,
+    -0.58
+   ],
+   "vertexOffset": 196,
+   "vertexCount": 442,
+   "indexOffset": 894,
+   "indexCount": 2364
+  },
+  {
+   "origin": [
+    -1700.0,
+    -1900.0,
+    -0.58
+   ],
+   "vertexOffset": 638,
+   "vertexCount": 663,
+   "indexOffset": 3258,
+   "indexCount": 3669
+  },
+  {
+   "origin": [
+    -1681.34,
+    -1700.0,
+    -0.58
+   ],
+   "vertexOffset": 1301,
+   "vertexCount": 403,
+   "indexOffset": 6927,
+   "indexCount": 2136
+  },
+  {
+   "origin": [
+    -1626.1,
+    -1552.76,
+    -0.58
+   ],
+   "vertexOffset": 1704,
+   "vertexCount": 66,
+   "indexOffset": 9063,
+   "indexCount": 279
+  },
+  {
+   "origin": [
+    -1477.69,
+    -2243.06,
+    -0.58
+   ],
+   "vertexOffset": 1770,
+   "vertexCount": 151,
+   "indexOffset": 9342,
+   "indexCount": 717
+  },
+  {
+   "origin": [
+    -1500.0,
+    -2100.0,
+    -0.58
+   ],
+   "vertexOffset": 1921,
+   "vertexCount": 673,
+   "indexOffset": 10059,
+   "indexCount": 3729
+  },
+  {
+   "origin": [
+    -1500.0,
+    -1900.0,
+    -0.58
+   ],
+   "vertexOffset": 2594,
+   "vertexCount": 676,
+   "indexOffset": 13788,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -1500.0,
+    -1700.0,
+    -0.58
+   ],
+   "vertexOffset": 3270,
+   "vertexCount": 676,
+   "indexOffset": 17538,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -1500.0,
+    -1500.0,
+    -0.58
+   ],
+   "vertexOffset": 3946,
+   "vertexCount": 639,
+   "indexOffset": 21288,
+   "indexCount": 3525
+  },
+  {
+   "origin": [
+    -1470.85,
+    -1300.0,
+    -0.58
+   ],
+   "vertexOffset": 4585,
+   "vertexCount": 334,
+   "indexOffset": 24813,
+   "indexCount": 1740
+  },
+  {
+   "origin": [
+    -1415.61,
+    -1171.74,
+    -0.58
+   ],
+   "vertexOffset": 4919,
+   "vertexCount": 32,
+   "indexOffset": 26553,
+   "indexCount": 117
+  },
+  {
+   "origin": [
+    -1300.0,
+    -2298.49,
+    -0.58
+   ],
+   "vertexOffset": 4951,
+   "vertexCount": 10439,
+   "indexOffset": 26670,
+   "indexCount": 37161
+  },
+  {
+   "origin": [
+    -1300.0,
+    -2100.28,
+    -0.58
+   ],
+   "vertexOffset": 15390,
+   "vertexCount": 5055,
+   "indexOffset": 63831,
+   "indexCount": 18876
+  },
+  {
+   "origin": [
+    -1299.46,
+    -1900.0,
+    -0.58
+   ],
+   "vertexOffset": 20445,
+   "vertexCount": 726,
+   "indexOffset": 82707,
+   "indexCount": 3888
+  },
+  {
+   "origin": [
+    -1300.0,
+    -1700.0,
+    -0.58
+   ],
+   "vertexOffset": 21171,
+   "vertexCount": 676,
+   "indexOffset": 86595,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -1300.0,
+    -1500.0,
+    -0.58
+   ],
+   "vertexOffset": 21847,
+   "vertexCount": 676,
+   "indexOffset": 90345,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -1300.0,
+    -1300.0,
+    -0.58
+   ],
+   "vertexOffset": 22523,
+   "vertexCount": 676,
+   "indexOffset": 94095,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -1300.0,
+    -1100.0,
+    -0.58
+   ],
+   "vertexOffset": 23199,
+   "vertexCount": 601,
+   "indexOffset": 97845,
+   "indexCount": 3297
+  },
+  {
+   "origin": [
+    -1260.37,
+    -900.0,
+    -0.58
+   ],
+   "vertexOffset": 23800,
+   "vertexCount": 266,
+   "indexOffset": 101142,
+   "indexCount": 1344
+  },
+  {
+   "origin": [
+    -1205.13,
+    -790.72,
+    -0.58
+   ],
+   "vertexOffset": 24066,
+   "vertexCount": 9,
+   "indexOffset": 102486,
+   "indexCount": 21
+  },
+  {
+   "origin": [
+    -1125.25,
+    -2299.92,
+    5.82
+   ],
+   "vertexOffset": 24075,
+   "vertexCount": 8978,
+   "indexOffset": 102507,
+   "indexCount": 27789
+  },
+  {
+   "origin": [
+    -1099.9,
+    -2100.0,
+    2.12
+   ],
+   "vertexOffset": 33053,
+   "vertexCount": 12878,
+   "indexOffset": 130296,
+   "indexCount": 43665
+  },
+  {
+   "origin": [
+    -1100.58,
+    -1899.84,
+    -0.58
+   ],
+   "vertexOffset": 45931,
+   "vertexCount": 11639,
+   "indexOffset": 173961,
+   "indexCount": 40188
+  },
+  {
+   "origin": [
+    -1099.58,
+    -1700.0,
+    -0.58
+   ],
+   "vertexOffset": 57570,
+   "vertexCount": 5075,
+   "indexOffset": 214149,
+   "indexCount": 18909
+  },
+  {
+   "origin": [
+    -1100.0,
+    -1500.0,
+    -0.58
+   ],
+   "vertexOffset": 62645,
+   "vertexCount": 676,
+   "indexOffset": 233058,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -1100.0,
+    -1300.0,
+    -0.58
+   ],
+   "vertexOffset": 63321,
+   "vertexCount": 676,
+   "indexOffset": 236808,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -1100.0,
+    -1100.0,
+    -0.58
+   ],
+   "vertexOffset": 63997,
+   "vertexCount": 676,
+   "indexOffset": 240558,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -1100.0,
+    -900.0,
+    -0.58
+   ],
+   "vertexOffset": 64673,
+   "vertexCount": 676,
+   "indexOffset": 244308,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -1100.0,
+    -700.0,
+    -0.58
+   ],
+   "vertexOffset": 65349,
+   "vertexCount": 552,
+   "indexOffset": 248058,
+   "indexCount": 3003
+  },
+  {
+   "origin": [
+    -1049.89,
+    -509.7,
+    -0.58
+   ],
+   "vertexOffset": 65901,
+   "vertexCount": 194,
+   "indexOffset": 251061,
+   "indexCount": 945
+  },
+  {
+   "origin": [
+    -960.22,
+    -2043.09,
+    21.51
+   ],
+   "vertexOffset": 66095,
+   "vertexCount": 984,
+   "indexOffset": 252006,
+   "indexCount": 3093
+  },
+  {
+   "origin": [
+    -905.46,
+    -1900.0,
+    5.06
+   ],
+   "vertexOffset": 67079,
+   "vertexCount": 10592,
+   "indexOffset": 255099,
+   "indexCount": 34626
+  },
+  {
+   "origin": [
+    -900.47,
+    -1699.87,
+    -0.58
+   ],
+   "vertexOffset": 77671,
+   "vertexCount": 16798,
+   "indexOffset": 289725,
+   "indexCount": 52092
+  },
+  {
+   "origin": [
+    -900.0,
+    -1500.19,
+    -0.58
+   ],
+   "vertexOffset": 94469,
+   "vertexCount": 11221,
+   "indexOffset": 341817,
+   "indexCount": 39021
+  },
+  {
+   "origin": [
+    -899.64,
+    -1300.42,
+    -0.58
+   ],
+   "vertexOffset": 105690,
+   "vertexCount": 2911,
+   "indexOffset": 380838,
+   "indexCount": 10302
+  },
+  {
+   "origin": [
+    -900.0,
+    -1100.0,
+    -0.58
+   ],
+   "vertexOffset": 108601,
+   "vertexCount": 676,
+   "indexOffset": 391140,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -900.0,
+    -900.0,
+    -0.58
+   ],
+   "vertexOffset": 109277,
+   "vertexCount": 676,
+   "indexOffset": 394890,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -900.0,
+    -700.0,
+    -0.58
+   ],
+   "vertexOffset": 109953,
+   "vertexCount": 676,
+   "indexOffset": 398640,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -900.0,
+    -500.0,
+    -0.58
+   ],
+   "vertexOffset": 110629,
+   "vertexCount": 677,
+   "indexOffset": 402390,
+   "indexCount": 3753
+  },
+  {
+   "origin": [
+    -894.64,
+    -300.0,
+    -0.58
+   ],
+   "vertexOffset": 111306,
+   "vertexCount": 489,
+   "indexOffset": 406143,
+   "indexCount": 2634
+  },
+  {
+   "origin": [
+    -839.4,
+    -128.67,
+    -0.58
+   ],
+   "vertexOffset": 111795,
+   "vertexCount": 130,
+   "indexOffset": 408777,
+   "indexCount": 609
+  },
+  {
+   "origin": [
+    -749.62,
+    -1689.16,
+    15.76
+   ],
+   "vertexOffset": 111925,
+   "vertexCount": 5662,
+   "indexOffset": 409386,
+   "indexCount": 16875
+  },
+  {
+   "origin": [
+    -700.0,
+    -1500.0,
+    5.21
+   ],
+   "vertexOffset": 117587,
+   "vertexCount": 13142,
+   "indexOffset": 426261,
+   "indexCount": 38763
+  },
+  {
+   "origin": [
+    -700.54,
+    -1299.92,
+    -0.58
+   ],
+   "vertexOffset": 130729,
+   "vertexCount": 15323,
+   "indexOffset": 465024,
+   "indexCount": 45210
+  },
+  {
+   "origin": [
+    -700.0,
+    -1100.04,
+    -0.58
+   ],
+   "vertexOffset": 146052,
+   "vertexCount": 7329,
+   "indexOffset": 510234,
+   "indexCount": 23178
+  },
+  {
+   "origin": [
+    -699.54,
+    -900.33,
+    -0.58
+   ],
+   "vertexOffset": 153381,
+   "vertexCount": 1762,
+   "indexOffset": 533412,
+   "indexCount": 7062
+  },
+  {
+   "origin": [
+    -700.0,
+    -700.0,
+    -0.58
+   ],
+   "vertexOffset": 155143,
+   "vertexCount": 676,
+   "indexOffset": 540474,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -700.0,
+    -500.0,
+    -0.58
+   ],
+   "vertexOffset": 155819,
+   "vertexCount": 676,
+   "indexOffset": 544224,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -700.0,
+    -300.0,
+    -0.58
+   ],
+   "vertexOffset": 156495,
+   "vertexCount": 676,
+   "indexOffset": 547974,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -700.0,
+    -100.0,
+    -0.58
+   ],
+   "vertexOffset": 157171,
+   "vertexCount": 668,
+   "indexOffset": 551724,
+   "indexCount": 3699
+  },
+  {
+   "origin": [
+    -684.16,
+    100.0,
+    -0.58
+   ],
+   "vertexOffset": 157839,
+   "vertexCount": 420,
+   "indexOffset": 555423,
+   "indexCount": 2232
+  },
+  {
+   "origin": [
+    -628.92,
+    252.35,
+    -0.58
+   ],
+   "vertexOffset": 158259,
+   "vertexCount": 81,
+   "indexOffset": 557655,
+   "indexCount": 351
+  },
+  {
+   "origin": [
+    -500.0,
+    -1472.45,
+    31.48
+   ],
+   "vertexOffset": 158340,
+   "vertexCount": 7141,
+   "indexOffset": 558006,
+   "indexCount": 23709
+  },
+  {
+   "origin": [
+    -500.0,
+    -1300.0,
+    17.41
+   ],
+   "vertexOffset": 165481,
+   "vertexCount": 15118,
+   "indexOffset": 581715,
+   "indexCount": 44772
+  },
+  {
+   "origin": [
+    -500.0,
+    -1100.0,
+    11.15
+   ],
+   "vertexOffset": 180599,
+   "vertexCount": 15542,
+   "indexOffset": 626487,
+   "indexCount": 44823
+  },
+  {
+   "origin": [
+    -500.02,
+    -899.59,
+    -0.58
+   ],
+   "vertexOffset": 196141,
+   "vertexCount": 11949,
+   "indexOffset": 671310,
+   "indexCount": 34302
+  },
+  {
+   "origin": [
+    -500.0,
+    -699.68,
+    -0.58
+   ],
+   "vertexOffset": 208090,
+   "vertexCount": 19952,
+   "indexOffset": 705612,
+   "indexCount": 96471
+  },
+  {
+   "origin": [
+    -499.85,
+    -500.12,
+    -0.58
+   ],
+   "vertexOffset": 228042,
+   "vertexCount": 2929,
+   "indexOffset": 802083,
+   "indexCount": 13404
+  },
+  {
+   "origin": [
+    -500.0,
+    -300.0,
+    -0.58
+   ],
+   "vertexOffset": 230971,
+   "vertexCount": 676,
+   "indexOffset": 815487,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -500.0,
+    -100.0,
+    -0.58
+   ],
+   "vertexOffset": 231647,
+   "vertexCount": 676,
+   "indexOffset": 819237,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -500.0,
+    100.0,
+    -0.58
+   ],
+   "vertexOffset": 232323,
+   "vertexCount": 676,
+   "indexOffset": 822987,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -500.0,
+    300.0,
+    -0.58
+   ],
+   "vertexOffset": 232999,
+   "vertexCount": 646,
+   "indexOffset": 826737,
+   "indexCount": 3567
+  },
+  {
+   "origin": [
+    -473.68,
+    500.0,
+    -0.58
+   ],
+   "vertexOffset": 233645,
+   "vertexCount": 352,
+   "indexOffset": 830304,
+   "indexCount": 1842
+  },
+  {
+   "origin": [
+    -418.43,
+    633.37,
+    -0.58
+   ],
+   "vertexOffset": 233997,
+   "vertexCount": 40,
+   "indexOffset": 832146,
+   "indexCount": 153
+  },
+  {
+   "origin": [
+    -251.83,
+    -1629.01,
+    31.34
+   ],
+   "vertexOffset": 234037,
+   "vertexCount": 1754,
+   "indexOffset": 832299,
+   "indexCount": 6108
+  },
+  {
+   "origin": [
+    -300.13,
+    -1500.0,
+    30.82
+   ],
+   "vertexOffset": 235791,
+   "vertexCount": 10415,
+   "indexOffset": 838407,
+   "indexCount": 29106
+  },
+  {
+   "origin": [
+    -299.72,
+    -1300.0,
+    33.71
+   ],
+   "vertexOffset": 246206,
+   "vertexCount": 13726,
+   "indexOffset": 867513,
+   "indexCount": 41478
+  },
+  {
+   "origin": [
+    -299.87,
+    -1099.55,
+    28.72
+   ],
+   "vertexOffset": 259932,
+   "vertexCount": 15317,
+   "indexOffset": 908991,
+   "indexCount": 47844
+  },
+  {
+   "origin": [
+    -299.61,
+    -900.43,
+    24.67
+   ],
+   "vertexOffset": 275249,
+   "vertexCount": 13819,
+   "indexOffset": 956835,
+   "indexCount": 40407
+  },
+  {
+   "origin": [
+    -300.0,
+    -700.1,
+    7.41
+   ],
+   "vertexOffset": 289068,
+   "vertexCount": 13934,
+   "indexOffset": 997242,
+   "indexCount": 45360
+  },
+  {
+   "origin": [
+    -300.13,
+    -499.67,
+    -0.58
+   ],
+   "vertexOffset": 303002,
+   "vertexCount": 27155,
+   "indexOffset": 1042602,
+   "indexCount": 130242
+  },
+  {
+   "origin": [
+    -299.77,
+    -299.71,
+    -0.58
+   ],
+   "vertexOffset": 330157,
+   "vertexCount": 9215,
+   "indexOffset": 1172844,
+   "indexCount": 42594
+  },
+  {
+   "origin": [
+    -299.51,
+    -100.0,
+    -0.58
+   ],
+   "vertexOffset": 339372,
+   "vertexCount": 1513,
+   "indexOffset": 1215438,
+   "indexCount": 6423
+  },
+  {
+   "origin": [
+    -300.0,
+    100.0,
+    -0.58
+   ],
+   "vertexOffset": 340885,
+   "vertexCount": 676,
+   "indexOffset": 1221861,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -300.0,
+    300.0,
+    -0.58
+   ],
+   "vertexOffset": 341561,
+   "vertexCount": 676,
+   "indexOffset": 1225611,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -300.0,
+    500.0,
+    -0.58
+   ],
+   "vertexOffset": 342237,
+   "vertexCount": 676,
+   "indexOffset": 1229361,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -300.0,
+    700.0,
+    -0.58
+   ],
+   "vertexOffset": 342913,
+   "vertexCount": 613,
+   "indexOffset": 1233111,
+   "indexCount": 3369
+  },
+  {
+   "origin": [
+    -263.19,
+    879.75,
+    -0.58
+   ],
+   "vertexOffset": 343526,
+   "vertexCount": 255,
+   "indexOffset": 1236480,
+   "indexCount": 1311
+  },
+  {
+   "origin": [
+    -100.0,
+    -1683.48,
+    22.56
+   ],
+   "vertexOffset": 343781,
+   "vertexCount": 7562,
+   "indexOffset": 1237791,
+   "indexCount": 23619
+  },
+  {
+   "origin": [
+    -100.0,
+    -1500.36,
+    34.04
+   ],
+   "vertexOffset": 351343,
+   "vertexCount": 10076,
+   "indexOffset": 1261410,
+   "indexCount": 31182
+  },
+  {
+   "origin": [
+    -100.21,
+    -1299.53,
+    34.97
+   ],
+   "vertexOffset": 361419,
+   "vertexCount": 14245,
+   "indexOffset": 1292592,
+   "indexCount": 43392
+  },
+  {
+   "origin": [
+    -99.65,
+    -1099.92,
+    39.76
+   ],
+   "vertexOffset": 375664,
+   "vertexCount": 17548,
+   "indexOffset": 1335984,
+   "indexCount": 49287
+  },
+  {
+   "origin": [
+    -99.96,
+    -900.48,
+    34.81
+   ],
+   "vertexOffset": 393212,
+   "vertexCount": 13505,
+   "indexOffset": 1385271,
+   "indexCount": 40611
+  },
+  {
+   "origin": [
+    -100.0,
+    -700.31,
+    23.8
+   ],
+   "vertexOffset": 406717,
+   "vertexCount": 14384,
+   "indexOffset": 1425882,
+   "indexCount": 45819
+  },
+  {
+   "origin": [
+    -100.61,
+    -500.0,
+    25.67
+   ],
+   "vertexOffset": 421101,
+   "vertexCount": 16385,
+   "indexOffset": 1471701,
+   "indexCount": 49755
+  },
+  {
+   "origin": [
+    -100.61,
+    -300.0,
+    9.87
+   ],
+   "vertexOffset": 437486,
+   "vertexCount": 16620,
+   "indexOffset": 1521456,
+   "indexCount": 59607
+  },
+  {
+   "origin": [
+    -100.62,
+    -99.99,
+    -0.58
+   ],
+   "vertexOffset": 454106,
+   "vertexCount": 20907,
+   "indexOffset": 1581063,
+   "indexCount": 88470
+  },
+  {
+   "origin": [
+    -99.36,
+    100.23,
+    -0.58
+   ],
+   "vertexOffset": 475013,
+   "vertexCount": 8094,
+   "indexOffset": 1669533,
+   "indexCount": 29241
+  },
+  {
+   "origin": [
+    -99.67,
+    299.65,
+    -0.58
+   ],
+   "vertexOffset": 483107,
+   "vertexCount": 818,
+   "indexOffset": 1698774,
+   "indexCount": 4014
+  },
+  {
+   "origin": [
+    -100.0,
+    500.0,
+    -0.58
+   ],
+   "vertexOffset": 483925,
+   "vertexCount": 676,
+   "indexOffset": 1702788,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -100.0,
+    700.0,
+    -0.58
+   ],
+   "vertexOffset": 484601,
+   "vertexCount": 676,
+   "indexOffset": 1706538,
+   "indexCount": 3750
+  },
+  {
+   "origin": [
+    -100.0,
+    870.93,
+    -0.58
+   ],
+   "vertexOffset": 485277,
+   "vertexCount": 335,
+   "indexOffset": 1710288,
+   "indexCount": 1746
+  },
+  {
+   "origin": [
+    95.95,
+    -1817.92,
+    15.38
+   ],
+   "vertexOffset": 485612,
+   "vertexCount": 824,
+   "indexOffset": 1712034,
+   "indexCount": 3330
+  },
+  {
+   "origin": [
+    100.0,
+    -1700.0,
+    8.74
+   ],
+   "vertexOffset": 486436,
+   "vertexCount": 14677,
+   "indexOffset": 1715364,
+   "indexCount": 52617
+  },
+  {
+   "origin": [
+    100.0,
+    -1500.0,
+    8.5
+   ],
+   "vertexOffset": 501113,
+   "vertexCount": 14568,
+   "indexOffset": 1767981,
+   "indexCount": 45717
+  },
+  {
+   "origin": [
+    100.0,
+    -1300.0,
+    11.68
+   ],
+   "vertexOffset": 515681,
+   "vertexCount": 13841,
+   "indexOffset": 1813698,
+   "indexCount": 41607
+  },
+  {
+   "origin": [
+    99.51,
+    -1099.89,
+    32.67
+   ],
+   "vertexOffset": 529522,
+   "vertexCount": 11567,
+   "indexOffset": 1855305,
+   "indexCount": 34422
+  },
+  {
+   "origin": [
+    99.78,
+    -900.24,
+    24.49
+   ],
+   "vertexOffset": 541089,
+   "vertexCount": 10897,
+   "indexOffset": 1889727,
+   "indexCount": 34035
+  },
+  {
+   "origin": [
+    100.0,
+    -700.0,
+    21.2
+   ],
+   "vertexOffset": 551986,
+   "vertexCount": 11740,
+   "indexOffset": 1923762,
+   "indexCount": 35481
+  },
+  {
+   "origin": [
+    100.16,
+    -499.44,
+    13.34
+   ],
+   "vertexOffset": 563726,
+   "vertexCount": 14281,
+   "indexOffset": 1959243,
+   "indexCount": 42750
+  },
+  {
+   "origin": [
+    100.01,
+    -300.52,
+    9.87
+   ],
+   "vertexOffset": 578007,
+   "vertexCount": 12025,
+   "indexOffset": 2001993,
+   "indexCount": 38217
+  },
+  {
+   "origin": [
+    100.66,
+    -100.0,
+    3.46
+   ],
+   "vertexOffset": 590032,
+   "vertexCount": 14982,
+   "indexOffset": 2040210,
+   "indexCount": 49461
+  },
+  {
+   "origin": [
+    99.53,
+    100.19,
+    -0.58
+   ],
+   "vertexOffset": 605014,
+   "vertexCount": 15718,
+   "indexOffset": 2089671,
+   "indexCount": 52548
+  },
+  {
+   "origin": [
+    99.6,
+    299.93,
+    -0.58
+   ],
+   "vertexOffset": 620732,
+   "vertexCount": 10129,
+   "indexOffset": 2142219,
+   "indexCount": 35037
+  },
+  {
+   "origin": [
+    100.0,
+    499.74,
+    -0.6
+   ],
+   "vertexOffset": 630861,
+   "vertexCount": 1419,
+   "indexOffset": 2177256,
+   "indexCount": 6888
+  },
+  {
+   "origin": [
+    100.0,
+    700.0,
+    -0.58
+   ],
+   "vertexOffset": 632280,
+   "vertexCount": 2256,
+   "indexOffset": 2184144,
+   "indexCount": 11112
+  },
+  {
+   "origin": [
+    28.73,
+    815.83,
+    -0.58
+   ],
+   "vertexOffset": 634536,
+   "vertexCount": 32,
+   "indexOffset": 2195256,
+   "indexCount": 117
+  },
+  {
+   "origin": [
+    218.02,
+    -1643.38,
+    9.18
+   ],
+   "vertexOffset": 634568,
+   "vertexCount": 1082,
+   "indexOffset": 2195373,
+   "indexCount": 3501
+  },
+  {
+   "origin": [
+    219.59,
+    -1500.0,
+    9.22
+   ],
+   "vertexOffset": 635650,
+   "vertexCount": 3280,
+   "indexOffset": 2198874,
+   "indexCount": 10902
+  },
+  {
+   "origin": [
+    257.08,
+    -1300.0,
+    9.55
+   ],
+   "vertexOffset": 638930,
+   "vertexCount": 6461,
+   "indexOffset": 2209776,
+   "indexCount": 19188
+  },
+  {
+   "origin": [
+    300.0,
+    -1100.11,
+    9.39
+   ],
+   "vertexOffset": 645391,
+   "vertexCount": 14617,
+   "indexOffset": 2228964,
+   "indexCount": 43863
+  },
+  {
+   "origin": [
+    299.43,
+    -900.0,
+    11.93
+   ],
+   "vertexOffset": 660008,
+   "vertexCount": 15565,
+   "indexOffset": 2272827,
+   "indexCount": 48078
+  },
+  {
+   "origin": [
+    300.0,
+    -699.96,
+    8.47
+   ],
+   "vertexOffset": 675573,
+   "vertexCount": 13859,
+   "indexOffset": 2320905,
+   "indexCount": 41334
+  },
+  {
+   "origin": [
+    299.98,
+    -500.06,
+    6.34
+   ],
+   "vertexOffset": 689432,
+   "vertexCount": 12974,
+   "indexOffset": 2362239,
+   "indexCount": 36294
+  },
+  {
+   "origin": [
+    300.19,
+    -300.0,
+    7.0
+   ],
+   "vertexOffset": 702406,
+   "vertexCount": 13801,
+   "indexOffset": 2398533,
+   "indexCount": 41994
+  },
+  {
+   "origin": [
+    299.55,
+    -100.0,
+    5.38
+   ],
+   "vertexOffset": 716207,
+   "vertexCount": 13212,
+   "indexOffset": 2440527,
+   "indexCount": 41100
+  },
+  {
+   "origin": [
+    300.0,
+    100.0,
+    4.81
+   ],
+   "vertexOffset": 729419,
+   "vertexCount": 11383,
+   "indexOffset": 2481627,
+   "indexCount": 34116
+  },
+  {
+   "origin": [
+    300.0,
+    300.0,
+    2.57
+   ],
+   "vertexOffset": 740802,
+   "vertexCount": 8911,
+   "indexOffset": 2515743,
+   "indexCount": 29481
+  },
+  {
+   "origin": [
+    300.0,
+    500.0,
+    -0.58
+   ],
+   "vertexOffset": 749713,
+   "vertexCount": 14182,
+   "indexOffset": 2545224,
+   "indexCount": 48825
+  },
+  {
+   "origin": [
+    299.92,
+    654.85,
+    -0.58
+   ],
+   "vertexOffset": 763895,
+   "vertexCount": 2839,
+   "indexOffset": 2594049,
+   "indexCount": 13083
+  },
+  {
+   "origin": [
+    412.56,
+    -1025.12,
+    9.72
+   ],
+   "vertexOffset": 766734,
+   "vertexCount": 339,
+   "indexOffset": 2607132,
+   "indexCount": 1194
+  },
+  {
+   "origin": [
+    500.0,
+    -900.0,
+    7.14
+   ],
+   "vertexOffset": 767073,
+   "vertexCount": 9638,
+   "indexOffset": 2608326,
+   "indexCount": 30465
+  },
+  {
+   "origin": [
+    500.0,
+    -700.0,
+    7.27
+   ],
+   "vertexOffset": 776711,
+   "vertexCount": 13437,
+   "indexOffset": 2638791,
+   "indexCount": 42636
+  },
+  {
+   "origin": [
+    499.84,
+    -500.0,
+    6.45
+   ],
+   "vertexOffset": 790148,
+   "vertexCount": 12836,
+   "indexOffset": 2681427,
+   "indexCount": 38823
+  },
+  {
+   "origin": [
+    499.93,
+    -300.0,
+    8.07
+   ],
+   "vertexOffset": 802984,
+   "vertexCount": 13966,
+   "indexOffset": 2720250,
+   "indexCount": 44340
+  },
+  {
+   "origin": [
+    500.0,
+    -99.82,
+    10.84
+   ],
+   "vertexOffset": 816950,
+   "vertexCount": 10933,
+   "indexOffset": 2764590,
+   "indexCount": 29889
+  },
+  {
+   "origin": [
+    500.0,
+    99.83,
+    16.49
+   ],
+   "vertexOffset": 827883,
+   "vertexCount": 11337,
+   "indexOffset": 2794479,
+   "indexCount": 35253
+  },
+  {
+   "origin": [
+    500.0,
+    300.0,
+    20.57
+   ],
+   "vertexOffset": 839220,
+   "vertexCount": 13639,
+   "indexOffset": 2829732,
+   "indexCount": 44022
+  },
+  {
+   "origin": [
+    500.0,
+    500.0,
+    7.89
+   ],
+   "vertexOffset": 852859,
+   "vertexCount": 10525,
+   "indexOffset": 2873754,
+   "indexCount": 30825
+  },
+  {
+   "origin": [
+    403.06,
+    601.55,
+    7.84
+   ],
+   "vertexOffset": 863384,
+   "vertexCount": 20,
+   "indexOffset": 2904579,
+   "indexCount": 45
+  },
+  {
+   "origin": [
+    647.62,
+    -855.58,
+    7.98
+   ],
+   "vertexOffset": 863404,
+   "vertexCount": 2709,
+   "indexOffset": 2904624,
+   "indexCount": 8631
+  },
+  {
+   "origin": [
+    700.0,
+    -700.0,
+    7.71
+   ],
+   "vertexOffset": 866113,
+   "vertexCount": 10698,
+   "indexOffset": 2913255,
+   "indexCount": 33624
+  },
+  {
+   "origin": [
+    700.15,
+    -500.0,
+    8.54
+   ],
+   "vertexOffset": 876811,
+   "vertexCount": 13382,
+   "indexOffset": 2946879,
+   "indexCount": 38853
+  },
+  {
+   "origin": [
+    700.0,
+    -300.0,
+    13.36
+   ],
+   "vertexOffset": 890193,
+   "vertexCount": 10308,
+   "indexOffset": 2985732,
+   "indexCount": 30831
+  },
+  {
+   "origin": [
+    700.2,
+    -100.0,
+    18.76
+   ],
+   "vertexOffset": 900501,
+   "vertexCount": 12432,
+   "indexOffset": 3016563,
+   "indexCount": 38481
+  },
+  {
+   "origin": [
+    700.0,
+    100.0,
+    26.85
+   ],
+   "vertexOffset": 912933,
+   "vertexCount": 13240,
+   "indexOffset": 3055044,
+   "indexCount": 43458
+  },
+  {
+   "origin": [
+    700.0,
+    300.0,
+    28.37
+   ],
+   "vertexOffset": 926173,
+   "vertexCount": 10689,
+   "indexOffset": 3098502,
+   "indexCount": 36456
+  },
+  {
+   "origin": [
+    687.37,
+    449.12,
+    28.59
+   ],
+   "vertexOffset": 936862,
+   "vertexCount": 4750,
+   "indexOffset": 3134958,
+   "indexCount": 14526
+  },
+  {
+   "origin": [
+    812.36,
+    -615.78,
+    10.4
+   ],
+   "vertexOffset": 941612,
+   "vertexCount": 259,
+   "indexOffset": 3149484,
+   "indexCount": 876
+  },
+  {
+   "origin": [
+    879.01,
+    -500.0,
+    10.25
+   ],
+   "vertexOffset": 941871,
+   "vertexCount": 8203,
+   "indexOffset": 3150360,
+   "indexCount": 25626
+  },
+  {
+   "origin": [
+    900.59,
+    -299.91,
+    11.33
+   ],
+   "vertexOffset": 950074,
+   "vertexCount": 13587,
+   "indexOffset": 3175986,
+   "indexCount": 39930
+  },
+  {
+   "origin": [
+    899.92,
+    -100.0,
+    15.09
+   ],
+   "vertexOffset": 963661,
+   "vertexCount": 14251,
+   "indexOffset": 3215916,
+   "indexCount": 51054
+  },
+  {
+   "origin": [
+    900.0,
+    100.0,
+    27.28
+   ],
+   "vertexOffset": 977912,
+   "vertexCount": 10712,
+   "indexOffset": 3266970,
+   "indexCount": 32616
+  },
+  {
+   "origin": [
+    900.59,
+    300.0,
+    37.74
+   ],
+   "vertexOffset": 988624,
+   "vertexCount": 10089,
+   "indexOffset": 3299586,
+   "indexCount": 31233
+  },
+  {
+   "origin": [
+    942.15,
+    445.85,
+    38.93
+   ],
+   "vertexOffset": 998713,
+   "vertexCount": 2617,
+   "indexOffset": 3330819,
+   "indexCount": 8085
+  },
+  {
+   "origin": [
+    1023.15,
+    -260.82,
+    11.11
+   ],
+   "vertexOffset": 1001330,
+   "vertexCount": 1693,
+   "indexOffset": 3338904,
+   "indexCount": 5193
+  },
+  {
+   "origin": [
+    1059.28,
+    -100.09,
+    10.94
+   ],
+   "vertexOffset": 1003023,
+   "vertexCount": 6086,
+   "indexOffset": 3344097,
+   "indexCount": 20169
+  },
+  {
+   "origin": [
+    1094.75,
+    100.0,
+    11.13
+   ],
+   "vertexOffset": 1009109,
+   "vertexCount": 11168,
+   "indexOffset": 3364266,
+   "indexCount": 33012
+  },
+  {
+   "origin": [
+    1099.52,
+    300.0,
+    11.25
+   ],
+   "vertexOffset": 1020277,
+   "vertexCount": 12966,
+   "indexOffset": 3397278,
+   "indexCount": 39780
+  },
+  {
+   "origin": [
+    1100.0,
+    447.85,
+    20.55
+   ],
+   "vertexOffset": 1033243,
+   "vertexCount": 5056,
+   "indexOffset": 3437058,
+   "indexCount": 15135
+  },
+  {
+   "origin": [
+    1230.14,
+    314.81,
+    11.31
+   ],
+   "vertexOffset": 1038299,
+   "vertexCount": 2671,
+   "indexOffset": 3452193,
+   "indexCount": 8547
+  },
+  {
+   "origin": [
+    1230.46,
+    417.99,
+    14.76
+   ],
+   "vertexOffset": 1040970,
+   "vertexCount": 682,
+   "indexOffset": 3460740,
+   "indexCount": 2124
+  }
+ ],
+ "sources": {
+  "roadbed, median, sidewalk": "NYC Planimetrics in 10-fetch-the-ground/data/planimetrics.json",
+  "footway, markings": "OpenStreetMap in 10-fetch-the-ground/data/streets.json",
+  "lawn, water": "step 65's surfaces-middle.png (OSM lawns off the LiDAR canopy; the river)",
+  "heights": "10-fetch-the-ground's heights.json and heights-middle.json (bilinear)",
+  "board": "region.json's neighbourhood outline"
+ }
+}
