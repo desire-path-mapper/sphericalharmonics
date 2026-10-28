@@ -287,12 +287,11 @@ a {
     max-width: var(--page);
     margin: 0 auto;
     padding: 0.95rem var(--gutter);
-    border-bottom: 0.5px solid var(--hairline);
 }
 
 .demo-copy {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
     flex-wrap: wrap;
     gap: 0.2rem 0.75rem;
@@ -369,8 +368,12 @@ a {
     font-weight: 700;
 }
 
+/* Two short lines, set tight so the pair stands as tall as the logo and the
+   Demo button beside it. */
 .demo-bar .demo-line {
     font-size: var(--fs-body);
+    line-height: 1.2;
+    text-align: left;
     font-style: italic;
     color: var(--ink-soft);
 }
