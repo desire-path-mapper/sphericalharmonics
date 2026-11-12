@@ -1,0 +1,106 @@
+{
+ "10-fetch-the-ground/data/riverside-85-120/heights-middle.i16.gz": {
+  "bytes": 1499439,
+  "sha256": "12857b554579fb9aed39be8a0e86a4eb81764e10a4a364633df6ff4307020366"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/heights-middle.json": {
+  "bytes": 906,
+  "sha256": "b89921f393450272038913f2f1e3df0b483ba50fab391d381164849ef754be63"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/heights.i16.gz": {
+  "bytes": 4137630,
+  "sha256": "8d72018608e8829690371a67323447a70b49acc6b6069efaaaac336102a3d3f4"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/heights.json": {
+  "bytes": 951,
+  "sha256": "89fdae645fed8afdac0558663e03002dffbf52c6990d34e7a17570a90643933c"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/in-the-park.json": {
+  "bytes": 38409,
+  "sha256": "888c45b4c295ebd3fd7e34274c8eea54809fe42025a158258f8bb4d1d4ab1e4a"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/ortho-middle-web.jpg": {
+  "bytes": 116040,
+  "sha256": "9bb178df92e6b3ad0cfb1991194adf14f9f41d27b9e551c12d1a181dbab06707"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/ortho-web.jpg": {
+  "bytes": 712343,
+  "sha256": "308676e828625909423aa540eee4c415ab823b2cb4125e4f96552cbc1fe41f00"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/region.json": {
+  "bytes": 9523,
+  "sha256": "e67b7df662ad97908b72349890bf1ad27ad3d0a890f8a59019321032b26a689a"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/site-features.geojson": {
+  "bytes": 42,
+  "sha256": "ed778c73ea51338d6576fb5992b189f2b94d9f3d5e199f46c1af520d6b0b3e6c"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/site.json": {
+  "bytes": 896909,
+  "sha256": "9af6aecb51bbc2c3ccc970ffb3b2c08715640da8131707782a8d88a439d673fb"
+ },
+ "10-fetch-the-ground/data/riverside-85-120/streets.json": {
+  "bytes": 818995,
+  "sha256": "e29ea2ef4a663f394c9da416161421149414c28180869e0854bdc2c421126972"
+ },
+ "15-scan-the-structures/data/riverside-85-120/buildings-web.json": {
+  "bytes": 97329,
+  "sha256": "a104e496da8fe929dca17e222bd717b7e6be18e61544f1948e697e12725c6174"
+ },
+ "15-scan-the-structures/data/riverside-85-120/buildings.i16.gz": {
+  "bytes": 1033376,
+  "sha256": "c5fcc1bfbe8e8eea1f06bd56fb361d541699bef43bf4158b2c27f9fcf3336169"
+ },
+ "15-scan-the-structures/data/riverside-85-120/decks.json": {
+  "bytes": 19133,
+  "sha256": "186305f509a531738ec58ca3914adfdd91fa268d34184997741a9089f22c380f"
+ },
+ "15-scan-the-structures/data/riverside-85-120/piers.json": {
+  "bytes": 16437,
+  "sha256": "5993a652712588a8adff82a4b21a0c2a87e86a4efbcad465707ad9ecd114c59a"
+ },
+ "15-scan-the-structures/data/riverside-85-120/play-areas.json": {
+  "bytes": 20373,
+  "sha256": "f54b6fc666208ccf11966533696c0108b065c0f390b760653c91ff825aa66ce9"
+ },
+ "15-scan-the-structures/data/riverside-85-120/scan.json": {
+  "bytes": 9065,
+  "sha256": "9b47cdbdfe3ed54ba9459aa1af94114c157b1eb47131fce83cd0f12b7156e39f"
+ },
+ "15-scan-the-structures/data/riverside-85-120/street-names.json": {
+  "bytes": 10882,
+  "sha256": "31c346b5905c659426223da0c48f304802a19c0b925384719abdecf73f84f085"
+ },
+ "15-scan-the-structures/data/riverside-85-120/surfaces-ground.i16.gz": {
+  "bytes": 3031628,
+  "sha256": "5899dffd50f1d5f65ec9bbd1c9d062d0f62a0afdc8ebd1f7f2c43cceb2aff22d"
+ },
+ "15-scan-the-structures/data/riverside-85-120/surfaces-ground.json": {
+  "bytes": 18692,
+  "sha256": "21f2121fc8a2778dac6b310e0763507767a2d4cf16bb5e4b686991ff946c2695"
+ },
+ "15-scan-the-structures/data/riverside-85-120/surfaces-ground.u16.gz": {
+  "bytes": 1750943,
+  "sha256": "8c24bb060a12d28c6e54e423952cd289d1bae9b63f0012cb03fa415e49e8f7be"
+ },
+ "15-scan-the-structures/data/riverside-85-120/surfaces-lines.i16.gz": {
+  "bytes": 293066,
+  "sha256": "b0125f51586aa9cf836161f7dd902cce499bec856525cd9e331350801c30de76"
+ },
+ "15-scan-the-structures/data/riverside-85-120/surfaces-lines.json": {
+  "bytes": 9591,
+  "sha256": "320bbc3ba88de7ffd880754b39f7bff0547670c4f6995a6c188ac9d4b0650d2e"
+ },
+ "15-scan-the-structures/data/riverside-85-120/surfaces-lines.u16.gz": {
+  "bytes": 7758,
+  "sha256": "693be69e7396fe27e3727b0363db93359d4cb3e240363de09f787ee0a5ea45f0"
+ },
+ "15-scan-the-structures/data/riverside-85-120/trees-web.json": {
+  "bytes": 4432,
+  "sha256": "be4079e4a7117ff0f68519f7fcc5fe1c53b2b35932e9b9a6485b4d7eb40ec936"
+ },
+ "15-scan-the-structures/data/riverside-85-120/trees.i16.gz": {
+  "bytes": 86917,
+  "sha256": "742e064ab8b264a39687ceb35fc6ea1ea4114a6708a917341a53201fe17ff8cc"
+ }
+}

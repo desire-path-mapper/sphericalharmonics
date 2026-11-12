@@ -1,0 +1,44 @@
+{
+ "bbox": [
+  -73.98370982087386,
+  40.78875939633489,
+  -73.96339002209555,
+  40.81292396694215
+ ],
+ "width": 2262,
+ "height": 2690,
+ "cellLatDeg": 8.983111749911427e-06,
+ "cellLonDeg": 8.983111749912826e-06,
+ "cellNorthM": 1.00000000000014,
+ "cellEastM": 0.7569854567459325,
+ "origin": {
+  "lat": 40.8008,
+  "lon": -73.9736
+ },
+ "rowOrder": "north-first",
+ "minHeight": -0.6317969560623169,
+ "maxHeight": 42.64593505859375,
+ "heightsFile": "heights.f32",
+ "int16": {
+  "file": "heights.i16",
+  "scale": 0.01,
+  "offset": 0.0,
+  "noData": -32768
+ },
+ "orthoFile": "ortho.jpg",
+ "orthoPx": [
+  3444,
+  4096
+ ],
+ "orthoWebFile": "ortho-web.jpg",
+ "despiked": true,
+ "sources": {
+  "dem": "USGS 3DEP 1 m bare earth via 3DEPElevation ImageServer exportImage",
+  "ortho": "NYS ITS statewide orthoimagery 'Latest' WMS (2022-2025, leaf-off spring flights)"
+ },
+ "role": "inner",
+ "regionFile": "region.json",
+ "coarserFiles": [
+  "heights-middle.json"
+ ]
+}
