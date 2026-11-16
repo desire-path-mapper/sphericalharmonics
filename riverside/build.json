@@ -1,0 +1,16 @@
+{
+ "build": "20261116T152319Z-ccf9ecd",
+ "entry": "assets/index-C_PMkXSv.js",
+ "css": [
+  "assets/index-CH-v6OFL.css"
+ ],
+ "integrity": {
+  "assets/06-answer-in-the-worker-BBQVCkwJ.js": "sha384-5O/kt4lgx3gOIMYHfwAzs287vns9wifFrHTNOapSMsOaxZ1GCb2N5TeyDFRzAo8a",
+  "assets/20-route-in-a-worker-CR2Yd2Gq.js": "sha384-O7QGeUnlh+pzJYBTyzW3rStjM8fQqaP8onatzK312uUmF3xOF8JgOoERAnuNCSO7",
+  "assets/index-CH-v6OFL.css": "sha384-3cX/5pGxcbpQDYbZHeh0/RZmuFIBg79gqxja2/juMo1sv6+bgGYNxVahgomX1sJn",
+  "assets/index-C_PMkXSv.js": "sha384-1KHnDbKVyBRkgOPMi1WvNMguopCxtG9hmU/F3nsWWSYKp7GH3logv1znGILpOZGu"
+ },
+ "env": "riverside",
+ "commit": "ccf9ecdf3ea186fc0a959cd74e746515c970e122",
+ "area": "riverside-85-120"
+}
