@@ -1,16 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="">
-  <!-- Many into one: people standing in a circle that together make one whole circle. Line weight 3 on a 64 grid; colours from the Spherical Harmonics sphere (wood, wood-brown, brass). -->
-  <circle cx="32" cy="32" r="22" fill="none" stroke="#c9a234" stroke-width="3"/>
-  <circle cx="32.00" cy="10.00" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="43.00" cy="12.95" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="51.05" cy="21.00" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="54.00" cy="32.00" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="51.05" cy="43.00" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="43.00" cy="51.05" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="32.00" cy="54.00" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="21.00" cy="51.05" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="12.95" cy="43.00" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="10.00" cy="32.00" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="12.95" cy="21.00" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
-  <circle cx="21.00" cy="12.95" r="4.2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.4"/>
+  <!-- Many into one, drawn as a network on a ring: people joined to one another, together one whole. Colours from the Spherical Harmonics sphere: wood dots with wood-brown outlines, a brass ring,
+       wood-brown links. The links are deliberately irregular, like a real network, never a star polygon. -->
+  <g fill="none" stroke="#c9a234" stroke-width="2.2" stroke-linecap="round"><path d="M32.00 8.00 A24 24 0 0 1 46.11 12.58"/><path d="M46.11 12.58 A24 24 0 0 1 54.83 24.58"/><path d="M54.83 24.58 A24 24 0 0 1 54.83 39.42"/><path d="M54.83 39.42 A24 24 0 0 1 46.11 51.42"/><path d="M46.11 51.42 A24 24 0 0 1 32.00 56.00"/><path d="M32.00 56.00 A24 24 0 0 1 17.89 51.42"/><path d="M17.89 51.42 A24 24 0 0 1 9.17 39.42"/><path d="M9.17 39.42 A24 24 0 0 1 9.17 24.58"/><path d="M9.17 24.58 A24 24 0 0 1 17.89 12.58"/><path d="M17.89 12.58 A24 24 0 0 1 32.00 8.00"/></g>
+  <g fill="none" stroke="#5a3017" stroke-width="1.6" stroke-linecap="round"><path d="M32.00 8.00 Q33.41 31.54 46.11 51.42"/><path d="M46.11 12.58 Q32.00 32.00 17.89 51.42"/><path d="M54.83 24.58 Q32.00 30.52 9.17 24.58"/><path d="M54.83 39.42 Q32.00 33.48 9.17 39.42"/><path d="M32.00 56.00 Q30.59 32.46 17.89 12.58"/><path d="M17.89 51.42 Q29.18 32.00 17.89 12.58"/></g>
+  <g fill="#c98a5c" stroke="#5a3017" stroke-width="1.6"><circle cx="32.00" cy="8.00" r="3.0"/><circle cx="46.11" cy="12.58" r="3.0"/><circle cx="54.83" cy="24.58" r="3.0"/><circle cx="54.83" cy="39.42" r="3.0"/><circle cx="46.11" cy="51.42" r="3.0"/><circle cx="32.00" cy="56.00" r="3.0"/><circle cx="17.89" cy="51.42" r="3.0"/><circle cx="9.17" cy="39.42" r="3.0"/><circle cx="9.17" cy="24.58" r="3.0"/><circle cx="17.89" cy="12.58" r="3.0"/></g>
 </svg>

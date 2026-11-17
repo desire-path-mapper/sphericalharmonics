@@ -23,33 +23,71 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=8141002d">
+    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=b1223f64">
     <style>
         .masthead h1 a { text-decoration: none; }
-        .section-head { text-align: center; margin-bottom: 1.4rem; }
+        .section-head { text-align: center; margin-bottom: 1.2rem; }
         .question { font-family: var(--display); font-size: clamp(1.6rem, 4.5vw, 2.2rem); font-weight: 500; line-height: 1.15; margin: 0.2rem 0 0.5rem; text-wrap: balance; }
         .section-links a { margin: 0 0.5rem; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
         .section-links a[aria-current="page"] { text-decoration-thickness: 1.5px; }
-        .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 2rem; border-top: 2px solid var(--rule); padding-top: 1.2rem; }
-        .side { display: flex; flex-direction: column; min-width: 0; text-align: center; }
-        .side .picture { height: clamp(170px, 32vw, 340px); display: flex; align-items: center; justify-content: center; margin-bottom: 0.8rem; }
-        .side img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .side h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
-        .side .gist { font-style: italic; color: var(--ink-soft); margin: 0.25rem 0 0.4rem; }
-        .side .links { font-size: var(--fs-small); color: var(--ink-faint); }
-        .side form { margin-top: auto; padding-top: 0.9rem; }
-        .side .btn { width: 100%; background: none; cursor: pointer; }
-        .side .btn:hover, .side .btn:focus-visible { background: var(--ink); color: var(--paper); }
-        .links a, .after a, .board a, .how a { color: var(--lane-green); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
-        .after { margin-top: 1.6rem; padding-top: 0.6rem; border-top: 0.5px solid var(--hairline); text-align: center; }
+        .links a, .from a, .board a, .how a { color: var(--lane-green); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
         .note { font-size: var(--fs-small); font-style: italic; color: var(--ink-soft); margin: 0.4rem 0 0.8rem; text-align: center; }
+
+        /* The deck: the top card, with the next two peeking out below it. */
+        .deck { display: grid; max-width: 44rem; margin: 0 auto; padding-bottom: 22px; }
+        .card { grid-area: 1 / 1; display: flex; align-items: stretch; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px;
+                touch-action: none; user-select: none; -webkit-user-select: none; transition: transform 0.28s ease, opacity 0.28s ease; }
+        .card:nth-child(1) { z-index: 3; }
+        .card:nth-child(2) { z-index: 2; transform: translateY(11px) scale(0.965); pointer-events: none; }
+        .card:nth-child(3) { z-index: 1; transform: translateY(22px) scale(0.93); pointer-events: none; }
+        .card:nth-child(n+4) { display: none; }
+        .card.dragging { transition: none; cursor: grabbing; }
+        .half { flex: 1 1 0; min-width: 0; padding: 0.8rem 0.7rem 0.7rem; text-align: center; transition: flex-grow 0.2s ease, background-color 0.2s ease; }
+        .half + .half { border-left: 0.5px solid var(--hairline); }
+        .card[data-aim="a"] .half-a, .card[data-aim="b"] .half-b { flex-grow: 1.45; background: var(--paper-deep); box-shadow: inset 0 0 0 2px var(--sienna); }
+        .card[data-aim="skip"] { opacity: 0.6; }
+        .card.leave-a { transform: translateX(-130%) rotate(-14deg); opacity: 0; }
+        .card.leave-b { transform: translateX(130%) rotate(14deg); opacity: 0; }
+        .card.leave-skip { transform: translateY(-120%); opacity: 0; }
+        .card.leave-tie { transform: scale(0.85); opacity: 0; }
+        .picture { height: clamp(120px, 30vw, 260px); display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
+        .picture img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
+        .half h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+        .half .gist { font-style: italic; color: var(--ink-soft); margin: 0.25rem 0 0.3rem; }
+        .half .links { font-size: var(--fs-small); color: var(--ink-faint); margin-top: 0.3rem; }
+        details.sec.more { border-bottom: 0; text-align: left; }
+        details.sec.more > summary { grid-template-columns: 1.2rem 1fr; padding: 0.3rem 0; font-size: var(--fs-small); color: var(--ink-soft); }
+        .intro { max-height: 14rem; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; font-size: var(--fs-small); line-height: 1.45; padding-right: 0.3rem; }
+        .intro p { margin-bottom: 0.4rem; hyphens: auto; }
+        .intro .from { color: var(--ink-faint); }
+
+        /* Ballot buttons: A and B large, the tie medium, skip small beneath. */
+        .ballots { display: flex; justify-content: center; align-items: center; gap: 1.4rem; margin-top: 1rem; }
+        .ballot { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--ink-soft); border-radius: 50%;
+                  background: var(--paper); color: var(--ink); cursor: pointer; padding: 0; }
+        .ballot:hover, .ballot:focus-visible { border-color: var(--ink); background: var(--paper-deep); }
+        .ballot.big { width: 4.2rem; height: 4.2rem; }
+        .ballot.mid { width: 3.3rem; height: 3.3rem; }
+        .ballot.small { width: 2.5rem; height: 2.5rem; }
+        .ballot svg { width: 64%; height: 64%; overflow: visible; }
+        .skip-row { display: flex; justify-content: center; margin-top: 0.6rem; }
+        .ballot .paper { transform-box: view-box; }
+        .ballot.drop .paper { animation: drop 0.55s ease-in; }
+        @keyframes drop { 0% { transform: translateY(0); } 65% { transform: translateY(15px); opacity: 1; } 66% { opacity: 0; } 67% { transform: translateY(-4px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        .deck.hint .card:first-child { animation: wiggle 0.9s ease; }
+        @keyframes wiggle { 25% { transform: translateX(-10px) rotate(-2deg); } 75% { transform: translateX(10px) rotate(2deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            .card, .half { transition: none !important; }
+            .ballot.drop .paper, .deck.hint .card:first-child { animation: none !important; }
+        }
+
         .board { width: 100%; max-width: 46rem; margin: 0 auto; border-collapse: collapse; font-variant-numeric: lining-nums tabular-nums; }
         .board th { text-align: left; font-weight: 700; color: var(--sienna-deep); border-bottom: 2px solid var(--rule); padding: 0.3rem 0.6rem 0.3rem 0; }
         .board td { padding: 0.35rem 0.6rem 0.35rem 0; border-bottom: 0.5px solid var(--hairline); vertical-align: top; }
-        .board .num { text-align: right; }
+        .board .num { text-align: right; white-space: nowrap; }
         .how { margin: 2.5rem auto 0; }
         .how p { margin-bottom: 0.6rem; }
-        @media (max-width: 540px) { .pair { gap: 1rem; } .side h3 { font-size: var(--fs-body); } .side .gist { font-size: var(--fs-small); } }
+        @media (max-width: 540px) { .half { padding: 0.6rem 0.45rem; } .half h3 { font-size: var(--fs-body); } .half .gist { font-size: var(--fs-small); } .board { font-size: var(--fs-small); } }
     </style>
 </head>
 <body>
@@ -61,7 +99,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/common-good-index/mark.svg?v=8141002d" alt="" class="logo">
+            <img src="/common-good-index/mark.svg?v=b1223f64" alt="" class="logo">
             <h1><a href="/common-good-index/">Common Good Index</a></h1>
         </div>
     </header>
@@ -77,7 +115,9 @@
             </p>
         </div>
 
-        <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app" data-start="/leaderboard"><p class="note">Loading…</p></div>
+        
+        <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app" data-board><p class="note">Loading…</p></div>
+        
         <noscript><p class="note">This page needs JavaScript to fetch the matchups.</p></noscript>
 
         
@@ -134,6 +174,6 @@
             });
         })();
     </script>
-    <script src="/common-good-index/20-fetch-the-fragments.js?v=8141002d"></script>
+    <script src="/common-good-index/20-play-the-cards.js?v=b1223f64"></script>
 </body>
 </html>
