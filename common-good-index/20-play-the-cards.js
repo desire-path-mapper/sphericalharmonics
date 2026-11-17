@@ -52,13 +52,26 @@
         });
     }
 
-    // Share a link: the phone's share sheet where there is one, else copy it and say so next to `where`.
+    // Share a link: the phone's share sheet where there is one, else copy it; if neither works (some
+    // browsers refuse once the tap is a few moments old), show the link to select by hand.
     function shareLink(form, where) {
+        var url;
+        function copy() {
+            return navigator.clipboard.writeText(url)
+                .then(function () { where.textContent = 'Link copied'; })
+                .catch(function () { where.textContent = url; });
+        }
         return send('/share', { method: 'POST', body: new URLSearchParams(form) })
-            .then(function (response) { return response.json(); })
+            .then(function (response) {
+                if (!response.ok) throw new Error(response.status);
+                return response.json();
+            })
             .then(function (answer) {
-                if (navigator.share) return navigator.share({ url: answer.url }).catch(function () {});
-                return navigator.clipboard.writeText(answer.url).then(function () { where.textContent = 'Link copied'; });
+                url = answer.url;
+                if (!navigator.share) return copy();
+                return navigator.share({ url: url }).catch(function (error) {
+                    if (error && error.name !== 'AbortError') return copy();  // a cancelled sheet is not an error
+                });
             })
             .catch(function () { where.textContent = 'Couldn\'t make a link'; });
     }
@@ -82,8 +95,11 @@
         box.addEventListener('submit', function (event) {
             event.preventDefault();
             send('/name', { method: 'POST', body: new URLSearchParams(new FormData(event.target)) })
-                .then(function (r) { return r.text(); })
-                .then(function () { showBoard(game.querySelector('[aria-pressed="true"]').dataset.board); });
+                .then(function (r) { return r.text().then(function (html) { return { ok: r.ok, html: html }; }); })
+                .then(function (answer) {
+                    if (answer.ok) showBoard(game.querySelector('[aria-pressed="true"]').dataset.board);
+                    else event.target.querySelector('.note').innerHTML = answer.html;  // e.g. a name too long
+                });
         });
         showBoard('today');
         return;
@@ -119,7 +135,7 @@
         modal.querySelector('.modal-body').appendChild(card);
         modal.hidden = false;
         tex(modal);
-        game.querySelector('.daily-actions').hidden = false;
+        modal.querySelector('.modal-close').focus();
         showProgress(10);
         if (!top()) deck.innerHTML = '<p class="note">Done for today.</p>';
     }
@@ -276,18 +292,23 @@
             if (!note) { note = document.createElement('span'); note.className = 'share-note'; note.setAttribute('role', 'status'); share.parentNode.appendChild(note); }
             shareLink({ kind: 'pair', p: card.dataset.pair, daily: card.dataset.day || '' }, note);
         }
-        if (event.target.closest('[data-continue]')) {  // after a shared pair already voted on
-            mode = day ? 'daily' : 'infinite';
+        var past = event.target.closest('[data-continue]') && event.target.closest('[data-past]');
+        if (past) {  // after a shared pair already voted on: on in the mode the service said
+            mode = past.dataset.mode || 'infinite';
+            day = past.dataset.day || '';
             load();
         }
     });
 
+    function closeResult() {  // done with the Daily 10: on to infinite mode (reloading /daily-10/ reopens the result)
+        modal.hidden = true;
+        location.href = game.dataset.home;
+    }
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !modal.hidden) closeResult();
+    });
     document.addEventListener('click', function (event) {  // the result modal and its buttons
-        if (event.target.closest('.modal-close') || event.target === modal) {
-            modal.hidden = true;
-            location.href = game.dataset.home;  // done with today's Daily 10: on to infinite mode
-        }
-        if (event.target.closest('[data-open-result]')) { modal.hidden = false; }
+        if (event.target.closest('.modal-close') || event.target === modal) closeResult();
         var shareResult = event.target.closest('[data-share-result]');
         if (shareResult) shareLink({ kind: 'result', day: day }, shareResult.parentNode.querySelector('.copied'));
     });
