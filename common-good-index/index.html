@@ -23,7 +23,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=c38dfe2b">
+    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=9f926022">
     <style>
         .masthead h1 a { text-decoration: none; }
         .section-head { text-align: center; margin-bottom: 1.2rem; }
@@ -33,54 +33,75 @@
         .links a, .from a, .board a, .how a { color: var(--lane-green); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
         .note { font-size: var(--fs-small); font-style: italic; color: var(--ink-soft); margin: 0.4rem 0 0.8rem; text-align: center; }
 
-        /* The deck: the top card, with the next two peeking out below it. */
-        .deck { display: grid; max-width: 44rem; margin: 0 auto; padding-bottom: 22px; }
-        .card { grid-area: 1 / 1; display: flex; align-items: stretch; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px;
-                touch-action: none; user-select: none; -webkit-user-select: none; transition: transform 0.28s ease, opacity 0.28s ease; }
-        .card:nth-child(1) { z-index: 3; }
-        .card:nth-child(2) { z-index: 2; transform: translateY(11px) scale(0.965); pointer-events: none; }
-        .card:nth-child(3) { z-index: 1; transform: translateY(22px) scale(0.93); pointer-events: none; }
-        .card:nth-child(n+4) { display: none; }
+        /* The feed: one card at a time, each with its own buttons. The next two are already loaded (hidden).
+           A skip scrolls the card up and the next comes up from below, like a reel; a vote sends the card
+           toward the chosen side and the next comes up from below the same way. Nothing fades. */
+        #game { overflow-x: clip; }
+        .deck { display: grid; max-width: 44rem; margin: 0 auto; }
+        .card { grid-area: 1 / 1; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--rule);
+                border-radius: 6px; overflow: clip; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform 0.35s ease; }
+        .card:not(:first-child) { display: none; }
+        .card.leaving + .card { display: flex; animation: arrive 0.35s ease; }
+        @keyframes arrive { from { transform: translateY(calc(100% + 2rem)); } to { transform: none; } }
         .card.dragging { transition: none; cursor: grabbing; }
-        .half { flex: 1 1 0; min-width: 0; padding: 0.8rem 0.7rem 0.7rem; text-align: center; transition: flex-grow 0.2s ease, background-color 0.2s ease; }
+        .card.leave-a { transform: translateX(-130%) rotate(-12deg); }
+        .card.leave-b { transform: translateX(130%) rotate(12deg); }
+        .card.leave-skip { transform: translateY(calc(-100% - 2rem)); }
+        .card.leave-tie { transform: translateY(calc(-100% - 2rem)); }
+        .halves { display: flex; align-items: stretch; }
+        .half { flex: 1 1 0; min-width: 0; padding: 0.8rem 0.7rem 0.6rem; text-align: center; position: relative; isolation: isolate; }
         .half + .half { border-left: 0.5px solid var(--hairline); }
-        .card[data-aim="a"] .half-a, .card[data-aim="b"] .half-b { flex-grow: 1.45; background: var(--paper-deep); box-shadow: inset 0 0 0 2px var(--sienna); }
-        .card[data-aim="skip"] { opacity: 0.6; }
-        .card.leave-a { transform: translateX(-130%) rotate(-14deg); opacity: 0; }
-        .card.leave-b { transform: translateX(130%) rotate(14deg); opacity: 0; }
-        .card.leave-skip { transform: translateY(-120%); opacity: 0; }
-        .card.leave-tie { transform: scale(0.85); opacity: 0; }
+        /* While dragging, the half you move toward is highlighted in proportion to the distance: --lean-a and
+           --lean-b go from 0 at rest to 1 at the swipe threshold (set by the script). The halves never resize. */
+        .half::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--paper-deep);
+                        box-shadow: inset 0 0 0 2px var(--sienna); opacity: 0; transition: opacity 0.2s ease; }
+        .half-a::before { opacity: var(--lean-a, 0); }
+        .half-b::before { opacity: var(--lean-b, 0); }
+        .card.dragging .half::before { transition: none; }
         .picture { height: clamp(120px, 30vw, 260px); display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
         .picture img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
         .half h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
         .half .gist { font-style: italic; color: var(--ink-soft); margin: 0.25rem 0 0.3rem; }
-        .half .links { font-size: var(--fs-small); color: var(--ink-faint); margin-top: 0.3rem; }
-        details.sec.more { border-bottom: 0; text-align: left; }
-        details.sec.more > summary { grid-template-columns: 1.2rem 1fr; padding: 0.3rem 0; font-size: var(--fs-small); color: var(--ink-soft); }
-        .intro { max-height: 14rem; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; font-size: var(--fs-small); line-height: 1.45; padding-right: 0.3rem; }
+        /* "+ Read more" and the source link share one line (the link sits in the summary); the intro opens below. */
+        .more-line { text-align: left; }
+        details.sec.more { border-bottom: 0; }
+        details.sec.more > summary { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.7rem; padding: 0.3rem 0;
+                                     font-size: var(--fs-small); color: var(--ink-soft); }
+        details.sec.more > summary::before { width: 0.6rem; margin-right: -0.2rem; }
+        .more-line .source { font-size: var(--fs-small); color: var(--ink-soft); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .more-line > .source { display: inline-block; padding: 0.3rem 0; }
+        /* Read more expands the card; it is never a scroll container. While expanded, the page scrolls under a
+           finger as usual (no swipes: see the script). */
+        .card.expanded { touch-action: auto; cursor: auto; }
+        .intro { font-size: var(--fs-small); line-height: 1.45; }
         .intro p { margin-bottom: 0.4rem; hyphens: auto; }
         .intro .from { color: var(--ink-faint); }
 
-        /* Ballot buttons: A and B large, the tie medium, skip small beneath. */
-        .ballots { display: flex; justify-content: center; align-items: center; gap: 1.4rem; margin-top: 1rem; }
+        /* The card's buttons: A and B large, Draw medium, Skip small beneath. They belong to the card, and while
+           an expanded card is taller than the screen they stay pinned to the bottom of the screen. */
+        .buttons { position: sticky; bottom: 0; z-index: 2; background: var(--paper); border-top: 0.5px solid var(--hairline);
+                   border-radius: 0 0 6px 6px; padding-bottom: env(safe-area-inset-bottom); }
+        .ballots { display: flex; justify-content: center; align-items: center; gap: 1.4rem; padding: 0.8rem 0 0; }
         .ballot, details.sec.more > summary { -webkit-tap-highlight-color: transparent; }
         .ballot { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--ink-soft); border-radius: 50%;
-                  background: var(--paper); color: var(--ink); cursor: pointer; padding: 0; }
+                  background: var(--paper); color: var(--ink); cursor: pointer; padding: 0; font: inherit; }
         .ballot:hover, .ballot:focus-visible { border-color: var(--ink); background: var(--paper-deep); }
         .ballot.big { width: 4.2rem; height: 4.2rem; }
-        .ballot.mid { width: 3.3rem; height: 3.3rem; }
+        .ballot.mid { width: 3.4rem; height: 3.4rem; }
+        .ballot.draw { font-size: var(--fs-small); font-weight: 700; letter-spacing: 0.01em; }
         .ballot.small { width: 2.5rem; height: 2.5rem; }
         .ballot svg { width: 64%; height: 64%; overflow: visible; }
-        .skip-row { display: flex; justify-content: center; margin-top: 0.6rem; }
+        .skip-row { display: flex; justify-content: center; padding: 0.5rem 0 0.8rem; }
         .ballot .paper { transform-box: view-box; }
         .ballot.drop .paper { animation: drop 0.55s ease-in; }
         @keyframes drop { 0% { transform: translateY(0); } 65% { transform: translateY(15px); opacity: 1; } 66% { opacity: 0; } 67% { transform: translateY(-4px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
         .deck.hint .card:first-child { animation: wiggle 0.9s ease; }
         @keyframes wiggle { 25% { transform: translateX(-10px) rotate(-2deg); } 75% { transform: translateX(10px) rotate(2deg); } }
         @media (prefers-reduced-motion: reduce) {
-            .card, .half { transition: none !important; }
-            .ballot.drop .paper, .deck.hint .card:first-child { animation: none !important; }
+            .card, .half::before { transition: none !important; }
+            .card.leaving + .card, .ballot.drop .paper, .deck.hint .card:first-child { animation: none !important; }
         }
+        .result { min-height: 1.5em; }
 
         .board { width: 100%; max-width: 46rem; margin: 0 auto; border-collapse: collapse; font-variant-numeric: lining-nums tabular-nums; }
         .board th { text-align: left; font-weight: 700; color: var(--sienna-deep); border-bottom: 2px solid var(--rule); padding: 0.3rem 0.6rem 0.3rem 0; }
@@ -100,7 +121,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/common-good-index/mark.svg?v=c38dfe2b" alt="" class="logo">
+            <img src="/common-good-index/mark.svg?v=9f926022" alt="" class="logo">
             <h1><a href="/common-good-index/">Common Good Index</a></h1>
         </div>
     </header>
@@ -119,54 +140,6 @@
         
         <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app">
             <div class="deck" aria-live="polite"><p class="note">Loading…</p></div>
-            <div class="ballots">
-                <button type="button" class="ballot big" data-choice="a" aria-label="Vote for the left one"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-  <defs><clipPath id="above-a"><rect x="0" y="-20" width="40" height="42"/></clipPath></defs>
-  
-  <g clip-path="url(#above-a)"><g class="paper">
-    
-    <rect x="13" y="3" width="14" height="17" rx="1" fill="#faf3e5" stroke="#5a3017" stroke-width="2"/>
-    <path d="M16.5 11.5 l2.5 2.5 l4.5 -5" fill="none" stroke="#5a3017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    
-  </g></g>
-  <rect x="7" y="22" width="26" height="13" rx="2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.2"/>
-  <path d="M13 22 H27" stroke="#c9a234" stroke-width="3" stroke-linecap="round"/>
-  
-</svg></button>
-                <button type="button" class="ballot mid" data-choice="tie" aria-label="Tie"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-  <defs><clipPath id="above-tie"><rect x="0" y="-20" width="40" height="42"/></clipPath></defs>
-  
-  <g clip-path="url(#above-tie)"><g class="paper">
-    
-    <rect x="12" y="4" width="7" height="16" rx="1" fill="#faf3e5" stroke="#5a3017" stroke-width="2"/>
-    <rect x="21" y="4" width="7" height="16" rx="1" fill="#faf3e5" stroke="#5a3017" stroke-width="2"/>
-    
-  </g></g>
-  <rect x="7" y="22" width="26" height="13" rx="2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.2"/>
-  <path d="M13 22 H27" stroke="#c9a234" stroke-width="3" stroke-linecap="round"/>
-  
-</svg></button>
-                <button type="button" class="ballot big" data-choice="b" aria-label="Vote for the right one"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-  <defs><clipPath id="above-b"><rect x="0" y="-20" width="40" height="42"/></clipPath></defs>
-  
-  <g clip-path="url(#above-b)"><g class="paper">
-    
-    <rect x="13" y="3" width="14" height="17" rx="1" fill="#faf3e5" stroke="#5a3017" stroke-width="2"/>
-    <path d="M16.5 11.5 l2.5 2.5 l4.5 -5" fill="none" stroke="#5a3017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    
-  </g></g>
-  <rect x="7" y="22" width="26" height="13" rx="2" fill="#c98a5c" stroke="#5a3017" stroke-width="2.2"/>
-  <path d="M13 22 H27" stroke="#c9a234" stroke-width="3" stroke-linecap="round"/>
-  
-</svg></button>
-            </div>
-            <div class="skip-row"><button type="button" class="ballot small" data-choice="skip" aria-label="Skip"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-  <defs><clipPath id="above-skip"><rect x="0" y="-20" width="40" height="42"/></clipPath></defs>
-  
-  <rect x="9" y="12" width="22" height="16" rx="2" fill="none" stroke="#5a3017" stroke-width="2.2"/>
-  <path d="M15 20 H25" stroke="#5a3017" stroke-width="2.4" stroke-linecap="round"/>
-  
-</svg></button></div>
             <p class="note result" aria-live="polite"></p>
         </div>
         
@@ -174,7 +147,7 @@
 
         
         <div class="aside how">
-            <p>Each card puts two people or groups side by side, living or dead, from any period: nations, empires, companies, organizations, movements, dynasties. Pick the one you think has done more for the common good: swipe the card left or right, or use the buttons. Swipe up to skip. On a keyboard, the left and right arrows pick, = or space is a tie, and the down arrow skips. Every pick moves both ratings by standard Elo (K = 32), so beating a highly rated contender counts for more than beating an unknown one; a tie counts like a draw in chess.</p>
+            <p>Each card represents two people or groups, living or dead, from any period: nations, empires, companies, organizations, movements, dynasties. Pick the one you think has done more for the common good: swipe the card left or right, or use the buttons. Swipe up to skip. On a keyboard, the left and right arrows pick, = or space is a tie, and the down arrow skips. Every pick moves both ratings by standard Elo (K = 32), so beating a highly rated contender counts for more than beating an unknown one; a tie counts like a draw in chess.</p>
             <p>The contenders come from Wikidata, chosen by how many Wikipedia language editions and sister sites cover them. That makes them recognisable, and it also inherits Wikipedia's biases toward the English-speaking, Western, recent and male. Coverage decides who is eligible, never anyone's rating: everyone starts at 1500. Names, descriptions and pictures come from Wikidata, Wikipedia and Wikimedia Commons, free images only; each picture links to its file page for the author and licence.</p>
             <p>Open source under the MIT licence: <a href="https://github.com/sphericalharmonics-org/common-good-index">github.com/sphericalharmonics-org/common-good-index</a>.</p>
         </div>
@@ -232,6 +205,6 @@
             });
         })();
     </script>
-    <script src="/common-good-index/20-play-the-cards.js?v=c38dfe2b"></script>
+    <script src="/common-good-index/20-play-the-cards.js?v=9f926022"></script>
 </body>
 </html>

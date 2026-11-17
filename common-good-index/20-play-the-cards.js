@@ -1,8 +1,9 @@
-// The vote page plays matchups as a deck of cards, filled from the Cloud Run service; the leaderboard page
-// just loads its table. A card has two halves: swipe left (or ←, or the left button) votes for the left
-// one, right votes for the right one, up (or ↓) skips, and the middle button (or = or space) is a tie.
-// The deck's tickets are kept in localStorage, so leaving for the leaderboard and coming back shows the
-// same pairs; only a vote or a skip draws a new one.
+// The vote page plays matchups as a feed of cards, one at a time, filled from the Cloud Run service; the
+// leaderboard page just loads its table. A card has two halves and its own buttons: swipe left (or ←, or
+// the left button) votes for the left one, right votes for the right one, up (or ↓, or Skip) skips, and
+// Draw (or = or space) is a tie. The next two cards are loaded ahead, and all three tickets are kept in
+// localStorage, so leaving for the leaderboard and coming back shows the same pairs; only a vote or a
+// skip draws a new one.
 (function () {
     'use strict';
     var game = document.getElementById('game');
@@ -34,7 +35,6 @@
 
     var deck = game.querySelector('.deck');
     var result = game.querySelector('.result');
-    var buttons = game.querySelectorAll('[data-choice]');
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var KEEP = 'common-good-deck', HINTED = 'common-good-hinted';
     var busy = false;  // one vote at a time: a fast double gesture can't spend two tickets
@@ -47,17 +47,6 @@
     function top() { return cards()[0] || null; }
     function keepDeck() { remember(KEEP, cards().map(function (card) { return card.dataset.token; }).join(',')); }
 
-    function name(card, side) { return card.querySelector('.half-' + side).dataset.name; }
-    function label() {
-        var card = top();
-        buttons.forEach(function (button) {
-            var choice = button.dataset.choice;
-            button.disabled = !card;
-            if (card && (choice === 'a' || choice === 'b')) button.setAttribute('aria-label', 'Vote for ' + name(card, choice));
-            if (card && choice === 'tie') button.setAttribute('aria-label', 'Tie between ' + name(card, 'a') + ' and ' + name(card, 'b'));
-        });
-    }
-
     // Add the cards in a fragment to the back of the deck, and show what it says was counted or refused.
     function take(html) {
         var box = document.createElement('div');
@@ -68,18 +57,14 @@
         if (message) result.innerHTML = message.innerHTML;
         if (!top()) deck.innerHTML = slow ? slow.outerHTML : offline();
         keepDeck();
-        label();
     }
 
-    function dropBallot(choice) {
-        if (reduced) return;
-        var sides = choice === 'tie' ? ['tie'] : [choice];
-        sides.forEach(function (side) {
-            var button = game.querySelector('[data-choice="' + side + '"]');
-            button.classList.remove('drop');
-            void button.offsetWidth;  // restart the animation
-            button.classList.add('drop');
-        });
+    function dropBallot(card, side) {  // the ballot on that side's button drops into its box
+        var button = card && card.querySelector('[data-choice="' + side + '"]');
+        if (reduced || !button) return;
+        button.classList.remove('drop');
+        void button.offsetWidth;  // restart the animation
+        button.classList.add('drop');
     }
 
     // Vote 'a', 'b' or 'tie', or 'skip', on the top card (and only if `card`, when given, is still the top
@@ -90,13 +75,14 @@
         busy = true;
         var body = new URLSearchParams({ matchup: card.dataset.token });
         if (choice !== 'skip') body.set('choice', choice === 'tie' ? 'tie' : card.querySelector('.half-' + choice).dataset.qid);
-        dropBallot(choice);
+        dropBallot(card, choice);
+        // The card leaves (up for a skip or a draw, toward the chosen side for a vote) while the next one
+        // comes up from below into its place (CSS: .card.leaving + .card). Reduced motion swaps in place.
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });  // back to the top: the next card starts under the header
         card.classList.add('leaving', 'leave-' + choice);
-        card.removeAttribute('data-aim');
         card.style.transform = '';
-        setTimeout(function () { card.remove(); }, reduced ? 0 : 300);
+        setTimeout(function () { card.remove(); }, reduced ? 0 : 360);
         keepDeck();
-        label();
         var token = card.dataset.token;
         send(choice === 'skip' ? '/skip' : '/vote', { method: 'POST', body: body, keepalive: true })
             .then(function (response) {
@@ -107,7 +93,7 @@
                 return response.text().then(take);
             })
             .catch(function () { result.innerHTML = offline(); return load(token); })  // refill rather than let the deck run dry
-            .then(function () { busy = false; label(); });
+            .then(function () { busy = false; });
         return true;
     }
 
@@ -123,11 +109,28 @@
         remember(HINTED, '1');
         deck.classList.add('hint');
         setTimeout(function () { deck.classList.remove('hint'); }, 1000);
-        setTimeout(function () { dropBallot('a'); dropBallot('b'); }, 300);
+        setTimeout(function () { dropBallot(top(), 'a'); dropBallot(top(), 'b'); }, 300);
     }
 
-    // Dragging the top card. A drag that starts on the read-more, a link or a button is not a swipe.
-    var drag = null;
+    // Read more expands the card in place and the page scrolls as usual. While either intro is open the card
+    // is "expanded": swiping is off, so scrolling can't vote by accident; its buttons (pinned to the bottom of
+    // the screen while the card is taller than it) and the keys still work.
+    deck.addEventListener('toggle', function (event) {
+        var card = event.target.closest('.card');
+        if (card) card.classList.toggle('expanded', !!card.querySelector('details[open]'));
+    }, true);
+
+    // Dragging the top card. A drag that starts on the read-more, the source link or a button is not a
+    // swipe; one that starts on the picture is (the picture is a link to its file page, opened only by a
+    // clean tap, never at the end of a drag).
+    var drag = null, dragged = false;
+    function threshold(card) { return Math.max(80, card.offsetWidth * 0.28); }  // past this the vote commits
+    function lean(card, dx, dy) {  // highlight the half being moved toward, in proportion to the distance
+        var sideways = Math.abs(dx) >= -dy;  // an upward drag is a skip: no half is highlighted
+        var strength = sideways ? Math.min(Math.abs(dx) / threshold(card), 1) : 0;
+        card.style.setProperty('--lean-a', dx < 0 ? strength : 0);
+        card.style.setProperty('--lean-b', dx > 0 ? strength : 0);
+    }
     function aim(dx, dy, limit) {
         if (-dy > limit && -dy > Math.abs(dx)) return 'skip';
         if (dx > limit) return 'b';
@@ -137,8 +140,10 @@
     deck.addEventListener('pointerdown', function (event) {
         var card = top();
         if (!event.isPrimary || event.button !== 0) return;
-        if (!card || busy || !card.contains(event.target) || event.target.closest('details, a, button')) return;
+        if (!card || busy || card.classList.contains('expanded')) return;
+        if (!card.contains(event.target) || event.target.closest('details, .source, button')) return;
         drag = { card: card, id: event.pointerId, x: event.clientX, y: event.clientY, dx: 0, dy: 0 };
+        dragged = false;
         card.setPointerCapture(event.pointerId);
         card.classList.add('dragging');
     });
@@ -146,26 +151,32 @@
         if (!drag || event.pointerId !== drag.id) return;
         drag.dx = event.clientX - drag.x;
         drag.dy = event.clientY - drag.y;
+        if (Math.abs(drag.dx) + Math.abs(drag.dy) > 6) dragged = true;
         drag.card.style.transform = 'translate(' + drag.dx + 'px, ' + Math.min(drag.dy, 0) + 'px) rotate(' + drag.dx / 25 + 'deg)';
-        drag.card.dataset.aim = aim(drag.dx, drag.dy, 24);
+        lean(drag.card, drag.dx, drag.dy);
     });
     function release(event) {
         if (!drag || event.pointerId !== drag.id) return;
         var done = drag;
         drag = null;
         done.card.classList.remove('dragging');
-        var threshold = Math.max(80, done.card.offsetWidth * 0.28);  // past this the vote commits
-        var choice = event.type === 'pointerup' ? aim(done.dx, done.dy, threshold) : '';
+        var choice = event.type === 'pointerup' ? aim(done.dx, done.dy, threshold(done.card)) : '';
+        lean(done.card, 0, 0);  // the highlight fades back
         if (!choice || !choose(choice, done.card)) {  // a short drag snaps back and casts nothing
             done.card.style.transform = '';
-            done.card.removeAttribute('data-aim');
         }
     }
     deck.addEventListener('pointerup', release);
     deck.addEventListener('pointercancel', release);
 
-    buttons.forEach(function (button) {
-        button.addEventListener('click', function () { choose(button.dataset.choice); });
+    deck.addEventListener('click', function (event) {
+        if (dragged && event.target.closest('.picture')) {  // the end of a swipe, not a tap on the picture
+            event.preventDefault();
+            dragged = false;
+            return;
+        }
+        var button = event.target.closest('[data-choice]');
+        if (button) choose(button.dataset.choice, button.closest('.card'));
     });
 
     var KEYS = { ArrowLeft: 'a', ArrowRight: 'b', ArrowDown: 'skip', '=': 'tie', ' ': 'tie' };
