@@ -23,7 +23,8 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=9f926022">
+    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=c6e615f1">
+    
     <style>
         .masthead h1 a { text-decoration: none; }
         .section-head { text-align: center; margin-bottom: 1.2rem; }
@@ -103,6 +104,44 @@
         }
         .result { min-height: 1.5em; }
 
+        /* Sub-headings, Daily 10 progress, the share modal, the Players toggle. */
+        .sub-links { font-size: var(--fs-small); margin-top: 0.2rem; }
+        .sub-links a { margin: 0 0.5rem; color: var(--ink-soft); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .sub-links a[aria-current="page"] { color: var(--ink); text-decoration-thickness: 1.5px; }
+        .progress { max-width: 44rem; margin: 0 auto 0.8rem; }
+        .progress-bar { height: 6px; border: 0.5px solid var(--rule); border-radius: 3px; overflow: hidden; }
+        .progress-bar span { display: block; height: 100%; width: 0; background: var(--sienna); transition: width 0.3s ease; }
+        .progress-label { font-size: var(--fs-small); color: var(--ink-soft); text-align: center; margin-top: 0.3rem; }
+        .daily-actions { text-align: center; margin-top: 1rem; }
+        .modal { position: fixed; inset: 0; z-index: 20; background: rgba(27, 24, 19, 0.45); display: flex; align-items: flex-start;
+                 justify-content: center; overflow-y: auto; padding: 1.5rem 0.8rem; }
+        .modal[hidden] { display: none; }
+        .modal-box { position: relative; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; max-width: 36rem; width: 100%; padding: 1.4rem 1.2rem; }
+        .modal-close { position: absolute; top: 0.4rem; right: 0.6rem; font: inherit; font-size: 1.6rem; line-height: 1; background: none; border: 0; cursor: pointer; color: var(--ink-soft); }
+        .result-card { text-align: center; }
+        .result-card .score { font-family: var(--display); font-size: 2.6rem; line-height: 1.1; margin: 0.4rem 0; }
+        .result-card .score .title { display: block; font-size: 1.6rem; }
+        .result-card .description { font-style: italic; color: var(--ink-soft); }
+        .result-card .rank { margin: 0.4rem 0 0.8rem; }
+        .result-card .actions { margin: 0.8rem 0; }
+        .result-card .rows { margin-top: 0.8rem; text-align: left; }
+        .formula { overflow-x: auto; margin: 0.6rem 0; }
+        .copied { font-size: var(--fs-small); font-style: italic; color: var(--lane-green); margin-left: 0.5rem; }
+        .toggle { text-align: center; margin-bottom: 0.8rem; }
+        .toggle button { font: inherit; background: none; border: 1px solid var(--ink-soft); padding: 0.25rem 0.9rem; cursor: pointer; }
+        .toggle button + button { border-left: 0; }
+        .toggle button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+        .board tr.me td { background: var(--paper-deep); font-weight: 700; }
+        .rename { max-width: 46rem; margin: 1rem auto 0; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
+        .rename input { font: inherit; padding: 0.2rem 0.4rem; border: 1px solid var(--ink-soft); background: var(--paper); }
+        .skip-row { position: relative; }
+        .share { position: absolute; right: 0.8rem; top: 50%; transform: translateY(-50%); font: inherit; font-size: var(--fs-small);
+                 background: none; border: 0; color: var(--ink-soft); text-decoration: underline; text-decoration-thickness: 0.5px;
+                 text-underline-offset: 0.18em; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .share-note { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); font-size: var(--fs-small); font-style: italic; color: var(--lane-green); }
+        .past-vote { padding: 1.2rem; text-align: center; }
+        .past-vote .past p { margin: 0.4rem 0; }
+
         .board { width: 100%; max-width: 46rem; margin: 0 auto; border-collapse: collapse; font-variant-numeric: lining-nums tabular-nums; }
         .board th { text-align: left; font-weight: 700; color: var(--sienna-deep); border-bottom: 2px solid var(--rule); padding: 0.3rem 0.6rem 0.3rem 0; }
         .board td { padding: 0.35rem 0.6rem 0.35rem 0; border-bottom: 0.5px solid var(--hairline); vertical-align: top; }
@@ -121,7 +160,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/common-good-index/mark.svg?v=9f926022" alt="" class="logo">
+            <img src="/common-good-index/mark.svg?v=c6e615f1" alt="" class="logo">
             <h1><a href="/common-good-index/">Common Good Index</a></h1>
         </div>
     </header>
@@ -135,14 +174,25 @@
                 <a href="/common-good-index/" aria-current="page">Vote</a>
                 <a href="/common-good-index/leaderboard/">Leaderboard</a>
             </p>
+            
+            <p class="sub-links">
+                <a href="/common-good-index/" aria-current="page">Infinite</a>
+                <a href="/common-good-index/daily-10/">Daily 10</a>
+            </p>
+            
         </div>
 
-        
-        <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app">
+        <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app" data-mode="infinite" data-home="/common-good-index/">
+            
+            <div class="progress" hidden><div class="progress-bar"><span></span></div><p class="progress-label"></p></div>
             <div class="deck" aria-live="polite"><p class="note">Loading…</p></div>
             <p class="note result" aria-live="polite"></p>
+            <p class="daily-actions" hidden><button type="button" class="btn" data-open-result>Share result</button></p>
+            
         </div>
-        
+        <div class="modal" hidden role="dialog" aria-modal="true" aria-label="Your Daily 10">
+            <div class="modal-box"><button type="button" class="modal-close" aria-label="Close">×</button><div class="modal-body"></div></div>
+        </div>
         <noscript><p class="note">This page needs JavaScript to fetch the matchups.</p></noscript>
 
         
@@ -205,6 +255,6 @@
             });
         })();
     </script>
-    <script src="/common-good-index/20-play-the-cards.js?v=9f926022"></script>
+    <script src="/common-good-index/20-play-the-cards.js?v=c6e615f1"></script>
 </body>
 </html>

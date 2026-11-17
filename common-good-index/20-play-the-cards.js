@@ -1,13 +1,36 @@
-// The vote page plays matchups as a feed of cards, one at a time, filled from the Cloud Run service; the
-// leaderboard page just loads its table. A card has two halves and its own buttons: swipe left (or ←, or
-// the left button) votes for the left one, right votes for the right one, up (or ↓, or Skip) skips, and
-// Draw (or = or space) is a tie. The next two cards are loaded ahead, and all three tickets are kept in
-// localStorage, so leaving for the leaderboard and coming back shows the same pairs; only a vote or a
-// skip draws a new one.
+// Every page of the section runs this script; #game's data-mode says which page it is:
+// - infinite: matchups as a feed of cards, one at a time. A card has two halves and its own buttons: swipe
+//   left (or ←, or the left button) votes for the left one, right for the right one, up (or ↓, or Skip)
+//   skips, and Draw (or = or space) is a tie. The next two are loaded ahead, and their tickets are kept in
+//   localStorage, so the same pairs come back after a visit to the leaderboard.
+// - daily: the Daily 10, the same cards with a progress bar, then the result in a modal.
+// - pair: a shared card first, then the Daily 10 it came from, or infinite mode.
+// - board, players, result: the tables, and a shared Daily 10 result.
+// The player is a random id in a first-party cookie, sent to the service as the X-Player header.
 (function () {
     'use strict';
     var game = document.getElementById('game');
     var api = game.dataset.api;
+    var mode = game.dataset.mode;
+    var query = new URLSearchParams(location.search);
+    var day = query.get('d') || query.get('daily') || '';
+
+    function playerId() {
+        var found = document.cookie.match(/(?:^|; )cgi_player=([0-9a-f-]{36})/);
+        if (found) return found[1];
+        var id = crypto.randomUUID();
+        document.cookie = 'cgi_player=' + id + '; Path=' + game.dataset.home + '; Max-Age=31536000; SameSite=Lax' +
+            (location.protocol === 'https:' ? '; Secure' : '');
+        return id;
+    }
+    var player = playerId();
+
+    function tex(root) {  // typeset the formulas once KaTeX has loaded
+        if (!window.katex) { setTimeout(function () { tex(root); }, 200); return; }
+        root.querySelectorAll('[data-tex]').forEach(function (el) {
+            window.katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false });
+        });
+    }
 
     function offline() {
         return '<p class="note">Couldn\'t reach the server. Reload the page to try again.</p>';
@@ -17,8 +40,9 @@
     function send(path, options) {
         var controller = new AbortController();
         var timer = setTimeout(function () { controller.abort(); }, 10000);
-        return fetch(api + path, Object.assign({ signal: controller.signal }, options))
-            .finally(function () { clearTimeout(timer); });
+        options = Object.assign({ signal: controller.signal }, options);
+        options.headers = Object.assign({ 'X-Player': player }, options.headers);
+        return fetch(api + path, options).finally(function () { clearTimeout(timer); });
     }
 
     function get(path) {
@@ -28,13 +52,47 @@
         });
     }
 
-    if ('board' in game.dataset) {  // the leaderboard page
+    // Share a link: the phone's share sheet where there is one, else copy it and say so next to `where`.
+    function shareLink(form, where) {
+        return send('/share', { method: 'POST', body: new URLSearchParams(form) })
+            .then(function (response) { return response.json(); })
+            .then(function (answer) {
+                if (navigator.share) return navigator.share({ url: answer.url }).catch(function () {});
+                return navigator.clipboard.writeText(answer.url).then(function () { where.textContent = 'Link copied'; });
+            })
+            .catch(function () { where.textContent = 'Couldn\'t make a link'; });
+    }
+
+    if (mode === 'board') {
         get('/leaderboard').then(function (html) { game.innerHTML = html; }, function () { game.innerHTML = offline(); });
+        return;
+    }
+    if (mode === 'result') {  // a shared Daily 10 result: that player's live score, title and rank
+        get('/result?day=' + encodeURIComponent(day) + '&p=' + encodeURIComponent(query.get('p') || ''))
+            .then(function (html) { game.innerHTML = html; tex(game); }, function () { game.innerHTML = offline(); });
+        return;
+    }
+    if (mode === 'players') {  // the Players table: Today or All time; a player may rename themselves
+        var box = game.querySelector('.board-box');
+        var showBoard = function (which) {
+            game.querySelectorAll('[data-board]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.board === which); });
+            get('/players?board=' + which).then(function (html) { box.innerHTML = html; tex(box); }, function () { box.innerHTML = offline(); });
+        };
+        game.querySelectorAll('[data-board]').forEach(function (b) { b.addEventListener('click', function () { showBoard(b.dataset.board); }); });
+        box.addEventListener('submit', function (event) {
+            event.preventDefault();
+            send('/name', { method: 'POST', body: new URLSearchParams(new FormData(event.target)) })
+                .then(function (r) { return r.text(); })
+                .then(function () { showBoard(game.querySelector('[aria-pressed="true"]').dataset.board); });
+        });
+        showBoard('today');
         return;
     }
 
     var deck = game.querySelector('.deck');
     var result = game.querySelector('.result');
+    var modal = document.querySelector('.modal');
+    var progress = game.querySelector('.progress');
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var KEEP = 'common-good-deck', HINTED = 'common-good-hinted';
     var busy = false;  // one vote at a time: a fast double gesture can't spend two tickets
@@ -45,16 +103,40 @@
 
     function cards() { return Array.prototype.slice.call(deck.querySelectorAll('.card:not(.leaving)')); }
     function top() { return cards()[0] || null; }
-    function keepDeck() { remember(KEEP, cards().map(function (card) { return card.dataset.token; }).join(',')); }
+    function keepDeck() {  // only infinite mode keeps its queue; a Daily 10 is kept by the service
+        if (mode === 'infinite') remember(KEEP, cards().map(function (card) { return card.dataset.token; }).join(','));
+    }
 
-    // Add the cards in a fragment to the back of the deck, and show what it says was counted or refused.
+    function showProgress(done) {
+        progress.hidden = false;
+        progress.querySelector('span').style.width = (done * 10) + '%';
+        progress.querySelector('.progress-label').textContent = done + ' / 10 done';
+    }
+
+    // The finished Daily 10, in a modal. Closing it goes on to infinite mode.
+    function showResult(card) {
+        modal.querySelector('.modal-body').innerHTML = '';
+        modal.querySelector('.modal-body').appendChild(card);
+        modal.hidden = false;
+        tex(modal);
+        game.querySelector('.daily-actions').hidden = false;
+        showProgress(10);
+        if (!top()) deck.innerHTML = '<p class="note">Done for today.</p>';
+    }
+
+    // Add the cards in a fragment to the back of the deck, and show what it says was counted or refused, the
+    // Daily 10's progress, or its result.
     function take(html) {
         var box = document.createElement('div');
         box.innerHTML = html;
         box.querySelectorAll('.card').forEach(function (card) { deck.appendChild(card); });
-        var message = box.querySelector('.note');
+        var message = box.querySelector('.note:not(.result-card .note)');
         var slow = box.querySelector('[data-slow]');
-        if (message) result.innerHTML = message.innerHTML;
+        var now = box.querySelector('.progress-now');
+        var finished = box.querySelector('[data-finished]');
+        if (message && !message.closest('.card')) result.innerHTML = message.innerHTML;
+        if (now) { mode = 'daily'; day = now.dataset.day; showProgress(Number(now.dataset.done)); }
+        if (finished) { mode = 'daily'; day = finished.dataset.day; showResult(finished); return; }
         if (!top()) deck.innerHTML = slow ? slow.outerHTML : offline();
         keepDeck();
     }
@@ -90,7 +172,10 @@
                 // expired one comes back as a fresh ticket for the same pair and a used one is dropped.
                 if (response.status === 400) return response.text().then(function (html) { take(html); return load(token); });
                 if (!response.ok && response.status !== 429) throw new Error(response.status);
-                return response.text().then(take);
+                return response.text().then(function (html) {
+                    take(html);
+                    if (mode === 'pair') { mode = 'infinite'; return load(); }  // a shared card, then infinite mode
+                });
             })
             .catch(function () { result.innerHTML = offline(); return load(token); })  // refill rather than let the deck run dry
             .then(function () { busy = false; });
@@ -98,8 +183,16 @@
     }
 
     function load(first) {
-        var keep = (first ? [first] : []).concat((recall(KEEP) || '').split(',')).filter(Boolean).slice(0, 3);
-        return get('/deck?keep=' + encodeURIComponent(keep.join(',')))
+        var path;
+        if (mode === 'daily') {
+            path = '/daily?day=' + encodeURIComponent(day);
+        } else if (mode === 'pair') {
+            path = '/pair?p=' + encodeURIComponent(query.get('p') || '') + (day ? '&daily=' + encodeURIComponent(day) : '');
+        } else {
+            var keep = (first ? [first] : []).concat((recall(KEEP) || '').split(',')).filter(Boolean).slice(0, 3);
+            path = '/deck?keep=' + encodeURIComponent(keep.join(','));
+        }
+        return get(path)
             .then(function (html) { deck.innerHTML = ''; take(html); hint(); }, function () { if (!top()) deck.innerHTML = offline(); });
     }
 
@@ -177,6 +270,26 @@
         }
         var button = event.target.closest('[data-choice]');
         if (button) choose(button.dataset.choice, button.closest('.card'));
+        var share = event.target.closest('.share');
+        if (share) {
+            var card = share.closest('.card'), note = card.querySelector('.share-note');
+            if (!note) { note = document.createElement('span'); note.className = 'share-note'; note.setAttribute('role', 'status'); share.parentNode.appendChild(note); }
+            shareLink({ kind: 'pair', p: card.dataset.pair, daily: card.dataset.day || '' }, note);
+        }
+        if (event.target.closest('[data-continue]')) {  // after a shared pair already voted on
+            mode = day ? 'daily' : 'infinite';
+            load();
+        }
+    });
+
+    document.addEventListener('click', function (event) {  // the result modal and its buttons
+        if (event.target.closest('.modal-close') || event.target === modal) {
+            modal.hidden = true;
+            location.href = game.dataset.home;  // done with today's Daily 10: on to infinite mode
+        }
+        if (event.target.closest('[data-open-result]')) { modal.hidden = false; }
+        var shareResult = event.target.closest('[data-share-result]');
+        if (shareResult) shareLink({ kind: 'result', day: day }, shareResult.parentNode.querySelector('.copied'));
     });
 
     var KEYS = { ArrowLeft: 'a', ArrowRight: 'b', ArrowDown: 'skip', '=': 'tie', ' ': 'tie' };
