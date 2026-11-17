@@ -12,8 +12,16 @@
         return '<p class="note">Couldn\'t reach the server. Reload the page to try again.</p>';
     }
 
+    // Every request gives up after 10 s, so a hung connection can't freeze the page.
+    function send(path, options) {
+        var controller = new AbortController();
+        var timer = setTimeout(function () { controller.abort(); }, 10000);
+        return fetch(api + path, Object.assign({ signal: controller.signal }, options))
+            .finally(function () { clearTimeout(timer); });
+    }
+
     function get(path) {
-        return fetch(api + path).then(function (response) {
+        return send(path).then(function (response) {
             if (!response.ok && response.status !== 400 && response.status !== 429) throw new Error(response.status);
             return response.text();
         });
@@ -56,8 +64,9 @@
         box.innerHTML = html;
         box.querySelectorAll('.card').forEach(function (card) { deck.appendChild(card); });
         var message = box.querySelector('.note');
+        var slow = box.querySelector('[data-slow]');
         if (message) result.innerHTML = message.innerHTML;
-        if (!top()) deck.innerHTML = message && message.hasAttribute('data-slow') ? message.outerHTML : offline();
+        if (!top()) deck.innerHTML = slow ? slow.outerHTML : offline();
         keepDeck();
         label();
     }
@@ -73,10 +82,11 @@
         });
     }
 
-    // Vote 'a', 'b' or 'tie', or 'skip', on the top card. Returns false if nothing was sent.
-    function choose(choice) {
-        var card = top();
-        if (!card || busy) return false;
+    // Vote 'a', 'b' or 'tie', or 'skip', on the top card (and only if `card`, when given, is still the top
+    // one). Returns false if nothing was sent.
+    function choose(choice, card) {
+        card = card || top();
+        if (!card || card !== top() || busy) return false;
         busy = true;
         var body = new URLSearchParams({ matchup: card.dataset.token });
         if (choice !== 'skip') body.set('choice', choice === 'tie' ? 'tie' : card.querySelector('.half-' + choice).dataset.qid);
@@ -87,20 +97,24 @@
         setTimeout(function () { card.remove(); }, reduced ? 0 : 300);
         keepDeck();
         label();
-        fetch(api + (choice === 'skip' ? '/skip' : '/vote'), { method: 'POST', body: body })
+        var token = card.dataset.token;
+        send(choice === 'skip' ? '/skip' : '/vote', { method: 'POST', body: body, keepalive: true })
             .then(function (response) {
-                if (response.status === 400) return response.text().then(function (html) { take(html); load(); });
+                // Refused (an expired or used ticket): ask for the deck again with that ticket first, so an
+                // expired one comes back as a fresh ticket for the same pair and a used one is dropped.
+                if (response.status === 400) return response.text().then(function (html) { take(html); return load(token); });
                 if (!response.ok && response.status !== 429) throw new Error(response.status);
                 return response.text().then(take);
             })
-            .catch(function () { result.innerHTML = offline(); })
+            .catch(function () { result.innerHTML = offline(); return load(token); })  // refill rather than let the deck run dry
             .then(function () { busy = false; label(); });
         return true;
     }
 
-    function load() {
-        get('/deck?keep=' + encodeURIComponent(recall(KEEP) || ''))
-            .then(function (html) { deck.innerHTML = ''; take(html); hint(); }, function () { deck.innerHTML = offline(); });
+    function load(first) {
+        var keep = (first ? [first] : []).concat((recall(KEEP) || '').split(',')).filter(Boolean).slice(0, 3);
+        return get('/deck?keep=' + encodeURIComponent(keep.join(',')))
+            .then(function (html) { deck.innerHTML = ''; take(html); hint(); }, function () { if (!top()) deck.innerHTML = offline(); });
     }
 
     // Once per browser: wiggle the card and drop a ballot on both sides, to show what the page does.
@@ -122,6 +136,7 @@
     }
     deck.addEventListener('pointerdown', function (event) {
         var card = top();
+        if (!event.isPrimary || event.button !== 0) return;
         if (!card || busy || !card.contains(event.target) || event.target.closest('details, a, button')) return;
         drag = { card: card, id: event.pointerId, x: event.clientX, y: event.clientY, dx: 0, dy: 0 };
         card.setPointerCapture(event.pointerId);
@@ -141,7 +156,7 @@
         done.card.classList.remove('dragging');
         var threshold = Math.max(80, done.card.offsetWidth * 0.28);  // past this the vote commits
         var choice = event.type === 'pointerup' ? aim(done.dx, done.dy, threshold) : '';
-        if (!choice || !choose(choice)) {  // a short drag snaps back and casts nothing
+        if (!choice || !choose(choice, done.card)) {  // a short drag snaps back and casts nothing
             done.card.style.transform = '';
             done.card.removeAttribute('data-aim');
         }
@@ -156,8 +171,9 @@
     var KEYS = { ArrowLeft: 'a', ArrowRight: 'b', ArrowDown: 'skip', '=': 'tie', ' ': 'tie' };
     document.addEventListener('keydown', function (event) {
         var choice = KEYS[event.key];
-        if (!choice || event.metaKey || event.ctrlKey || event.altKey) return;
-        if (event.key === ' ' && event.target.closest('button, summary, a, input, textarea, select')) return;
+        if (!choice || event.metaKey || event.ctrlKey || event.altKey || event.repeat || event.isComposing) return;
+        if (event.target.closest('input, textarea, select, [contenteditable], details')) return;  // typing, or reading an intro
+        if (event.key === ' ' && event.target.closest('button, a')) return;  // Space presses a focused button
         event.preventDefault();
         choose(choice);
     });
