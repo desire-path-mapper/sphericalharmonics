@@ -23,7 +23,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=c6e615f1">
+    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=9c50b269">
     
     <style>
         .masthead h1 a { text-decoration: none; }
@@ -124,7 +124,9 @@
         .result-card .description { font-style: italic; color: var(--ink-soft); }
         .result-card .rank { margin: 0.4rem 0 0.8rem; }
         .result-card .actions { margin: 0.8rem 0; }
-        .result-card .rows { margin-top: 0.8rem; text-align: left; }
+        .result-card .rows { margin-top: 0.8rem; text-align: left; font-size: var(--fs-small); table-layout: fixed; }
+        .result-card .rows td { overflow-wrap: anywhere; }
+        .result-card .rows th.num, .result-card .rows td.num { width: 2.8rem; }
         .formula { overflow-x: auto; margin: 0.6rem 0; }
         .copied { font-size: var(--fs-small); font-style: italic; color: var(--lane-green); margin-left: 0.5rem; }
         .toggle { text-align: center; margin-bottom: 0.8rem; }
@@ -160,7 +162,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/common-good-index/mark.svg?v=c6e615f1" alt="" class="logo">
+            <img src="/common-good-index/mark.svg?v=9c50b269" alt="" class="logo">
             <h1><a href="/common-good-index/">Common Good Index</a></h1>
         </div>
     </header>
@@ -255,6 +257,6 @@
             });
         })();
     </script>
-    <script src="/common-good-index/20-play-the-cards.js?v=c6e615f1"></script>
+    <script src="/common-good-index/20-play-the-cards.js?v=9c50b269"></script>
 </body>
 </html>
