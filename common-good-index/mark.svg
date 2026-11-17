@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 68" role="img" aria-label="">
+  <!-- Generic mark for this section, in the family of the Spherical Harmonics logo: carved wood with a square
+       lattice and a brass band, on a soft shadow. Placeholder until the project is named; swap this one file. -->
+  <defs>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e2ad80"/><stop offset="0.55" stop-color="#c98a5c"/><stop offset="1" stop-color="#9c5c33"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8cf6e"/><stop offset="0.5" stop-color="#c9a234"/><stop offset="1" stop-color="#8d6c17"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="32" cy="64.5" rx="22" ry="2.6" fill="#1b1813" opacity="0.14"/>
+  <rect x="4" y="4" width="56" height="56" rx="11" fill="url(#wood)"/>
+  <g fill="#5a3017" opacity="0.88"><rect x="12.4" y="11" width="4.2" height="3.2" rx="0.6"/><rect x="19.4" y="11" width="4.2" height="3.2" rx="0.6"/><rect x="26.4" y="11" width="4.2" height="3.2" rx="0.6"/><rect x="33.4" y="11" width="4.2" height="3.2" rx="0.6"/><rect x="40.4" y="11" width="4.2" height="3.2" rx="0.6"/><rect x="47.4" y="11" width="4.2" height="3.2" rx="0.6"/><rect x="8.9" y="17.5" width="4.2" height="3.2" rx="0.6"/><rect x="15.9" y="17.5" width="4.2" height="3.2" rx="0.6"/><rect x="22.9" y="17.5" width="4.2" height="3.2" rx="0.6"/><rect x="29.9" y="17.5" width="4.2" height="3.2" rx="0.6"/><rect x="36.9" y="17.5" width="4.2" height="3.2" rx="0.6"/><rect x="43.9" y="17.5" width="4.2" height="3.2" rx="0.6"/><rect x="50.9" y="17.5" width="4.2" height="3.2" rx="0.6"/><rect x="8.9" y="40.5" width="4.2" height="3.6" rx="0.6"/><rect x="15.9" y="40.5" width="4.2" height="3.6" rx="0.6"/><rect x="22.9" y="40.5" width="4.2" height="3.6" rx="0.6"/><rect x="29.9" y="40.5" width="4.2" height="3.6" rx="0.6"/><rect x="36.9" y="40.5" width="4.2" height="3.6" rx="0.6"/><rect x="43.9" y="40.5" width="4.2" height="3.6" rx="0.6"/><rect x="50.9" y="40.5" width="4.2" height="3.6" rx="0.6"/><rect x="12.4" y="47.5" width="4.2" height="3.2" rx="0.6"/><rect x="19.4" y="47.5" width="4.2" height="3.2" rx="0.6"/><rect x="26.4" y="47.5" width="4.2" height="3.2" rx="0.6"/><rect x="33.4" y="47.5" width="4.2" height="3.2" rx="0.6"/><rect x="40.4" y="47.5" width="4.2" height="3.2" rx="0.6"/><rect x="47.4" y="47.5" width="4.2" height="3.2" rx="0.6"/></g>
+  <rect x="7" y="25" width="50" height="9.6" rx="1.6" fill="url(#brass)" stroke="#6f5210" stroke-width="0.6"/>
+  <g fill="#2a1d0c"><rect x="12.2" y="27.6" width="3.2" height="4.4" rx="0.4"/><rect x="17.4" y="27.6" width="3.2" height="4.4" rx="0.4"/><rect x="22.6" y="27.6" width="3.2" height="4.4" rx="0.4"/><rect x="27.8" y="27.6" width="3.2" height="4.4" rx="0.4"/><rect x="33.0" y="27.6" width="3.2" height="4.4" rx="0.4"/><rect x="38.2" y="27.6" width="3.2" height="4.4" rx="0.4"/><rect x="43.4" y="27.6" width="3.2" height="4.4" rx="0.4"/><rect x="48.6" y="27.6" width="3.2" height="4.4" rx="0.4"/></g>
+</svg>
