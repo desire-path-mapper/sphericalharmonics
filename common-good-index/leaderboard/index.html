@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard · Common Good Index · Spherical Harmonics</title>
+    <link rel="preload" href="/assets/fonts/cmu-serif-500-roman.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/cmu-serif-700-roman.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/assets/site.css?v=20261027a">
+    <meta name="description" content="Who has done more for the common good? Pick between two people or groups at a time; everyone is ranked by Elo.">
+    <meta name="theme-color" content="#faf3e5">
+    <meta name="color-scheme" content="light">
+    <script>
+        // Light by default; a reader's own choice (the toggle, top right) is
+        // remembered in this browser and applied before first paint.
+        (function () {
+            var theme = 'light';
+            try { if (localStorage.getItem('sh-theme') === 'dark') theme = 'dark'; } catch (e) {}
+            document.documentElement.dataset.theme = theme;
+            if (theme === 'dark') {
+                document.querySelector('meta[name="theme-color"]').content = '#18130d';
+                document.querySelector('meta[name="color-scheme"]').content = 'dark';
+            }
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/favicon.png?v=2">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <style>
+        .section-head { text-align: center; margin-bottom: 1.4rem; }
+        .question { font-family: var(--display); font-size: clamp(1.6rem, 4.5vw, 2.2rem); font-weight: 500; line-height: 1.15; margin: 0.2rem 0 0.5rem; text-wrap: balance; }
+        .section-links a { margin: 0 0.5rem; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .section-links a[aria-current="page"] { text-decoration-thickness: 1.5px; }
+        .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 2rem; border-top: 2px solid var(--rule); padding-top: 1.2rem; }
+        .side { display: flex; flex-direction: column; min-width: 0; text-align: center; }
+        .side .picture { height: clamp(170px, 32vw, 340px); display: flex; align-items: center; justify-content: center; margin-bottom: 0.8rem; }
+        .side img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .side h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+        .side .gist { font-style: italic; color: var(--ink-soft); margin: 0.25rem 0 0.4rem; }
+        .side .links { font-size: var(--fs-small); color: var(--ink-faint); }
+        .side form { margin-top: auto; padding-top: 0.9rem; }
+        .side .btn { width: 100%; background: none; cursor: pointer; }
+        .side .btn:hover, .side .btn:focus-visible { background: var(--ink); color: var(--paper); }
+        .links a, .after a, .board a, .how a { color: var(--lane-green); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .after { margin-top: 1.6rem; padding-top: 0.6rem; border-top: 0.5px solid var(--hairline); text-align: center; }
+        .note { font-size: var(--fs-small); font-style: italic; color: var(--ink-soft); margin: 0.4rem 0 0.8rem; text-align: center; }
+        .board { width: 100%; max-width: 46rem; margin: 0 auto; border-collapse: collapse; font-variant-numeric: lining-nums tabular-nums; }
+        .board th { text-align: left; font-weight: 700; color: var(--sienna-deep); border-bottom: 2px solid var(--rule); padding: 0.3rem 0.6rem 0.3rem 0; }
+        .board td { padding: 0.35rem 0.6rem 0.35rem 0; border-bottom: 0.5px solid var(--hairline); vertical-align: top; }
+        .board .num { text-align: right; }
+        .how { margin: 2.5rem auto 0; }
+        .how p { margin-bottom: 0.6rem; }
+        @media (max-width: 540px) { .pair { gap: 1rem; } .side h3 { font-size: var(--fs-body); } .side .gist { font-size: var(--fs-small); } }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="masthead">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Dark mode" title="Dark mode">
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
+        </button>
+        <div class="masthead-lockup">
+            <img src="/logo_header.png" alt="Spherical Harmonics logo: a carved wooden sphere with a brass harmonica at its equator" class="logo">
+            <h1><a href="/">Spherical Harmonics</a></h1>
+        </div>
+    </header>
+
+    <div class="rule-wrap"><div class="double-rule"></div></div>
+
+    <nav class="section-nav" aria-label="Sections">
+        <a href="/#mission">Mission</a>
+        <a href="/#demo">City Edit</a>
+        <a href="/#newsletter">Newsletter</a>
+        <a href="/#people">People</a>
+        <a href="/#gallery">Gallery</a>
+        <a href="/shop/">Shop</a>
+        <a href="mailto:brook@sphericalharmonics.org">Contact</a>
+        <a class="nav-donate" href="https://donorbox.org/support-spherical-harmonics">Donate</a>
+    </nav>
+
+    <main class="container" id="main">
+        <div class="section-head">
+            <p class="kicker">Common Good Index</p>
+            <h2 class="question">Who has done more for the common good?</h2>
+            <p class="section-links">
+                <a href="/common-good-index/">Vote</a>
+                <a href="/common-good-index/leaderboard/" aria-current="page">Leaderboard</a>
+            </p>
+        </div>
+
+        <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app" data-start="/leaderboard"><p class="note">Loading…</p></div>
+        <noscript><p class="note">This page needs JavaScript to fetch the matchups.</p></noscript>
+
+        
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <div>
+                <div class="wordmark">Spherical Harmonics</div>
+                <p class="foot-tag">A civic technology nonprofit building open tools for community-driven street redesign.</p>
+            </div>
+            <div>
+                <div class="foot-head">Get Involved</div>
+                <ul>
+                    <li><a href="https://demo.cityedit.org/">City Edit demo</a></li>
+                    <li><a href="https://sphericalharmonics.substack.com/">Newsletter</a></li>
+                    <li><a href="/shop/">Shop</a></li>
+                    <li><a href="https://donorbox.org/support-spherical-harmonics">Donate</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="foot-head">Contact</div>
+                <ul>
+                    <li><a href="mailto:brook@sphericalharmonics.org">brook@sphericalharmonics.org</a></li>
+                    <li><a href="mailto:eric@sphericalharmonics.org">eric@sphericalharmonics.org</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <span>&copy; 2026 Spherical Harmonics Inc. All rights reserved.</span>
+            <span>New York City</span>
+        </div>
+    </footer>
+
+    <script>
+        // Theme toggle, top right. Light unless the reader picks dark.
+        (function () {
+            var root = document.documentElement;
+            var button = document.getElementById('theme-toggle');
+            function apply(theme) {
+                root.dataset.theme = theme;
+                var dark = theme === 'dark';
+                button.setAttribute('aria-pressed', dark ? 'true' : 'false');
+                button.setAttribute('aria-label', dark ? 'Light mode' : 'Dark mode');
+                button.title = dark ? 'Light mode' : 'Dark mode';
+                document.querySelector('meta[name="theme-color"]').content = dark ? '#18130d' : '#faf3e5';
+                document.querySelector('meta[name="color-scheme"]').content = dark ? 'dark' : 'light';
+            }
+            apply(root.dataset.theme === 'dark' ? 'dark' : 'light');
+            button.addEventListener('click', function () {
+                var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+                apply(next);
+                try { localStorage.setItem('sh-theme', next); } catch (e) {}
+            });
+        })();
+    </script>
+    <script src="/common-good-index/20-fetch-the-fragments.js?v=e7a0f84b"></script>
+</body>
+</html>
