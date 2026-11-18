@@ -23,7 +23,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=0e824eeb">
+    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=6f48a2df">
     
     <style>
         .masthead h1 a { text-decoration: none; }
@@ -50,7 +50,9 @@
         .card.leave-skip { transform: translateY(calc(-100% - 2rem)); }
         .card.leave-tie { transform: translateY(calc(-100% - 2rem)); }
         .halves { display: flex; align-items: stretch; }
-        .half { flex: 1 1 0; min-width: 0; padding: 0.8rem 0.7rem 0.6rem; text-align: center; position: relative; isolation: isolate; }
+        .half { flex: 1 1 0; min-width: 0; padding: 0.8rem 0.7rem 0.6rem; text-align: center; position: relative; isolation: isolate;
+                display: flex; flex-direction: column; }
+        .half .more-line { margin-top: auto; }  /* the read-more lines sit level, whatever the descriptions' lengths */
         .half + .half { border-left: 0.5px solid var(--hairline); }
         /* While dragging, the half you move toward is highlighted in proportion to the distance: --lean-a and
            --lean-b go from 0 at rest to 1 at the swipe threshold (set by the script). The halves never resize. */
@@ -83,7 +85,9 @@
 
         /* The card's buttons, under the text in normal flow: A and B large, Draw medium, Share small, Skip beneath. */
         .buttons { border-top: 0.5px solid var(--hairline); }
-        .ballots { display: flex; justify-content: center; align-items: center; gap: 1rem; padding: 0.8rem 0 0; }
+        .ballots { display: flex; justify-content: center; align-items: flex-start; gap: 1rem; padding: 0.8rem 0 0; }
+        .labelled { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; min-height: 5.3rem; }
+        .labelled .label { font-size: var(--fs-small); color: var(--ink-soft); line-height: 1; }
         .ballot, details.sec.more > summary { -webkit-tap-highlight-color: transparent; }
         .ballot { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--ink-soft); border-radius: 50%;
                   background: var(--paper); color: var(--ink); cursor: pointer; padding: 0; font: inherit; }
@@ -148,6 +152,15 @@
         .board th { text-align: left; font-weight: 700; color: var(--sienna-deep); border-bottom: 2px solid var(--rule); padding: 0.3rem 0.6rem 0.3rem 0; }
         .board td { padding: 0.35rem 0.6rem 0.35rem 0; border-bottom: 0.5px solid var(--hairline); vertical-align: top; }
         .board .num { text-align: right; white-space: nowrap; }
+        .board a { text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .unranked-head { max-width: 46rem; margin: 2rem auto 0.4rem; font-size: var(--fs-body); }
+        .unranked { max-width: 46rem; margin: 0 auto; padding: 0; list-style: none; columns: 2 16rem; column-gap: 2rem; }
+        .unranked li { break-inside: avoid; padding: 0.15rem 0; }
+        .unranked a { color: var(--lane-green); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .note-inline { font-size: var(--fs-small); color: var(--ink-faint); }
+        .history { max-width: 46rem; margin: 0 auto; }
+        .history .back a, .history .note a { color: var(--lane-green); }
+        .history h3 { font-family: var(--display); font-weight: 500; font-size: 1.6rem; margin: 0.4rem 0 0.2rem; }
         .how { margin: 2.5rem auto 0; }
         .how p { margin-bottom: 0.6rem; }
         @media (max-width: 540px) { .half { padding: 0.6rem 0.45rem; } .half h3 { font-size: var(--fs-body); } .half .gist { font-size: var(--fs-small); } .board { font-size: var(--fs-small); } }
@@ -162,7 +175,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/common-good-index/mark.svg?v=0e824eeb" alt="" class="logo">
+            <img src="/common-good-index/mark.svg?v=6f48a2df" alt="" class="logo">
             <h1><a href="/common-good-index/">Common Good Index</a></h1>
         </div>
     </header>
@@ -201,22 +214,14 @@
         <div class="footer-inner">
             <div>
                 <div class="wordmark"><a href="https://sphericalharmonics.org/">Spherical Harmonics</a></div>
-                <p class="foot-tag">Common Good Index is a project of Spherical Harmonics, a civic technology nonprofit building open tools for community-driven street redesign. Home page: <a href="https://sphericalharmonics.org/">sphericalharmonics.org</a>.</p>
+                <p class="foot-tag">Common Good Index is a project of Spherical Harmonics. Home page: <a href="https://sphericalharmonics.org/">sphericalharmonics.org</a>.</p>
             </div>
             <div>
                 <div class="foot-head">Get Involved</div>
                 <ul>
-                    <li><a href="https://demo.cityedit.org/">City Edit demo</a></li>
                     <li><a href="https://sphericalharmonics.substack.com/">Newsletter</a></li>
-                    <li><a href="/shop/">Shop</a></li>
                     <li><a href="https://donorbox.org/support-spherical-harmonics">Donate</a></li>
-                </ul>
-            </div>
-            <div>
-                <div class="foot-head">Contact</div>
-                <ul>
-                    <li><a href="mailto:brook@sphericalharmonics.org">brook@sphericalharmonics.org</a></li>
-                    <li><a href="mailto:eric@sphericalharmonics.org">eric@sphericalharmonics.org</a></li>
+                    <li><a href="mailto:brook@sphericalharmonics.org">Contact</a></li>
                 </ul>
             </div>
         </div>
@@ -248,6 +253,6 @@
             });
         })();
     </script>
-    <script src="/common-good-index/20-play-the-cards.js?v=0e824eeb"></script>
+    <script src="/common-good-index/20-play-the-cards.js?v=6f48a2df"></script>
 </body>
 </html>

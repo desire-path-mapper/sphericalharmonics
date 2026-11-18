@@ -129,8 +129,9 @@
         if (prompt) { event.preventDefault(); location.href = signInLink(); }
     });
 
-    if (mode === 'board') {
-        get('/leaderboard').then(function (html) { game.innerHTML = html; }, function () { game.innerHTML = offline(); });
+    if (mode === 'board') {  // the People & groups table, or one contender's matches (?c=<id>)
+        get(query.get('c') ? '/contender?c=' + encodeURIComponent(query.get('c')) : '/leaderboard')
+            .then(function (html) { game.innerHTML = html; }, function () { game.innerHTML = offline(); });
         return;
     }
     if (mode === 'result') {  // a shared Daily 10 result: that player's live score, title and rank
@@ -233,6 +234,7 @@
                 if (response.status === 400) return response.text().then(function (html) { take(html); return load(token); });
                 if (!response.ok && response.status !== 429) throw new Error(response.status);
                 return response.text().then(function (html) {
+                    busy = false;  // before the next card shows, so a quick tap on it counts
                     take(html);
                     if (mode === 'pair') { mode = 'infinite'; return load(); }  // a shared card, then infinite mode
                 });
