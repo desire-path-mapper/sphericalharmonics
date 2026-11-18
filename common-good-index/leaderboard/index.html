@@ -23,7 +23,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=46f9187a">
+    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=0e824eeb">
     
     <style>
         .masthead h1 a { text-decoration: none; }
@@ -136,8 +136,10 @@
         .toggle button + button { border-left: 0; }
         .toggle button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
         .board tr.me td { background: var(--paper-deep); font-weight: 700; }
-        .rename { max-width: 46rem; margin: 1rem auto 0; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
-        .rename input { font: inherit; padding: 0.2rem 0.4rem; border: 1px solid var(--ink-soft); background: var(--paper); }
+        .account { display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-size: var(--fs-small); color: var(--ink-soft); margin-bottom: 0.4rem; }
+        .account a, .sign-out { font: inherit; color: var(--ink-soft); background: none; border: 0; padding: 0; cursor: pointer;
+                                text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .avatar { width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; }
         .share-note { display: block; text-align: center; font-size: var(--fs-small); font-style: italic; color: var(--lane-green); min-height: 1.2em; }
         .past-vote { padding: 1.2rem; text-align: center; }
         .past-vote .past p { margin: 0.4rem 0; }
@@ -160,7 +162,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/common-good-index/mark.svg?v=46f9187a" alt="" class="logo">
+            <img src="/common-good-index/mark.svg?v=0e824eeb" alt="" class="logo">
             <h1><a href="/common-good-index/">Common Good Index</a></h1>
         </div>
     </header>
@@ -169,6 +171,7 @@
 
     <main class="container" id="main">
         <div class="section-head">
+            <p class="account" hidden></p>
             <p class="section-links">
                 <a href="/common-good-index/">Vote</a>
                 <a href="/common-good-index/leaderboard/" aria-current="page">Leaderboard</a>
@@ -245,6 +248,6 @@
             });
         })();
     </script>
-    <script src="/common-good-index/20-play-the-cards.js?v=46f9187a"></script>
+    <script src="/common-good-index/20-play-the-cards.js?v=0e824eeb"></script>
 </body>
 </html>

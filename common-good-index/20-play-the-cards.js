@@ -6,7 +6,9 @@
 // - daily: the Daily 10, the same cards with a progress bar, then the result in a modal.
 // - pair: a shared card first, then the Daily 10 it came from, or infinite mode.
 // - board, players, result: the tables, and a shared Daily 10 result.
-// The player is a random id in a first-party cookie, sent to the service as the X-Player header.
+// Players sign in with X. The only lasting cookie is the sign-in session (cgi_session, set here, first-party),
+// sent as X-Auth. A signed-out tab has a per-tab id (sessionStorage, no cookie), sent as X-Session, so its
+// votes can join the account when it signs in.
 (function () {
     'use strict';
     var game = document.getElementById('game');
@@ -15,15 +17,22 @@
     var query = new URLSearchParams(location.search);
     var day = query.get('d') || query.get('daily') || '';
 
-    function playerId() {
-        var found = document.cookie.match(/(?:^|; )cgi_player=([0-9a-f-]{36})/);
-        if (found) return found[1];
-        var id = crypto.randomUUID();
-        document.cookie = 'cgi_player=' + id + '; Path=' + game.dataset.home + '; Max-Age=31536000; SameSite=Lax' +
+    var home = game.dataset.home;
+    function cookie(name, value, seconds) {
+        document.cookie = name + '=' + value + '; Path=' + home + '; Max-Age=' + seconds + '; SameSite=Lax' +
             (location.protocol === 'https:' ? '; Secure' : '');
-        return id;
     }
-    var player = playerId();
+    cookie('cgi_player', '', 0);  // the old anonymous cookie: gone
+    function sessionToken() {
+        var found = document.cookie.match(/(?:^|; )cgi_session=([A-Za-z0-9_-]+)/);
+        return found ? found[1] : '';
+    }
+    var tab = (function () {
+        var id = null;
+        try { id = sessionStorage.getItem('cgi_tab'); } catch (e) { /* no storage: an id for this page only */ }
+        if (!id) { id = crypto.randomUUID(); try { sessionStorage.setItem('cgi_tab', id); } catch (e) { /* kept in memory */ } }
+        return id;
+    })();
 
     function tex(root) {  // typeset the formulas once KaTeX has loaded
         if (!window.katex) { setTimeout(function () { tex(root); }, 200); return; }
@@ -41,7 +50,9 @@
         var controller = new AbortController();
         var timer = setTimeout(function () { controller.abort(); }, 10000);
         options = Object.assign({ signal: controller.signal }, options);
-        options.headers = Object.assign({ 'X-Player': player }, options.headers);
+        var who = { 'X-Session': tab };
+        if (sessionToken()) who['X-Auth'] = sessionToken();
+        options.headers = Object.assign(who, options.headers);
         return fetch(api + path, options).finally(function () { clearTimeout(timer); });
     }
 
@@ -76,32 +87,65 @@
             .catch(function () { where.textContent = 'Couldn\'t make a link'; });
     }
 
+    // Signing in: X sends the visitor back with ?login=<one-time code>; trade it for a session token, keep the
+    // token in our own cookie, and drop the code from the address bar.
+    var account = document.querySelector('.account');
+    function signInLink() {
+        return api + '/auth/x/start?session=' + encodeURIComponent(tab) + '&return=' + encodeURIComponent(location.href.split('?')[0] + location.search.replace(/[?&]login=[^&]*/, ''));
+    }
+    function showAccount(me) {
+        if (!account) return;
+        account.innerHTML = '';
+        if (me.player) {
+            var img = document.createElement('img');
+            img.src = me.player.avatar; img.alt = ''; img.className = 'avatar'; img.referrerPolicy = 'no-referrer';
+            var who = document.createElement('span');
+            who.textContent = '@' + me.player.username;
+            var out = document.createElement('button');
+            out.type = 'button'; out.className = 'sign-out'; out.textContent = 'Sign out';
+            account.append(img, who, out);
+        } else if (me.sign_in) {
+            var link = document.createElement('a');
+            link.href = signInLink(); link.textContent = 'Sign in with X';
+            account.append(link);
+        }
+        account.hidden = !account.childNodes.length;
+    }
+    var signedIn = (function () {
+        var code = query.get('login');
+        if (!code || code === 'failed') return Promise.resolve();
+        history.replaceState(null, '', location.pathname + location.search.replace(/[?&]login=[^&]*/, '').replace(/^&/, '?'));
+        return send('/auth/login', { method: 'POST', body: new URLSearchParams({ code: code }) })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (answer) { if (answer) cookie('cgi_session', answer.token, 30 * 24 * 3600); });
+    })().then(function () {
+        return get('/me').then(function (text) { showAccount(JSON.parse(text)); }, function () {});
+    });
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('.sign-out')) {
+            send('/auth/logout', { method: 'POST' }).finally(function () { cookie('cgi_session', '', 0); location.reload(); });
+        }
+        var prompt = event.target.closest('[data-sign-in]');
+        if (prompt) { event.preventDefault(); location.href = signInLink(); }
+    });
+
     if (mode === 'board') {
         get('/leaderboard').then(function (html) { game.innerHTML = html; }, function () { game.innerHTML = offline(); });
         return;
     }
     if (mode === 'result') {  // a shared Daily 10 result: that player's live score, title and rank
-        get('/result?day=' + encodeURIComponent(day) + '&p=' + encodeURIComponent(query.get('p') || ''))
-            .then(function (html) { game.innerHTML = html; tex(game); }, function () { game.innerHTML = offline(); });
+        signedIn.then(function () { return get('/result?day=' + encodeURIComponent(day) + '&p=' + encodeURIComponent(query.get('p') || ''))
+; }).then(function (html) { game.innerHTML = html; tex(game); }, function () { game.innerHTML = offline(); });
         return;
     }
-    if (mode === 'players') {  // the Players table: Today or All time; a player may rename themselves
+    if (mode === 'players') {  // the Players table: Today or All time
         var box = game.querySelector('.board-box');
         var showBoard = function (which) {
             game.querySelectorAll('[data-board]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.board === which); });
             get('/players?board=' + which).then(function (html) { box.innerHTML = html; tex(box); }, function () { box.innerHTML = offline(); });
         };
         game.querySelectorAll('[data-board]').forEach(function (b) { b.addEventListener('click', function () { showBoard(b.dataset.board); }); });
-        box.addEventListener('submit', function (event) {
-            event.preventDefault();
-            send('/name', { method: 'POST', body: new URLSearchParams(new FormData(event.target)) })
-                .then(function (r) { return r.text().then(function (html) { return { ok: r.ok, html: html }; }); })
-                .then(function (answer) {
-                    if (answer.ok) showBoard(game.querySelector('[aria-pressed="true"]').dataset.board);
-                    else event.target.querySelector('.note').innerHTML = answer.html;  // e.g. a name too long
-                });
-        });
-        showBoard('today');
+        signedIn.then(function () { showBoard('today'); });
         return;
     }
 
@@ -330,5 +374,5 @@
         choose(choice);
     });
 
-    load();
+    signedIn.then(function () { load(); });
 })();
