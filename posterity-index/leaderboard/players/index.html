@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players · Posterity Index</title>
+    <link rel="preload" href="/assets/fonts/cmu-serif-500-roman.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/cmu-serif-700-roman.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/assets/site.css?v=20261027a">
+    <meta name="description" content="Who has done more for the common good? Pick between two people or groups at a time; everyone is ranked by Elo.">
+    <meta name="theme-color" content="#faf3e5">
+    <meta name="color-scheme" content="light">
+    <script>
+        // Light by default; a reader's own choice (the toggle, top right) is
+        // remembered in this browser and applied before first paint.
+        (function () {
+            var theme = 'light';
+            try { if (localStorage.getItem('sh-theme') === 'dark') theme = 'dark'; } catch (e) {}
+            document.documentElement.dataset.theme = theme;
+            if (theme === 'dark') {
+                document.querySelector('meta[name="theme-color"]').content = '#18130d';
+                document.querySelector('meta[name="color-scheme"]').content = 'dark';
+            }
+        })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/posterity-index/mark-small.svg?v=a26607cc">
+    
+    <link rel="stylesheet" href="/posterity-index/katex/katex.min.css">
+    <script defer src="/posterity-index/katex/katex.min.js"></script>
+    
+    <style>
+        .masthead h1 a { text-decoration: none; }
+        .section-head { text-align: center; margin-bottom: 1.2rem; }
+        .question { font-family: var(--display); font-size: clamp(1.6rem, 4.5vw, 2.2rem); font-weight: 500; line-height: 1.15; margin: 0.8rem 0 0.2rem; text-wrap: balance; }
+        .links a, .from a, .board a, .how a { color: var(--lane-green); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .note { font-size: var(--fs-small); font-style: italic; color: var(--ink-soft); margin: 0.4rem 0 0.8rem; text-align: center; }
+
+        /* The feed: one card at a time, each with its own buttons. The next two are already loaded (hidden).
+           A skip scrolls the card up and the next comes up from below, like a reel; a vote sends the card
+           toward the chosen side and the next comes up from below the same way. Nothing fades. */
+        #game { overflow-x: clip; }
+        .deck { display: grid; max-width: 44rem; margin: 0 auto; }
+        @media (max-width: 540px) {  /* 14 px of page each side of the card: a place to scroll the page, never a swipe */
+            .deck { margin: 0 calc(14px - var(--gutter)); }
+        }
+        .card { grid-area: 1 / 1; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--rule);
+                border-radius: 6px; overflow: clip; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform 0.35s ease; }
+        .card:not(:first-child) { display: none; }
+        .card.leaving + .card { display: flex; animation: arrive 0.35s ease; }
+        @keyframes arrive { from { transform: translateY(calc(100% + 2rem)); } to { transform: none; } }
+        .card.dragging { transition: none; cursor: grabbing; }
+        .card.leave-a { transform: translateX(-130%) rotate(-12deg); }
+        .card.leave-b { transform: translateX(130%) rotate(12deg); }
+        .card.leave-skip { transform: translateY(calc(-100% - 2rem)); }
+        .card.leave-tie { transform: translateY(calc(-100% - 2rem)); }
+        .halves { display: flex; align-items: stretch; }
+        .half { flex: 1 1 0; min-width: 0; padding: 0.8rem 0.7rem 0.6rem; text-align: center; position: relative; isolation: isolate;
+                display: flex; flex-direction: column; }
+        .half .more-line { margin-top: auto; }  /* the read-more lines sit level, whatever the descriptions' lengths */
+        .half + .half { border-left: 0.5px solid var(--hairline); }
+        /* While dragging, the half you move toward is highlighted in proportion to the distance: --lean-a and
+           --lean-b go from 0 at rest to 1 at the swipe threshold (set by the script). The halves never resize. */
+        .half::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--paper-deep);
+                        box-shadow: inset 0 0 0 2px var(--sienna); opacity: 0; transition: opacity 0.2s ease; }
+        .half-a::before { opacity: var(--lean-a, 0); }
+        .half-b::before { opacity: var(--lean-b, 0); }
+        .card.dragging .half::before { transition: none; }
+        .picture { height: clamp(120px, 30vw, 260px); display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
+        .picture img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
+        .half h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+        .half .gist { font-style: italic; color: var(--ink-soft); margin: 0.25rem 0 0.3rem; }
+        /* "+ Read more" and the source link share one line (the link sits in the summary); the intro opens below. */
+        .more-line { text-align: left; }
+        details.sec.more { border-bottom: 0; }
+        details.sec.more > summary { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.7rem; padding: 0.3rem 0;
+                                     font-size: var(--fs-small); color: var(--ink-soft); }
+        details.sec.more > summary::before { width: 0.6rem; margin-right: -0.2rem; }
+        .more-line .source { font-size: var(--fs-small); color: var(--ink-soft); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .more-line > .source { display: inline-block; padding: 0.3rem 0; }
+        /* Read more expands the card; it is never a scroll container. While expanded, the photos and text scroll the
+           page like any page, and only the button row swipes (see the script). */
+        .card.expanded { touch-action: auto; cursor: auto; }
+        .card.expanded .buttons { touch-action: none; }
+        details.sec.more > summary .when-open, details.sec.more[open] > summary .when-closed { display: none; }
+        details.sec.more[open] > summary .when-open { display: inline; }
+        details.sec.more[open] > summary::before { content: ""; width: 0; margin: 0; }
+        .intro { font-size: var(--fs-small); line-height: 1.45; }
+        .intro p { margin-bottom: 0.4rem; hyphens: auto; }
+        .intro .from { color: var(--ink-faint); }
+
+        /* The card's button row, under the text in normal flow: A far left, B far right, Skip, Share and Draw in the
+           middle with labels under them. Every circle is one size, so their centres share one line. */
+        .buttons { border-top: 0.5px solid var(--hairline); --button: 3.6rem; }
+        @media (max-width: 360px) { .buttons { --button: 2.9rem; } }  /* still one row at 320 px */
+        .ballots { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.8rem 0.8rem 0.6rem; }
+        .middle { display: flex; gap: 0.6rem; }
+        .labelled { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+        .labelled .label { font-size: var(--fs-small); color: var(--ink-soft); line-height: 1; }
+        .ballot, details.sec.more > summary { -webkit-tap-highlight-color: transparent; }
+        .ballot { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--ink-soft); border-radius: 50%;
+                  background: var(--paper); color: var(--ink); cursor: pointer; padding: 0; font: inherit;
+                  width: var(--button); height: var(--button); flex: none; }
+        .ballot:hover, .ballot:focus-visible { border-color: var(--ink); background: var(--paper-deep); }
+        .ballot svg { width: 58%; height: 58%; overflow: visible; }
+        .ballot.side svg { width: 66%; height: 66%; }
+        .ballot .paper { transform-box: view-box; }
+        .ballot.drop .paper { animation: drop 0.55s ease-in; }
+        @keyframes drop { 0% { transform: translateY(0); } 65% { transform: translateY(15px); opacity: 1; } 66% { opacity: 0; } 67% { transform: translateY(-4px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        .deck.hint .card:first-child { animation: wiggle 0.9s ease; }
+        @keyframes wiggle { 25% { transform: translateX(-10px) rotate(-2deg); } 75% { transform: translateX(10px) rotate(2deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            .card, .half::before { transition: none !important; }
+            .card.leaving + .card, .ballot.drop .paper, .deck.hint .card:first-child { animation: none !important; }
+        }
+        .result { min-height: 1.5em; }
+
+        /* The tab group: Vote and Leaderboard sit on a hairline; the open one is a tab (a thin rule on three sides,
+           open at the bottom into the page) holding its two sub-tabs. The other shows its sub-tabs quietly. */
+        .tabs { display: flex; justify-content: center; border-bottom: 0.5px solid var(--rule); margin: 0 auto 0.4rem; max-width: 30rem; }
+        .tab-group { display: flex; flex-direction: column; align-items: center; padding: 0.45rem 1.1rem 0.5rem; margin-bottom: -0.5px;
+                     border: 0.5px solid transparent; border-bottom: 0; border-radius: 5px 5px 0 0; }
+        .tab-group.open { border-color: var(--rule); background: var(--paper); }
+        .tabs a { text-decoration: none; }
+        .tab { font-size: var(--fs-large); color: var(--ink-faint); letter-spacing: 0.01em; }
+        .tab-group.open .tab { color: var(--ink); }
+        .sub-tabs { display: flex; gap: 0.9rem; margin-top: 0.15rem; font-size: var(--fs-small); }
+        .sub-tabs a { color: var(--ink-faint); padding-bottom: 0.1rem; border-bottom: 1.5px solid transparent; }
+        .tab-group.open .sub-tabs a { color: var(--ink-soft); }
+        .sub-tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--sienna); }
+        .tabs a:hover { color: var(--ink); }
+        @media (max-width: 400px) { .tab-group { padding: 0.4rem 0.6rem 0.45rem; } .sub-tabs { gap: 0.6rem; } }
+        .progress { max-width: 44rem; margin: 0 auto 0.8rem; }
+        .progress-bar { height: 6px; border: 0.5px solid var(--rule); border-radius: 3px; overflow: hidden; }
+        .progress-bar span { display: block; height: 100%; width: 0; background: var(--sienna); transition: width 0.3s ease; }
+        .progress-label { font-size: var(--fs-small); color: var(--ink-soft); text-align: center; margin-top: 0.3rem; }
+        .modal { position: fixed; inset: 0; z-index: 20; background: rgba(27, 24, 19, 0.45); display: flex; align-items: flex-start;
+                 justify-content: center; overflow-y: auto; padding: 1.5rem 0.8rem; }
+        .modal[hidden] { display: none; }
+        .modal-box { position: relative; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; max-width: 36rem; width: 100%; padding: 1.4rem 1.2rem; }
+        .modal-close { position: absolute; top: 0.4rem; right: 0.6rem; font: inherit; font-size: 1.6rem; line-height: 1; background: none; border: 0; cursor: pointer; color: var(--ink-soft); }
+        .result-card { text-align: center; }
+        .result-card .score { font-family: var(--display); font-size: 2.6rem; line-height: 1.1; margin: 0.4rem 0; }
+        .result-card .score .title { display: block; font-size: 1.6rem; }
+        .result-card .description { font-style: italic; color: var(--ink-soft); }
+        .result-card .rank { margin: 0.4rem 0 0.8rem; }
+        .result-card .actions { margin: 0.8rem 0; }
+        .result-card .rows { margin-top: 0.8rem; text-align: left; font-size: var(--fs-small); table-layout: fixed; }
+        .result-card .rows td { overflow-wrap: anywhere; }
+        .result-card .rows th.num, .result-card .rows td.num { width: 2.8rem; }
+        .formula { overflow-x: auto; margin: 0.6rem 0; }
+        .copied { font-size: var(--fs-small); font-style: italic; color: var(--lane-green); margin-left: 0.5rem; }
+        .toggle { text-align: center; margin-bottom: 0.8rem; }
+        .toggle button { font: inherit; background: none; border: 1px solid var(--ink-soft); padding: 0.25rem 0.9rem; cursor: pointer; }
+        .toggle button + button { border-left: 0; }
+        .toggle button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+        .board tr.me td { background: var(--paper-deep); font-weight: 700; }
+        .account { display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-size: var(--fs-small); color: var(--ink-soft); margin-bottom: 0.4rem; }
+        .account a, .sign-out { font: inherit; color: var(--ink-soft); background: none; border: 0; padding: 0; cursor: pointer;
+                                text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .avatar { width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; }
+        .share-note { display: block; text-align: center; font-size: var(--fs-small); font-style: italic; color: var(--lane-green); min-height: 1.2em; }
+        .past-vote { padding: 1.2rem; text-align: center; }
+        .past-vote .past p { margin: 0.4rem 0; }
+
+        .board { width: 100%; max-width: 46rem; margin: 0 auto; border-collapse: collapse; font-variant-numeric: lining-nums tabular-nums; }
+        .board th { text-align: left; font-weight: 700; color: var(--sienna-deep); border-bottom: 2px solid var(--rule); padding: 0.3rem 0.6rem 0.3rem 0; }
+        .board td { padding: 0.35rem 0.6rem 0.35rem 0; border-bottom: 0.5px solid var(--hairline); vertical-align: top; }
+        .board .num { text-align: right; white-space: nowrap; }
+        .board a { text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .unranked-head { max-width: 46rem; margin: 2rem auto 0.4rem; font-size: var(--fs-body); }
+        .unranked { max-width: 46rem; margin: 0 auto; padding: 0; list-style: none; columns: 2 16rem; column-gap: 2rem; }
+        .unranked li { break-inside: avoid; padding: 0.15rem 0; }
+        .unranked a { color: var(--lane-green); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .note-inline { font-size: var(--fs-small); color: var(--ink-faint); }
+        .history { max-width: 46rem; margin: 0 auto; }
+        .history .back a, .history .note a { color: var(--lane-green); }
+        .history h3 { font-family: var(--display); font-weight: 500; font-size: 1.6rem; margin: 0.4rem 0 0.2rem; }
+        .how { margin: 2.5rem auto 0; }
+        .how p { margin-bottom: 0.6rem; }
+        @media (max-width: 540px) { .half { padding: 0.6rem 0.45rem; } .half h3 { font-size: var(--fs-body); } .half .gist { font-size: var(--fs-small); } .board { font-size: var(--fs-small); } }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="masthead">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Dark mode" title="Dark mode">
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
+        </button>
+        <div class="masthead-lockup">
+            <img src="/posterity-index/mark.svg?v=a26607cc" alt="" class="logo">
+            <h1><a href="/posterity-index/">Posterity Index</a></h1>
+        </div>
+    </header>
+
+    <div class="rule-wrap"><div class="double-rule"></div></div>
+
+    <main class="container" id="main">
+        <div class="section-head">
+            <p class="account" hidden></p>
+            
+            <nav class="tabs" aria-label="Sections">
+                <div class="tab-group">
+                    <a class="tab" href="/posterity-index/">Vote</a>
+                    <span class="sub-tabs">
+                        <a href="/posterity-index/daily-10/">Daily 10</a>
+                        <a href="/posterity-index/">Random</a>
+                    </span>
+                </div>
+                <div class="tab-group open">
+                    <a class="tab" href="/posterity-index/leaderboard/" aria-current="true">Leaderboard</a>
+                    <span class="sub-tabs">
+                        <a href="/posterity-index/leaderboard/">People &amp; groups</a>
+                        <a href="/posterity-index/leaderboard/players/" aria-current="page">Players</a>
+                    </span>
+                </div>
+            </nav>
+            
+        </div>
+
+        <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app" data-mode="players" data-home="/posterity-index/">
+            
+            <p class="toggle"><button type="button" data-board="today" aria-pressed="true">Today</button><button type="button" data-board="all" aria-pressed="false">All time</button></p>
+            <div class="board-box"><p class="note">Loading…</p></div>
+            
+        </div>
+        <div class="modal" hidden role="dialog" aria-modal="true" aria-label="Your Daily 10">
+            <div class="modal-box"><button type="button" class="modal-close" aria-label="Close">×</button><div class="modal-body"></div></div>
+        </div>
+        <noscript><p class="note">This page needs JavaScript to fetch the matchups.</p></noscript>
+
+        
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <div>
+                <div class="wordmark"><a href="https://sphericalharmonics.org/">Spherical Harmonics</a></div>
+                <p class="foot-tag">Posterity Index is a project of Spherical Harmonics. Home page: <a href="https://sphericalharmonics.org/">sphericalharmonics.org</a>.</p>
+            </div>
+            <div>
+                <div class="foot-head">Get Involved</div>
+                <ul>
+                    <li><a href="https://sphericalharmonics.substack.com/">Newsletter</a></li>
+                    <li><a href="https://donorbox.org/support-spherical-harmonics">Donate</a></li>
+                    <li><a href="mailto:brook@sphericalharmonics.org">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <span>&copy; 2026 Spherical Harmonics Inc. All rights reserved.</span>
+            <span>New York City</span>
+        </div>
+    </footer>
+
+    <script>
+        // Theme toggle, top right. Light unless the reader picks dark.
+        (function () {
+            var root = document.documentElement;
+            var button = document.getElementById('theme-toggle');
+            function apply(theme) {
+                root.dataset.theme = theme;
+                var dark = theme === 'dark';
+                button.setAttribute('aria-pressed', dark ? 'true' : 'false');
+                button.setAttribute('aria-label', dark ? 'Light mode' : 'Dark mode');
+                button.title = dark ? 'Light mode' : 'Dark mode';
+                document.querySelector('meta[name="theme-color"]').content = dark ? '#18130d' : '#faf3e5';
+                document.querySelector('meta[name="color-scheme"]').content = dark ? 'dark' : 'light';
+            }
+            apply(root.dataset.theme === 'dark' ? 'dark' : 'light');
+            button.addEventListener('click', function () {
+                var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+                apply(next);
+                try { localStorage.setItem('sh-theme', next); } catch (e) {}
+            });
+        })();
+    </script>
+    <script src="/posterity-index/20-play-the-cards.js?v=a26607cc"></script>
+</body>
+</html>

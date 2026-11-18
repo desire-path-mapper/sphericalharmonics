@@ -6,7 +6,7 @@
 // - daily: the Daily 10, the same cards with a progress bar, then the result in a modal.
 // - pair: a shared card first, then the Daily 10 it came from, or infinite mode.
 // - board, players, result: the tables, and a shared Daily 10 result.
-// Players sign in with X. The only lasting cookie is the sign-in session (cgi_session, set here, first-party),
+// Players sign in with X or Bluesky. The only lasting cookie is the sign-in session (cgi_session, set here, first-party),
 // sent as X-Auth. A signed-out tab has a per-tab id (sessionStorage, no cookie), sent as X-Session, so its
 // votes can join the account when it signs in.
 (function () {
@@ -90,8 +90,8 @@
     // Signing in: X sends the visitor back with ?login=<one-time code>; trade it for a session token, keep the
     // token in our own cookie, and drop the code from the address bar.
     var account = document.querySelector('.account');
-    function signInLink() {
-        return api + '/auth/x/start?session=' + encodeURIComponent(tab) + '&return=' + encodeURIComponent(location.href.split('?')[0] + location.search.replace(/[?&]login=[^&]*/, ''));
+    function signInLink(provider) {
+        return api + '/auth/' + provider + '/start?session=' + encodeURIComponent(tab) + '&return=' + encodeURIComponent(location.href.split('?')[0] + location.search.replace(/[?&]login=[^&]*/, ''));
     }
     function showAccount(me) {
         if (!account) return;
@@ -104,10 +104,13 @@
             var out = document.createElement('button');
             out.type = 'button'; out.className = 'sign-out'; out.textContent = 'Sign out';
             account.append(img, who, out);
-        } else if (me.sign_in) {
-            var link = document.createElement('a');
-            link.href = signInLink(); link.textContent = 'Sign in with X';
-            account.append(link);
+        } else if (me.sign_in && me.sign_in.length) {  // one link per provider that is on
+            account.append('Sign in with ');
+            me.sign_in.forEach(function (p, i) {
+                var link = document.createElement('a');
+                link.href = signInLink(p.name); link.textContent = p.label;
+                account.append(i ? ' or ' : '', link);
+            });
         }
         account.hidden = !account.childNodes.length;
     }
@@ -126,7 +129,7 @@
             send('/auth/logout', { method: 'POST' }).finally(function () { cookie('cgi_session', '', 0); location.reload(); });
         }
         var prompt = event.target.closest('[data-sign-in]');
-        if (prompt) { event.preventDefault(); location.href = signInLink(); }
+        if (prompt) { event.preventDefault(); location.href = signInLink(prompt.dataset.signIn); }
     });
 
     if (mode === 'board') {  // the People & groups table, or one contender's matches (?c=<id>)
@@ -267,24 +270,20 @@
         setTimeout(function () { dropBallot(top(), 'a'); dropBallot(top(), 'b'); }, 300);
     }
 
-    // Read more expands the card in place and the page scrolls as usual. While either intro is open the card
-    // is "expanded": swiping is off, so scrolling can't vote by accident, until its button row (under the
-    // text) is fully on screen; then swipes work again. Its buttons and the keys always work.
-    var inView = 'IntersectionObserver' in window && new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            entry.target.closest('.card').classList.toggle('buttons-in-view', entry.intersectionRatio >= 0.99);
-        });
-    }, { threshold: [0, 0.99, 1] });
+    // Read more expands the card in place and the page scrolls as usual. While either intro is open the card is
+    // "expanded": its photos and text only scroll the page, and only its button row swipes. Collapsed, the whole
+    // card swipes.
     deck.addEventListener('toggle', function (event) {
         var card = event.target.closest('.card');
-        if (!card) return;
-        card.classList.toggle('expanded', !!card.querySelector('details[open]'));
-        if (inView) inView.observe(card.querySelector('.buttons'));
+        if (card) card.classList.toggle('expanded', !!card.querySelector('details[open]'));
     }, true);
-    function swipeable(card) { return !card.classList.contains('expanded') || card.classList.contains('buttons-in-view'); }
+    function startsASwipe(card, target) {
+        if (card.classList.contains('expanded')) return !!target.closest('.buttons');
+        return !target.closest('summary, .source, .intro a');
+    }
 
-    // Dragging the top card. A drag that starts on the read-more line, a link in the intro or a button is
-    // not a swipe (the intro's text is, once the card's buttons are in view); one that starts on the picture is (the picture is a link to its file page, opened only by a
+    // Dragging the top card. A drag may start on a button (a tap there still presses it); not on the read-more
+    // line or a link; one that starts on the picture is (the picture is a link to its file page, opened only by a
     // clean tap, never at the end of a drag).
     var drag = null, dragged = false;
     function threshold(card) { return Math.max(80, card.offsetWidth * 0.28); }  // past this the vote commits
@@ -303,18 +302,20 @@
     deck.addEventListener('pointerdown', function (event) {
         var card = top();
         if (!event.isPrimary || event.button !== 0) return;
-        if (!card || busy || !swipeable(card)) return;
-        if (!card.contains(event.target) || event.target.closest('summary, .source, .intro a, button')) return;
+        if (!card || busy || !card.contains(event.target) || !startsASwipe(card, event.target)) return;
         drag = { card: card, id: event.pointerId, x: event.clientX, y: event.clientY, dx: 0, dy: 0 };
-        dragged = false;
-        card.setPointerCapture(event.pointerId);
-        card.classList.add('dragging');
+        dragged = false;  // a press only becomes a drag once it moves; until then a tap stays a tap on its button
     });
     deck.addEventListener('pointermove', function (event) {
         if (!drag || event.pointerId !== drag.id) return;
         drag.dx = event.clientX - drag.x;
         drag.dy = event.clientY - drag.y;
-        if (Math.abs(drag.dx) + Math.abs(drag.dy) > 6) dragged = true;
+        if (!dragged && Math.abs(drag.dx) + Math.abs(drag.dy) > 6) {
+            dragged = true;
+            drag.card.setPointerCapture(event.pointerId);
+            drag.card.classList.add('dragging');
+        }
+        if (!dragged) return;
         drag.card.style.transform = 'translate(' + drag.dx + 'px, ' + Math.min(drag.dy, 0) + 'px) rotate(' + drag.dx / 25 + 'deg)';
         lean(drag.card, drag.dx, drag.dy);
     });
@@ -322,6 +323,7 @@
         if (!drag || event.pointerId !== drag.id) return;
         var done = drag;
         drag = null;
+        if (!dragged) return;  // a tap: its click does the work
         done.card.classList.remove('dragging');
         var choice = event.type === 'pointerup' ? aim(done.dx, done.dy, threshold(done.card)) : '';
         lean(done.card, 0, 0);  // the highlight fades back
@@ -333,7 +335,7 @@
     deck.addEventListener('pointercancel', release);
 
     deck.addEventListener('click', function (event) {
-        if (dragged && event.target.closest('.picture')) {  // the end of a swipe, not a tap on the picture
+        if (dragged && event.target.closest('.picture, button')) {  // the end of a swipe, not a tap
             event.preventDefault();
             dragged = false;
             return;
