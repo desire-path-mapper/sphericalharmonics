@@ -23,12 +23,12 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=68a6e1d4">
+    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=46f9187a">
     
     <style>
         .masthead h1 a { text-decoration: none; }
         .section-head { text-align: center; margin-bottom: 1.2rem; }
-        .question { font-family: var(--display); font-size: clamp(1.6rem, 4.5vw, 2.2rem); font-weight: 500; line-height: 1.15; margin: 0.2rem 0 0.5rem; text-wrap: balance; }
+        .question { font-family: var(--display); font-size: clamp(1.6rem, 4.5vw, 2.2rem); font-weight: 500; line-height: 1.15; margin: 0.8rem 0 0.2rem; text-wrap: balance; }
         .section-links a { margin: 0 0.5rem; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
         .section-links a[aria-current="page"] { text-decoration-thickness: 1.5px; }
         .links a, .from a, .board a, .how a { color: var(--lane-green); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
@@ -72,17 +72,18 @@
         .more-line .source { font-size: var(--fs-small); color: var(--ink-soft); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
         .more-line > .source { display: inline-block; padding: 0.3rem 0; }
         /* Read more expands the card; it is never a scroll container. While expanded, the page scrolls under a
-           finger as usual (no swipes: see the script). */
-        .card.expanded { touch-action: auto; cursor: auto; }
+           finger as usual, until the card's button row is fully in view: then swipes are back (see the script). */
+        .card.expanded:not(.buttons-in-view) { touch-action: auto; cursor: auto; }
+        details.sec.more > summary .when-open, details.sec.more[open] > summary .when-closed { display: none; }
+        details.sec.more[open] > summary .when-open { display: inline; }
+        details.sec.more[open] > summary::before { content: ""; width: 0; margin: 0; }
         .intro { font-size: var(--fs-small); line-height: 1.45; }
         .intro p { margin-bottom: 0.4rem; hyphens: auto; }
         .intro .from { color: var(--ink-faint); }
 
-        /* The card's buttons: A and B large, Draw medium, Skip small beneath. They belong to the card, and while
-           an expanded card is taller than the screen they stay pinned to the bottom of the screen. */
-        .buttons { position: sticky; bottom: 0; z-index: 2; background: var(--paper); border-top: 0.5px solid var(--hairline);
-                   border-radius: 0 0 6px 6px; padding-bottom: env(safe-area-inset-bottom); }
-        .ballots { display: flex; justify-content: center; align-items: center; gap: 1.4rem; padding: 0.8rem 0 0; }
+        /* The card's buttons, under the text in normal flow: A and B large, Draw medium, Share small, Skip beneath. */
+        .buttons { border-top: 0.5px solid var(--hairline); }
+        .ballots { display: flex; justify-content: center; align-items: center; gap: 1rem; padding: 0.8rem 0 0; }
         .ballot, details.sec.more > summary { -webkit-tap-highlight-color: transparent; }
         .ballot { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--ink-soft); border-radius: 50%;
                   background: var(--paper); color: var(--ink); cursor: pointer; padding: 0; font: inherit; }
@@ -90,7 +91,9 @@
         .ballot.big { width: 4.2rem; height: 4.2rem; }
         .ballot.mid { width: 3.4rem; height: 3.4rem; }
         .ballot.draw { font-size: var(--fs-small); font-weight: 700; letter-spacing: 0.01em; }
-        .ballot.small { width: 2.5rem; height: 2.5rem; }
+        .ballot.small { width: 2.9rem; height: 2.9rem; }
+        .ballot.skip { width: 3.6rem; height: 3.6rem; flex-direction: column; gap: 0.05rem; font-size: var(--fs-small); line-height: 1; }
+        .ballot.skip svg { width: 1.1rem; height: 1.1rem; }
         .ballot svg { width: 64%; height: 64%; overflow: visible; }
         .skip-row { display: flex; justify-content: center; padding: 0.5rem 0 0.8rem; }
         .ballot .paper { transform-box: view-box; }
@@ -135,11 +138,7 @@
         .board tr.me td { background: var(--paper-deep); font-weight: 700; }
         .rename { max-width: 46rem; margin: 1rem auto 0; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
         .rename input { font: inherit; padding: 0.2rem 0.4rem; border: 1px solid var(--ink-soft); background: var(--paper); }
-        .skip-row { position: relative; }
-        .share { position: absolute; right: 0.8rem; top: 50%; transform: translateY(-50%); font: inherit; font-size: var(--fs-small);
-                 background: none; border: 0; color: var(--ink-soft); text-decoration: underline; text-decoration-thickness: 0.5px;
-                 text-underline-offset: 0.18em; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        .share-note { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); font-size: var(--fs-small); font-style: italic; color: var(--lane-green); }
+        .share-note { display: block; text-align: center; font-size: var(--fs-small); font-style: italic; color: var(--lane-green); min-height: 1.2em; }
         .past-vote { padding: 1.2rem; text-align: center; }
         .past-vote .past p { margin: 0.4rem 0; }
 
@@ -161,7 +160,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/common-good-index/mark.svg?v=68a6e1d4" alt="" class="logo">
+            <img src="/common-good-index/mark.svg?v=46f9187a" alt="" class="logo">
             <h1><a href="/common-good-index/">Common Good Index</a></h1>
         </div>
     </header>
@@ -170,7 +169,6 @@
 
     <main class="container" id="main">
         <div class="section-head">
-            <h2 class="question">Who has done more for the common good?</h2>
             <p class="section-links">
                 <a href="/common-good-index/" aria-current="page">Vote</a>
                 <a href="/common-good-index/leaderboard/">Leaderboard</a>
@@ -180,6 +178,7 @@
                 <a href="/common-good-index/" aria-current="page">Infinite</a>
                 <a href="/common-good-index/daily-10/">Daily 10</a>
             </p>
+            <h2 class="question">Who has done more for the common good?</h2>
             
         </div>
 
@@ -255,6 +254,6 @@
             });
         })();
     </script>
-    <script src="/common-good-index/20-play-the-cards.js?v=68a6e1d4"></script>
+    <script src="/common-good-index/20-play-the-cards.js?v=46f9187a"></script>
 </body>
 </html>

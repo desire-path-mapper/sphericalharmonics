@@ -222,15 +222,23 @@
     }
 
     // Read more expands the card in place and the page scrolls as usual. While either intro is open the card
-    // is "expanded": swiping is off, so scrolling can't vote by accident; its buttons (pinned to the bottom of
-    // the screen while the card is taller than it) and the keys still work.
+    // is "expanded": swiping is off, so scrolling can't vote by accident, until its button row (under the
+    // text) is fully on screen; then swipes work again. Its buttons and the keys always work.
+    var inView = 'IntersectionObserver' in window && new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            entry.target.closest('.card').classList.toggle('buttons-in-view', entry.intersectionRatio >= 0.99);
+        });
+    }, { threshold: [0, 0.99, 1] });
     deck.addEventListener('toggle', function (event) {
         var card = event.target.closest('.card');
-        if (card) card.classList.toggle('expanded', !!card.querySelector('details[open]'));
+        if (!card) return;
+        card.classList.toggle('expanded', !!card.querySelector('details[open]'));
+        if (inView) inView.observe(card.querySelector('.buttons'));
     }, true);
+    function swipeable(card) { return !card.classList.contains('expanded') || card.classList.contains('buttons-in-view'); }
 
-    // Dragging the top card. A drag that starts on the read-more, the source link or a button is not a
-    // swipe; one that starts on the picture is (the picture is a link to its file page, opened only by a
+    // Dragging the top card. A drag that starts on the read-more line, a link in the intro or a button is
+    // not a swipe (the intro's text is, once the card's buttons are in view); one that starts on the picture is (the picture is a link to its file page, opened only by a
     // clean tap, never at the end of a drag).
     var drag = null, dragged = false;
     function threshold(card) { return Math.max(80, card.offsetWidth * 0.28); }  // past this the vote commits
@@ -249,8 +257,8 @@
     deck.addEventListener('pointerdown', function (event) {
         var card = top();
         if (!event.isPrimary || event.button !== 0) return;
-        if (!card || busy || card.classList.contains('expanded')) return;
-        if (!card.contains(event.target) || event.target.closest('details, .source, button')) return;
+        if (!card || busy || !swipeable(card)) return;
+        if (!card.contains(event.target) || event.target.closest('summary, .source, .intro a, button')) return;
         drag = { card: card, id: event.pointerId, x: event.clientX, y: event.clientY, dx: 0, dy: 0 };
         dragged = false;
         card.setPointerCapture(event.pointerId);
@@ -289,7 +297,6 @@
         var share = event.target.closest('.share');
         if (share) {
             var card = share.closest('.card'), note = card.querySelector('.share-note');
-            if (!note) { note = document.createElement('span'); note.className = 'share-note'; note.setAttribute('role', 'status'); share.parentNode.appendChild(note); }
             shareLink({ kind: 'pair', p: card.dataset.pair, daily: card.dataset.day || '' }, note);
         }
         var past = event.target.closest('[data-continue]') && event.target.closest('[data-past]');
