@@ -23,7 +23,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=6f48a2df">
+    <link rel="icon" type="image/svg+xml" href="/common-good-index/mark-small.svg?v=87b5eed3">
     
     <style>
         .masthead h1 a { text-decoration: none; }
@@ -88,6 +88,8 @@
         .ballots { display: flex; justify-content: center; align-items: flex-start; gap: 1rem; padding: 0.8rem 0 0; }
         .labelled { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; min-height: 5.3rem; }
         .labelled .label { font-size: var(--fs-small); color: var(--ink-soft); line-height: 1; }
+        .labelled .ballot.mid { margin: 0.4rem 0; }    /* smaller buttons centred in the large ones' height, */
+        .labelled .ballot.small { margin: 0.65rem 0; } /* so every label sits on one line */
         .ballot, details.sec.more > summary { -webkit-tap-highlight-color: transparent; }
         .ballot { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--ink-soft); border-radius: 50%;
                   background: var(--paper); color: var(--ink); cursor: pointer; padding: 0; font: inherit; }
@@ -175,7 +177,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/common-good-index/mark.svg?v=6f48a2df" alt="" class="logo">
+            <img src="/common-good-index/mark.svg?v=87b5eed3" alt="" class="logo">
             <h1><a href="/common-good-index/">Common Good Index</a></h1>
         </div>
     </header>
@@ -253,6 +255,6 @@
             });
         })();
     </script>
-    <script src="/common-good-index/20-play-the-cards.js?v=6f48a2df"></script>
+    <script src="/common-good-index/20-play-the-cards.js?v=87b5eed3"></script>
 </body>
 </html>
