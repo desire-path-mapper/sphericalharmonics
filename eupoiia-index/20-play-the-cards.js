@@ -34,13 +34,6 @@
         return id;
     })();
 
-    function tex(root) {  // typeset the formulas once KaTeX has loaded
-        if (!window.katex) { setTimeout(function () { tex(root); }, 200); return; }
-        root.querySelectorAll('[data-tex]').forEach(function (el) {
-            window.katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false });
-        });
-    }
-
     function offline() {
         return '<p class="note">Couldn\'t reach the server. Reload the page to try again.</p>';
     }
@@ -114,14 +107,26 @@
         }
         account.hidden = !account.childNodes.length;
     }
-    var signedIn = (function () {
+    function loginFailure(message) {
+        if (!account) return;
+        var failed = document.createElement('p');
+        failed.className = 'note'; failed.setAttribute('role', 'status');
+        failed.textContent = message;
+        account.insertAdjacentElement('afterend', failed);
+    }
+    if (query.get('login') === 'failed') loginFailure("Bluesky sign-in didn't finish. Try again.");
+    var authenticated = (function () {
         var code = query.get('login');
-        if (!code || code === 'failed') return Promise.resolve();
-        history.replaceState(null, '', location.pathname + location.search.replace(/[?&]login=[^&]*/, '').replace(/^&/, '?'));
+        if (!code) return Promise.resolve();
+        query.delete('login');
+        history.replaceState(null, '', location.pathname + (query.toString() ? '?' + query : '') + location.hash);
+        if (code === 'failed') return Promise.resolve();
         return send('/auth/login', { method: 'POST', body: new URLSearchParams({ code: code }) })
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (answer) { if (answer) cookie('cgi_session', answer.token, 30 * 24 * 3600); });
-    })().then(function () {
+            .then(function (r) { if (!r.ok) throw new Error('login'); return r.json(); })
+            .then(function (answer) { cookie('cgi_session', answer.token, 30 * 24 * 3600); })
+            .catch(function () { loginFailure("Sign-in didn't finish. Try again."); });
+    })();
+    authenticated.then(function () {
         return get('/me').then(function (text) { showAccount(JSON.parse(text)); }, function () {});
     });
     document.addEventListener('click', function (event) {
@@ -133,23 +138,24 @@
     });
 
     if (mode === 'board') {  // the People & groups table, or one contender's matches (?c=<id>)
-        get(query.get('c') ? '/contender?c=' + encodeURIComponent(query.get('c')) : '/leaderboard')
+        get(query.get('c') ? '/contender?c=' + encodeURIComponent(query.get('c')) : '/leaderboard?page=' + encodeURIComponent(query.get('page') || '1'))
             .then(function (html) { game.innerHTML = html; }, function () { game.innerHTML = offline(); });
         return;
     }
     if (mode === 'result') {  // a shared Daily 10 result: that player's live score, title and rank
-        signedIn.then(function () { return get('/result?day=' + encodeURIComponent(day) + '&p=' + encodeURIComponent(query.get('p') || ''))
-; }).then(function (html) { game.innerHTML = html; tex(game); }, function () { game.innerHTML = offline(); });
+        authenticated.then(function () { return get('/result?day=' + encodeURIComponent(day) + '&p=' + encodeURIComponent(query.get('p') || ''))
+; }).then(function (html) { game.innerHTML = html; }, function () { game.innerHTML = offline(); });
         return;
     }
     if (mode === 'players') {  // the Players table: Today or All time
         var box = game.querySelector('.board-box');
         var showBoard = function (which) {
             game.querySelectorAll('[data-board]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.board === which); });
-            get('/players?board=' + which).then(function (html) { box.innerHTML = html; tex(box); }, function () { box.innerHTML = offline(); });
+            get('/players?board=' + which + '&page=' + encodeURIComponent(query.get('page') || '1') + '&day=' + encodeURIComponent(query.get('day') || '')).then(function (html) { box.innerHTML = html; }, function () { box.innerHTML = offline(); });
         };
-        game.querySelectorAll('[data-board]').forEach(function (b) { b.addEventListener('click', function () { showBoard(b.dataset.board); }); });
-        signedIn.then(function () { showBoard('today'); });
+        game.querySelectorAll('[data-board]').forEach(function (b) { b.addEventListener('click', function () { query.set('board', b.dataset.board); query.delete('page'); history.pushState(null, '', '?' + query); showBoard(b.dataset.board); }); });
+        window.addEventListener('popstate', function () { query = new URLSearchParams(location.search); showBoard(query.get('board') === 'all' ? 'all' : 'today'); });
+        authenticated.then(function () { showBoard(query.get('board') === 'all' ? 'all' : 'today'); });
         return;
     }
 
@@ -182,7 +188,6 @@
         modal.querySelector('.modal-body').innerHTML = '';
         modal.querySelector('.modal-body').appendChild(card);
         modal.hidden = false;
-        tex(modal);
         modal.querySelector('.modal-close').focus();
         showProgress(10);
         if (!top()) deck.innerHTML = '<p class="note">Done for today.</p>';
@@ -227,7 +232,7 @@
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });  // back to the top: the next card starts under the header
         card.classList.add('leaving', 'leave-' + choice);
         card.style.transform = '';
-        setTimeout(function () { card.remove(); }, reduced ? 0 : 360);
+        setTimeout(function () { cardSizes.unobserve(card); card.remove(); }, reduced ? 0 : 360);
         keepDeck();
         var token = card.dataset.token;
         send(choice === 'skip' ? '/skip' : '/vote', { method: 'POST', body: body, keepalive: true })
@@ -270,21 +275,22 @@
         setTimeout(function () { dropBallot(top(), 'a'); dropBallot(top(), 'b'); }, 300);
     }
 
-    // Read more expands the card in place and the page scrolls as usual. While either intro is open the card is
-    // "expanded": its photos and text only scroll the page, and only its button row swipes. Collapsed, the whole
-    // card swipes.
+    // Tall cards scroll until their bottom is visible; a new left/right/up gesture can then drag.
+    function sizeCard(card) {
+        card.classList.toggle('scrollable', card.offsetHeight > window.innerHeight - 32);
+    }
+    var cardSizes = new ResizeObserver(function (entries) {
+        entries.forEach(function (entry) { sizeCard(entry.target); });
+    });
+    function watchCards() { cards().forEach(function (card) { sizeCard(card); cardSizes.observe(card); }); }
+    new MutationObserver(watchCards).observe(deck, { childList: true });
+    window.addEventListener('resize', watchCards);
     deck.addEventListener('toggle', function (event) {
         var card = event.target.closest('.card');
-        if (card) card.classList.toggle('expanded', !!card.querySelector('details[open]'));
+        if (card) { card.classList.toggle('expanded', !!card.querySelector('details[open]')); sizeCard(card); }
     }, true);
-    function startsASwipe(card, target) {
-        if (card.classList.contains('expanded')) return !!target.closest('.buttons');
-        return !target.closest('summary, .source, .intro a');
-    }
 
-    // Dragging the top card. A drag may start on a button (a tap there still presses it); not on the read-more
-    // line or a link; one that starts on the picture is (the picture is a link to its file page, opened only by a
-    // clean tap, never at the end of a drag).
+    // Capture only an actual drag; taps keep working on every button, summary and link.
     var drag = null, dragged = false;
     function threshold(card) { return Math.max(80, card.offsetWidth * 0.28); }  // past this the vote commits
     function lean(card, dx, dy) {  // highlight the half being moved toward, in proportion to the distance
@@ -302,28 +308,46 @@
     deck.addEventListener('pointerdown', function (event) {
         var card = top();
         if (!event.isPrimary || event.button !== 0) return;
-        if (!card || busy || !card.contains(event.target) || !startsASwipe(card, event.target)) return;
-        drag = { card: card, id: event.pointerId, x: event.clientX, y: event.clientY, dx: 0, dy: 0 };
+        if (!card || busy || !card.contains(event.target)) return;
+        var bounds = card.getBoundingClientRect();
+        if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) return;
+        var tall = card.classList.contains('scrollable');
+        drag = { card: card, id: event.pointerId, x: event.clientX, y: event.clientY, dx: 0, dy: 0,
+                 tall: tall, eligible: !tall || card.getBoundingClientRect().bottom <= window.innerHeight + 4,
+                 state: 'pending' };
         dragged = false;  // a press only becomes a drag once it moves; until then a tap stays a tap on its button
     });
-    deck.addEventListener('pointermove', function (event) {
-        if (!drag || event.pointerId !== drag.id) return;
-        drag.dx = event.clientX - drag.x;
-        drag.dy = event.clientY - drag.y;
-        if (!dragged && Math.abs(drag.dx) + Math.abs(drag.dy) > 6) {
+    function moveDrag(x, y) {
+        drag.dx = x - drag.x;
+        drag.dy = y - drag.y;
+        if (drag.state === 'scroll' || drag.state === 'blocked') return;
+        if (drag.state === 'pending' && Math.hypot(drag.dx, drag.dy) >= 10) {
             dragged = true;
-            drag.card.setPointerCapture(event.pointerId);
+            if (drag.dy > 0 && Math.abs(drag.dy) >= Math.abs(drag.dx)) { drag.state = 'scroll'; return; }
+            if (!drag.eligible) { drag.state = Math.abs(drag.dy) >= Math.abs(drag.dx) ? 'scroll' : 'blocked'; return; }
+            drag.state = 'dragging';
+            drag.card.setPointerCapture(drag.id);
             drag.card.classList.add('dragging');
         }
         if (!dragged) return;
         drag.card.style.transform = 'translate(' + drag.dx + 'px, ' + Math.min(drag.dy, 0) + 'px) rotate(' + drag.dx / 25 + 'deg)';
         lean(drag.card, drag.dx, drag.dy);
+    }
+    deck.addEventListener('pointermove', function (event) {
+        if (drag && event.pointerId === drag.id) moveDrag(event.clientX, event.clientY);
     });
+    // Native vertical scrolling stays available until an eligible left/right/up gesture is chosen.
+    // Safari needs a non-passive touch listener to cancel an upward page pan before it takes ownership.
+    deck.addEventListener('touchmove', function (event) {
+        if (drag && event.touches.length === 1) moveDrag(event.touches[0].clientX, event.touches[0].clientY);
+        if (drag && drag.state === 'dragging' && event.cancelable) event.preventDefault();
+    }, { passive: false });
     function release(event) {
         if (!drag || event.pointerId !== drag.id) return;
         var done = drag;
         drag = null;
-        if (!dragged) return;  // a tap: its click does the work
+        if (done.card.hasPointerCapture(done.id)) done.card.releasePointerCapture(done.id);
+        if (done.state !== 'dragging') return;  // a tap: its click does the work
         done.card.classList.remove('dragging');
         var choice = event.type === 'pointerup' ? aim(done.dx, done.dy, threshold(done.card)) : '';
         lean(done.card, 0, 0);  // the highlight fades back
@@ -331,14 +355,20 @@
             done.card.style.transform = '';
         }
     }
+    deck.addEventListener('touchstart', function (event) {
+        if (drag && event.touches.length > 1) release({ pointerId: drag.id, type: 'pointercancel' });
+    }, { passive: true });
     deck.addEventListener('pointerup', release);
     deck.addEventListener('pointercancel', release);
+    deck.addEventListener('lostpointercapture', function (event) {
+        if (drag && event.target === drag.card) release(event);
+    });
+    deck.addEventListener('dragstart', function (event) { event.preventDefault(); });
 
     deck.addEventListener('click', function (event) {
-        if (dragged && event.target.closest('.picture, button')) {  // the end of a swipe, not a tap
-            event.preventDefault();
+        if (dragged) {
             dragged = false;
-            return;
+            if (event.detail !== 0) { event.preventDefault(); return; }  // suppress pointer clicks, preserve keyboard activation
         }
         var button = event.target.closest('[data-choice]');
         if (button) choose(button.dataset.choice, button.closest('.card'));
@@ -378,5 +408,5 @@
         choose(choice);
     });
 
-    signedIn.then(function () { load(); });
+    authenticated.then(function () { load(); });
 })();
