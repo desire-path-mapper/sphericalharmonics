@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="">
+  <!-- Two candidates, one pact, one runner: two lines meet at a joint and leave as one. Drawn by 05-draw-the-mark.py. -->
+  <path d="M13 14 C27 14 24 32 36 32 M13 50 C27 50 24 32 36 32 M36 32 H51" fill="none" stroke="#5a3017" stroke-width="2.0" stroke-linecap="round"/>
+  <g fill="#c98a5c" stroke="#5a3017" stroke-width="1.80"><circle cx="13" cy="14" r="5.0"/><circle cx="13" cy="50" r="5.0"/><circle cx="51" cy="32" r="8.5"/></g>
+</svg>
