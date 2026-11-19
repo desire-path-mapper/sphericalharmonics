@@ -34,7 +34,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=a538c422">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=62ac8151">
     <style>
         :root, :root[data-theme="dark"] {
             --serif: "LM Roman 12", Georgia, serif;
@@ -254,6 +254,11 @@
             width: 22rem; max-width: calc(100vw - 40px); margin: 0; padding: 0.75rem;
             background: var(--paper); border: 1px solid var(--rule); border-radius: var(--control-radius);
             font-style: normal; text-align: left; z-index: 11; }
+        @media (max-width: 1023px) {
+            #account-panel > .account-error { position: static; width: 100%; max-width: none;
+                padding: 0; background: none; border: 0; }
+            .account-error .sign-in-actions { flex-direction: column; align-items: stretch; }
+        }
         .account a, .sign-out { font: inherit; color: var(--ink-soft); background: none; border: 0; padding: 0; cursor: pointer;
                                 text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
         .avatar { width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; }
@@ -291,7 +296,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/eupoiia-index/mark.svg?v=a538c422" alt="" class="logo">
+            <img src="/eupoiia-index/mark.svg?v=62ac8151" alt="" class="logo">
             <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
         </div>
     </header>
@@ -386,6 +391,6 @@
             });
         })();
     </script>
-    <script src="/eupoiia-index/20-play-the-cards.js?v=a538c422"></script>
+    <script src="/eupoiia-index/20-play-the-cards.js?v=62ac8151"></script>
 </body>
 </html>

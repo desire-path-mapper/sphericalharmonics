@@ -356,16 +356,22 @@
             history.replaceState(null, '', location.pathname + location.search);
             return send('/auth/email/redeem', { method: 'POST', body: new URLSearchParams({
                 token: emailToken, binding: cookieValue('cgi_email_binding') }) })
-                .then(function (response) { if (!response.ok) throw new Error('email'); return response.json(); })
-                .then(function (answer) { return exchangeCode(answer.code); })
-                .catch(function () {
-                    // Reopening a spent link must not turn a valid existing session into an error.
-                    return get('/me').then(function (text) {
-                        var me = JSON.parse(text);
-                        if (me.player) showAccount(me);
-                        else loginFailure('This link has expired or was already used.');
-                    }).catch(function () { loginFailure('This link has expired or was already used.'); });
-                });
+                .then(function (response) {
+                    return response.json().then(function (answer) {
+                        if (!response.ok) {
+                            var messages = {
+                                used: 'This link was already used. Send a new one?',
+                                expired: 'This link has expired. Send a new one?',
+                                invalid: "This link isn't valid. Send a new one?"
+                            };
+                            loginFailure(messages[answer.error] || "This link couldn't be checked. Try again or send a new one.");
+                            return null;
+                        }
+                        return answer;
+                    });
+                })
+                .then(function (answer) { if (answer && !answer.already_signed_in) return exchangeCode(answer.code); })
+                .catch(function () { loginFailure("This link couldn't be checked. Try again or send a new one."); });
         }
         var code = query.get('login');
         if (!code) return Promise.resolve();
@@ -415,10 +421,13 @@
         location.replace(legacy.href); return;
     }
     if (mode === 'players') {  // the Players table: Today or All time
-        var box = game.querySelector('.board-box');
+        var box = game.querySelector('.board-box'), boardRequest = 0;
         var showBoard = function (which) {
             game.querySelectorAll('[data-board]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.board === which); });
-            get('/players?board=' + which + '&page=' + encodeURIComponent(query.get('page') || '1') + '&day=' + encodeURIComponent(query.get('day') || '')).then(function (html) { box.innerHTML = html; boardMath(box); }, function () { box.innerHTML = offline(); });
+            var request = ++boardRequest;
+            get('/players?board=' + which + '&page=' + encodeURIComponent(query.get('page') || '1') + '&day=' + encodeURIComponent(query.get('day') || ''))
+                .then(function (html) { if (request === boardRequest) { box.innerHTML = html; boardMath(box); } },
+                      function () { if (request === boardRequest) box.innerHTML = offline(); });
         };
         game.querySelectorAll('[data-board]').forEach(function (b) { b.addEventListener('click', function () { query.set('board', b.dataset.board); query.delete('page'); history.pushState(null, '', '?' + query); showBoard(b.dataset.board); }); });
         window.addEventListener('popstate', function () { query = new URLSearchParams(location.search); showBoard(query.get('board') === 'all' ? 'all' : 'today'); });
