@@ -1,0 +1,17 @@
+{
+ "build": "20261119T021537Z-96ba820",
+ "entry": "assets/index-BaVsChmj.js",
+ "css": [
+  "assets/index-DuX_1MQJ.css"
+ ],
+ "integrity": {
+  "assets/06-answer-in-the-worker-C-A6CRGZ.js": "sha384-J7LNRiGnjnfyl3NAV7O9zkQ89wc2nmm+jCCVrqZrQz1X9c6Zumkhs15ne3dV0ygt",
+  "assets/20-route-in-a-worker-CmZduLVZ.js": "sha384-SLTXsisqjj4TY8/+Q0iEg1QhLpVSB4eoyrbRcWJ6tKL3X2OgDFwC5B65dCsneRMV",
+  "assets/index-BaVsChmj.js": "sha384-BgwdA9SwyUnSIimKa92h/xqgZ9Jy4XeVcb7SBh5lTaPeq5Itss2bDRCrr1PI0fxZ",
+  "assets/index-DuX_1MQJ.css": "sha384-TCyh54hEkvlWyFe1xRW335oX2GiFa2kNUAUdUR8ghlGPVEd3T9VsAQ0sDeC9WnrT"
+ },
+ "content": "cee87219f91550810bbf6c6bf580aeff8f6c7841a0aa34ab42a9cde07eb33b5a",
+ "env": "staging",
+ "commit": "96ba820623056816b7c9d5e2e10d4daf5060dff0",
+ "area": ""
+}
