@@ -275,9 +275,27 @@
         setTimeout(function () { dropBallot(top(), 'a'); dropBallot(top(), 'b'); }, 300);
     }
 
-    // Tall cards scroll until their bottom is visible; a new left/right/up gesture can then drag.
+    // Read through every visible scroll container before a fresh gesture may drag the card.
+    function visibleViewport() {
+        var view = window.visualViewport;
+        var top = view ? Math.max(0, view.offsetTop || 0) : 0;
+        var bottom = Math.min(window.innerHeight, view ? (view.offsetTop || 0) + view.height : window.innerHeight);
+        return { top: top, bottom: bottom, height: Math.max(0, bottom - top) };
+    }
+    function contentAtEnd(card) {
+        var elements = [card].concat(Array.prototype.slice.call(card.querySelectorAll('*')));
+        return elements.every(function (element) {
+            if (!element.clientHeight || element.scrollHeight - element.clientHeight <= 2 || !element.getClientRects().length) return true;
+            if (!/^(auto|scroll|overlay|hidden)$/.test(getComputedStyle(element).overflowY)) return true;
+            return element.scrollHeight - element.clientHeight - Math.max(0, element.scrollTop) <= 2;
+        });
+    }
+    function mayDrag(card) {
+        var view = visibleViewport(), bottom = card.getBoundingClientRect().bottom;
+        return bottom >= view.top && bottom <= view.bottom + 2 && contentAtEnd(card);
+    }
     function sizeCard(card) {
-        card.classList.toggle('scrollable', card.offsetHeight > window.innerHeight - 32);
+        card.classList.toggle('scrollable', card.offsetHeight > visibleViewport().height - 32);
     }
     var cardSizes = new ResizeObserver(function (entries) {
         entries.forEach(function (entry) { sizeCard(entry.target); });
@@ -311,9 +329,8 @@
         if (!card || busy || !card.contains(event.target)) return;
         var bounds = card.getBoundingClientRect();
         if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) return;
-        var tall = card.classList.contains('scrollable');
         drag = { card: card, id: event.pointerId, x: event.clientX, y: event.clientY, dx: 0, dy: 0,
-                 tall: tall, eligible: !tall || card.getBoundingClientRect().bottom <= window.innerHeight + 4,
+                 eligible: mayDrag(card),
                  state: 'pending' };
         dragged = false;  // a press only becomes a drag once it moves; until then a tap stays a tap on its button
     });
@@ -357,6 +374,7 @@
     }
     deck.addEventListener('touchstart', function (event) {
         if (drag && event.touches.length > 1) release({ pointerId: drag.id, type: 'pointercancel' });
+        else if (drag && drag.state === 'pending') drag.eligible = drag.eligible && mayDrag(drag.card);
     }, { passive: true });
     deck.addEventListener('pointerup', release);
     deck.addEventListener('pointercancel', release);

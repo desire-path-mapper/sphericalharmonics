@@ -24,9 +24,10 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=ff109aa7">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=86651771">
     <style>
         .masthead h1 a { text-decoration: none; }
+        #main.container { padding-top: 0.2rem; }
         .section-head { text-align: center; margin-bottom: 1.2rem; }
         .question { font-family: var(--display); font-size: clamp(1.6rem, 4.5vw, 2.2rem); font-weight: 500; line-height: 1.15; margin: 0.8rem 0 0.2rem; text-wrap: balance; }
         .links a, .from a, .board a, .how a { color: var(--lane-green); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
@@ -38,10 +39,7 @@
         body { overflow-x: clip; }
         #game { overflow: visible; }
         .deck { display: grid; max-width: 44rem; margin: 0 auto; }
-        @media (max-width: 540px) {  /* 14 px of page each side of the card: a place to scroll the page, never a swipe */
-            .deck { margin: 0 calc(14px - var(--gutter)); }
-        }
-        .card { grid-area: 1 / 1; display: flex; flex-direction: column; background: var(--paper); border: 0;
+        .card { grid-area: 1 / 1; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--rule);
                 border-radius: 0; overflow: clip; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; transition: transform 0.35s ease; }
         .card:not(:first-child) { display: none; }
         .card.leaving + .card { display: flex; animation: arrive 0.35s ease; }
@@ -54,7 +52,7 @@
         .halves { display: flex; align-items: stretch; }
         .half { flex: 1 1 0; min-width: 0; padding: 0.8rem 0.7rem 0.6rem; text-align: center; position: relative; isolation: isolate;
                 display: flex; flex-direction: column; }
-        .half .more-line { margin-top: auto; }  /* the read-more lines sit level, whatever the descriptions' lengths */
+        .half .more-line { margin-top: 0; }  /* expanding the other half never pushes this control down */
         .half + .half { border-left: 0.5px solid var(--hairline); }
         /* While dragging, the half you move toward is highlighted in proportion to the distance: --lean-a and
            --lean-b go from 0 at rest to 1 at the swipe threshold (set by the script). The halves never resize. */
@@ -67,19 +65,25 @@
         .picture img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
         .half h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
         .half .gist { font-style: italic; color: var(--ink-soft); margin: 0.25rem 0 0.3rem; }
-        /* "+ Read more" and the source link share one line (the link sits in the summary); the intro opens below. */
+        /* A fixed glyph column and right-aligned source keep both labels still when details open. */
         .more-line { text-align: left; }
         details.sec.more { border-bottom: 0; }
-        details.sec.more > summary { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.7rem; padding: 0.3rem 0;
+        details.sec.more > summary { display: grid; grid-template-columns: 0.7rem minmax(0, 1fr) auto; align-items: baseline; column-gap: 0.3rem; padding: 0.3rem 0;
                                      font-size: var(--fs-small); color: var(--ink-soft); }
-        details.sec.more > summary::before { width: 0.6rem; margin-right: -0.2rem; }
+        details.sec.more > summary::before { content: "+"; grid-column: 1; width: 0.7rem; margin: 0; }
+        details.sec.more > summary > span { grid-column: 2; white-space: nowrap; }
         .more-line .source { font-size: var(--fs-small); color: var(--ink-soft); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
-        .more-line > .source { display: inline-block; padding: 0.3rem 0; }
+        details.sec.more > summary > .source { grid-column: 3; justify-self: end; border-left: 0.5px solid var(--hairline); padding-left: 0.5rem; white-space: nowrap; }
+        .more-line > .source { display: block; padding: 0.3rem 0; text-align: right; }
+        @media (max-width: 540px) {
+            details.sec.more > summary { grid-template-columns: 0.7rem minmax(0, 1fr); row-gap: 0.2rem; }
+            details.sec.more > summary > .source { grid-column: 1 / -1; grid-row: 2; }
+        }
         /* Touch action is set before pointerdown so vertical gestures stay native on tall cards. */
         .card.scrollable { touch-action: pan-y pinch-zoom; cursor: auto; }
         details.sec.more > summary .when-open, details.sec.more[open] > summary .when-closed { display: none; }
         details.sec.more[open] > summary .when-open { display: inline; }
-        details.sec.more[open] > summary::before { content: ""; width: 0; margin: 0; }
+        details.sec.more[open] > summary::before { content: "\2212"; }
         .intro { font-size: var(--fs-small); line-height: 1.45; }
         .intro p { margin-bottom: 0.4rem; hyphens: auto; }
         .intro .from { color: var(--ink-faint); }
@@ -108,7 +112,10 @@
             .card, .half::before { transition: none !important; }
             .card.leaving + .card, .ballot.drop .paper, .deck.hint .card:first-child { animation: none !important; }
         }
-        .result { min-height: 1.5em; }
+        .result:empty, .share-note:empty { margin: 0; }
+        /* Counted votes are announced without adding a visual row; errors remain in normal flow. */
+        .result:has(.counted-status) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+                                     overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 
         /* The tab group: Vote and Leaderboard sit on a hairline; the open one is a tab (a thin rule on three sides,
            open at the bottom into the page) holding its two sub-tabs. The other shows its sub-tabs quietly. */
@@ -138,8 +145,8 @@
         .result-card .score { font-family: var(--display); font-size: 2.6rem; line-height: 1.1; margin: 0.4rem 0; }
         .result-card .score .title { display: block; font-size: 1.6rem; }
         .result-card .description { font-style: italic; color: var(--ink-soft); }
-        .result-card .rank { margin: 0.4rem 0 0.8rem; }
-        .result-card .actions { margin: 0.8rem 0; }
+        .result-card .rank { margin: 0.4rem 0 0.2rem; }
+        .result-card .actions { margin: 0.2rem 0; }
         .result-card .rows { margin-top: 0.8rem; text-align: left; font-size: var(--fs-small); table-layout: fixed; }
         .result-card .rows td { overflow-wrap: anywhere; }
         .result-card .rows th.num, .result-card .rows td.num { width: 2.8rem; }
@@ -158,7 +165,7 @@
         .account a, .sign-out { font: inherit; color: var(--ink-soft); background: none; border: 0; padding: 0; cursor: pointer;
                                 text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
         .avatar { width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; }
-        .share-note { display: block; text-align: center; font-size: var(--fs-small); font-style: italic; color: var(--lane-green); min-height: 1.2em; }
+        .share-note { display: block; text-align: center; font-size: var(--fs-small); font-style: italic; color: var(--lane-green); }
         .past-vote { padding: 1.2rem; text-align: center; }
         .past-vote .past p { margin: 0.4rem 0; }
 
@@ -176,7 +183,7 @@
         .history { max-width: 46rem; margin: 0 auto; }
         .history .back a, .history .note a { color: var(--lane-green); }
         .history h3 { font-family: var(--display); font-weight: 500; font-size: 1.6rem; margin: 0.4rem 0 0.2rem; }
-        .how { margin: 2.5rem auto 0; }
+        .how { margin: 0.2rem auto 0; padding-top: 0; border-top: 0; }
         .how p { margin-bottom: 0.6rem; }
         @media (max-width: 540px) { .half { padding: 0.6rem 0.45rem; } .half h3 { font-size: var(--fs-body); } .half .gist { font-size: var(--fs-small); } .board { font-size: var(--fs-small); } }
     </style>
@@ -190,7 +197,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/eupoiia-index/mark.svg?v=ff109aa7" alt="" class="logo">
+            <img src="/eupoiia-index/mark.svg?v=86651771" alt="" class="logo">
             <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
         </div>
     </header>
@@ -276,6 +283,6 @@
             });
         })();
     </script>
-    <script src="/eupoiia-index/20-play-the-cards.js?v=ff109aa7"></script>
+    <script src="/eupoiia-index/20-play-the-cards.js?v=86651771"></script>
 </body>
 </html>
