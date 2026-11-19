@@ -34,20 +34,14 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=7d3e1a09">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=a3a34049">
     <style>
         :root, :root[data-theme="dark"] {
             --serif: "LM Roman 12", Georgia, serif;
             --display: var(--serif);
             --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
-            --sienna: #0560FF;
-            --lane-green: #0560FF;
-            --sienna-deep: var(--ink);
             --control-radius: 0.6rem;
         }
-        :root { --ink: #1b1b1b; --ink-soft: #4f4f4f; --ink-faint: #737373; --paper-deep: #eee; }
-        :root[data-theme="dark"] { --ink: #ececec; --ink-soft: #c2c2c2; --ink-faint: #999; --paper-deep: #222; }
-        .logo, .ballot svg { filter: grayscale(1); }
         details.sec > summary::before { font-family: inherit; }
         .masthead h1 a { text-decoration: none; }
         #main.container { padding-top: 0.2rem; }
@@ -88,8 +82,8 @@
                       width: calc(12px + 60px * var(--glow-strength, 0)); max-width: 20vw;
                       opacity: var(--glow-strength, 0); z-index: 10; pointer-events: none;
                       transition: none; animation: none; }
-        .swipe-glow-left { left: 0; background: linear-gradient(to right, rgba(5, 96, 255, 0.55), rgba(5, 96, 255, 0)); }
-        .swipe-glow-right { right: 0; background: linear-gradient(to left, rgba(5, 96, 255, 0.55), rgba(5, 96, 255, 0)); }
+        .swipe-glow-left { left: 0; background: linear-gradient(to right, color-mix(in srgb, var(--sienna) 55%, transparent), transparent); }
+        .swipe-glow-right { right: 0; background: linear-gradient(to left, color-mix(in srgb, var(--sienna) 55%, transparent), transparent); }
         .picture { height: clamp(120px, 30vw, 260px); display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
         .picture img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
         .half h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
@@ -197,6 +191,20 @@
         .toggle button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
         .board tr.me td { background: var(--paper-deep); font-weight: 700; }
         .pagination { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.7rem; margin: 1.2rem auto; }
+        .sign-in-row { display: flex; flex-wrap: nowrap; justify-content: center; align-items: center;
+                       gap: 0.5rem; margin: 0.6rem 0; font-size: var(--fs-small); }
+        .sign-in-row[hidden], .account[hidden], .email-sign-in-form[hidden] { display: none; }
+        .sign-in-row .btn { min-width: 0; }
+        .email-sign-in.btn, .email-sign-in-form button { display: inline-flex; align-items: center; justify-content: center;
+            min-height: 44px; padding: 0.35rem 0.65rem; border: 1px solid #000; border-radius: var(--control-radius);
+            background: var(--paper); color: var(--ink); font: inherit; font-style: normal; cursor: pointer; text-decoration: none; }
+        .email-sign-in.btn:hover, .email-sign-in.btn:focus-visible, .email-sign-in-form button:hover { background: var(--paper-deep); }
+        .email-sign-in-form { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+                              max-width: 28rem; margin: 0.6rem auto; text-align: left; font-size: var(--fs-small); }
+        .email-sign-in-form label, .email-sign-in-form [role="status"], .email-sign-in-form [role="alert"] { flex-basis: 100%; }
+        .email-sign-in-form input[type="email"] { flex: 1 1 12rem; min-width: 0; min-height: 44px;
+            padding: 0.35rem 0.5rem; border: 1px solid var(--ink-soft); border-radius: var(--control-radius);
+            color: var(--ink); background: var(--paper); font: inherit; }
         .bluesky-sign-in.btn { background: #0560FF; color: #fff; display: inline-flex; align-items: center; justify-content: center;
                                gap: 0.5rem; min-height: 44px; padding: 0.35rem 0.65rem; max-width: 100%;
                                font-style: normal; text-decoration: none; white-space: normal; border: 1px solid #000; border-radius: var(--control-radius); }
@@ -243,7 +251,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/eupoiia-index/mark.svg?v=7d3e1a09" alt="" class="logo">
+            <img src="/eupoiia-index/mark.svg?v=a3a34049" alt="" class="logo">
             <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
         </div>
     </header>
@@ -269,6 +277,7 @@
                     </span>
                 </div>
             </nav>
+            <div id="sign-in-row" class="sign-in-row" hidden></div>
             <h2 class="question">Who has done more for the common good?</h2>
             <p class="account" hidden></p>
         </div>
@@ -331,6 +340,6 @@
             });
         })();
     </script>
-    <script src="/eupoiia-index/20-play-the-cards.js?v=7d3e1a09"></script>
+    <script src="/eupoiia-index/20-play-the-cards.js?v=a3a34049"></script>
 </body>
 </html>

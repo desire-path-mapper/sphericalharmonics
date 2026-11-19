@@ -139,7 +139,46 @@
 
     // Signing in: X sends the visitor back with ?login=<one-time code>; trade it for a session token, keep the
     // token in our own cookie, and drop the code from the address bar.
-    var account = document.querySelector('.account');
+    var account = document.querySelector('.account'), signInRow = document.getElementById('sign-in-row'), emailForm;
+    function cookieValue(name) {
+        var found = document.cookie.match(new RegExp('(?:^|; )' + name + '=([A-Za-z0-9_-]+)'));
+        return found ? found[1] : '';
+    }
+    function emailBinding() {
+        var value = cookieValue('cgi_email_binding');
+        if (!value) {
+            var bytes = new Uint8Array(32); crypto.getRandomValues(bytes);
+            value = Array.from(bytes).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+        }
+        cookie('cgi_email_binding', value, 600);
+        return value;
+    }
+    function emailSignIn() {
+        if (!signInProviders.some(function (p) { return p.name === 'email'; }) || !signInRow) return;
+        if (!emailForm) {
+            emailForm = document.createElement('form'); emailForm.className = 'email-sign-in-form';
+            var label = document.createElement('label'); label.htmlFor = 'signin-email'; label.textContent = 'Email address';
+            var input = document.createElement('input'); input.id = 'signin-email'; input.name = 'email'; input.type = 'email';
+            input.required = true; input.maxLength = 254; input.autocomplete = 'email';
+            var submit = document.createElement('button'); submit.type = 'submit'; submit.className = 'btn'; submit.textContent = 'Send sign-in link';
+            var status = document.createElement('span'); status.setAttribute('role', 'status');
+            emailForm.append(label, input, submit, status); signInRow.insertAdjacentElement('afterend', emailForm);
+            emailForm.addEventListener('submit', function (event) {
+                event.preventDefault(); submit.disabled = true; status.textContent = 'Sending…';
+                var back = new URL(location.href); back.searchParams.delete('login'); back.hash = '';
+                send('/auth/email/start', { method: 'POST', body: new URLSearchParams({ email: input.value,
+                    binding: emailBinding(), session: tab, return: back.href }) })
+                    .then(function (response) { if (!response.ok) throw new Error('email'); return response.json(); })
+                    .then(function (answer) { status.textContent = answer.message; })
+                    .catch(function () { status.textContent = 'Could not request a link. Check the address and try again.'; })
+                    .finally(function () { submit.disabled = false; });
+            });
+        }
+        emailForm.hidden = false;
+        // A result dialog may contain another sign-in action; close it before focusing the form.
+        var dialog = document.querySelector('.modal'); if (dialog) dialog.hidden = true;
+        emailForm.querySelector('input').focus();
+    }
     function signInLink(provider) {
         return api + '/auth/' + provider + '/start?session=' + encodeURIComponent(tab) + '&return=' + encodeURIComponent(location.href.split('?')[0] + location.search.replace(/[?&]login=[^&]*/, ''));
     }
@@ -160,21 +199,26 @@
     }
     function showAccount(me) {
         if (!account) return;
-        account.innerHTML = ''; signInProviders = me.sign_in || [];
+        account.innerHTML = ''; if (signInRow) signInRow.replaceChildren(); signInProviders = me.sign_in || [];
         if (me.player) {
             var img = document.createElement('img');
-            img.src = me.player.avatar; img.alt = ''; img.className = 'avatar'; img.referrerPolicy = 'no-referrer';
+            img.src = me.player.avatar || home + 'mark-small.svg';
+            img.alt = ''; img.className = 'avatar'; img.referrerPolicy = 'no-referrer';
             var who = document.createElement('span'); who.textContent = '@' + me.player.username;
             var out = document.createElement('button'); out.type = 'button'; out.className = 'sign-out'; out.textContent = 'Sign out';
             account.append(img, who, out);
-        } else signInProviders.forEach(function (p, i) {
-            if (i) account.append(' or ');
-            if (p.name === 'bluesky') account.append(blueskyButton('Sign in with Bluesky'));
-            else {
-                var link = document.createElement('a'); link.href = signInLink(p.name); link.textContent = p.label;
-                account.append('Sign in with ', link);
+        } else if (signInRow) signInProviders.forEach(function (p) {
+            if (p.name === 'bluesky') signInRow.append(blueskyButton('Sign in with Bluesky'));
+            else if (p.name === 'email') {
+                var button = document.createElement('button'); button.type = 'button'; button.className = 'btn email-sign-in';
+                button.dataset.signIn = 'email'; button.textContent = 'Sign in by email'; signInRow.append(button);
+            } else if (p.name === 'x') { // Existing optional provider; FB6 deploy supplies no X credentials.
+                var link = document.createElement('a'); link.href = signInLink('x'); link.textContent = 'Sign in with ' + p.label;
+                signInRow.append(link);
             }
         });
+        if (signInRow) signInRow.hidden = !!me.player || !signInRow.childNodes.length;
+        if (emailForm && me.player) emailForm.hidden = true;
         account.hidden = !account.childNodes.length; retrySignIn();
     }
     function loginFailure(message) {
@@ -183,15 +227,27 @@
         failed.textContent = message; account.insertAdjacentElement('afterend', failed); failedSignIn = failed; retrySignIn();
     }
     if (query.get('login') === 'failed') loginFailure("Bluesky sign-in didn't finish. Try again.");
+    function exchangeCode(code) {
+        return send('/auth/login', { method: 'POST', body: new URLSearchParams({ code: code }) })
+            .then(function (r) { if (!r.ok) throw new Error('login'); return r.json(); })
+            .then(function (answer) { cookie('cgi_session', answer.token, 30 * 24 * 3600); });
+    }
     var authenticated = (function () {
+        var emailToken = new URLSearchParams(location.hash.slice(1)).get('email');
+        if (emailToken) {
+            history.replaceState(null, '', location.pathname + location.search);
+            return send('/auth/email/redeem', { method: 'POST', body: new URLSearchParams({
+                token: emailToken, binding: cookieValue('cgi_email_binding') }) })
+                .then(function (response) { if (!response.ok) throw new Error('email'); return response.json(); })
+                .then(function (answer) { return exchangeCode(answer.code); })
+                .catch(function () { loginFailure('This email link has expired, was used, or belongs to another browser. Request a new link.'); });
+        }
         var code = query.get('login');
         if (!code) return Promise.resolve();
         query.delete('login');
         history.replaceState(null, '', location.pathname + (query.toString() ? '?' + query : '') + location.hash);
         if (code === 'failed') return Promise.resolve();
-        return send('/auth/login', { method: 'POST', body: new URLSearchParams({ code: code }) })
-            .then(function (r) { if (!r.ok) throw new Error('login'); return r.json(); })
-            .then(function (answer) { cookie('cgi_session', answer.token, 30 * 24 * 3600); })
+        return exchangeCode(code)
             .catch(function () { loginFailure("Sign-in didn't finish. Try again."); });
     })();
     authenticated.then(function () {
@@ -202,7 +258,11 @@
             send('/auth/logout', { method: 'POST' }).finally(function () { cookie('cgi_session', '', 0); location.reload(); });
         }
         var prompt = event.target.closest('[data-sign-in]');
-        if (prompt) { event.preventDefault(); location.href = signInLink(prompt.dataset.signIn); }
+        if (prompt) {
+            event.preventDefault();
+            if (prompt.dataset.signIn === 'email') emailSignIn();
+            else if (prompt.dataset.signIn === 'bluesky') location.href = signInLink('bluesky');
+        }
     });
 
     if (mode === 'board') {  // the People & groups table, or one contender's matches (?c=<id>)
