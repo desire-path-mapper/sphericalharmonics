@@ -9,6 +9,16 @@
     <link rel="stylesheet" href="/assets/site.css?v=20261027a">
     <link rel="preconnect" href="https://common-good-katze52zaq-uc.a.run.app" crossorigin>
     <meta name="description" content="Who has done more for the common good? Pick between two people or groups at a time; everyone is ranked by Elo.">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Eupoiia Index">
+    <meta property="og:description" content="Who has done more for the common good?">
+    <meta property="og:url" content="https://sphericalharmonics.org/eupoiia-index/">
+    <meta property="og:image" content="https://sphericalharmonics.org/eupoiia-index/sphericalharmonics.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Eupoiia Index">
+    <meta name="twitter:description" content="Who has done more for the common good?">
+    <meta name="twitter:image" content="https://sphericalharmonics.org/eupoiia-index/sphericalharmonics.png">
     <meta name="theme-color" content="#faf3e5">
     <meta name="color-scheme" content="light">
     <script>
@@ -24,7 +34,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=86651771">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=9576e3e3">
     <style>
         .masthead h1 a { text-decoration: none; }
         #main.container { padding-top: 0.2rem; }
@@ -39,7 +49,7 @@
         body { overflow-x: clip; }
         #game { overflow: visible; }
         .deck { display: grid; max-width: 44rem; margin: 0 auto; }
-        .card { grid-area: 1 / 1; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--rule);
+        .card { grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--rule);
                 border-radius: 0; overflow: clip; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; transition: transform 0.35s ease; }
         .card:not(:first-child) { display: none; }
         .card.leaving + .card { display: flex; animation: arrive 0.35s ease; }
@@ -75,9 +85,14 @@
         .more-line .source { font-size: var(--fs-small); color: var(--ink-soft); text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
         details.sec.more > summary > .source { grid-column: 3; justify-self: end; border-left: 0.5px solid var(--hairline); padding-left: 0.5rem; white-space: nowrap; }
         .more-line > .source { display: block; padding: 0.3rem 0; text-align: right; }
-        @media (max-width: 540px) {
+        @media (min-width: 361px) and (max-width: 540px) {
+            details.sec.more > summary { font-size: 0.8rem; grid-template-columns: 0.6rem minmax(0, 1fr) auto; column-gap: 0.2rem; }
+            details.sec.more > summary::before { width: 0.6rem; font-size: inherit; }
+            details.sec.more > summary > .source { font-size: inherit; padding-left: 0.3rem; }
+        }
+        @media (max-width: 360px) {
             details.sec.more > summary { grid-template-columns: 0.7rem minmax(0, 1fr); row-gap: 0.2rem; }
-            details.sec.more > summary > .source { grid-column: 1 / -1; grid-row: 2; }
+            details.sec.more > summary > .source { grid-column: 1 / -1; grid-row: 2; border-left: 0; padding-left: 0; }
         }
         /* Touch action is set before pointerdown so vertical gestures stay native on tall cards. */
         .card.scrollable { touch-action: pan-y pinch-zoom; cursor: auto; }
@@ -146,7 +161,12 @@
         .result-card .score .title { display: block; font-size: 1.6rem; }
         .result-card .description { font-style: italic; color: var(--ink-soft); }
         .result-card .rank { margin: 0.4rem 0 0.2rem; }
-        .result-card .actions { margin: 0.2rem 0; }
+        .result-card .actions { position: relative; margin: 0.2rem 0; }
+        .result-card .actions .copied { position: absolute; top: 100%; left: 0; right: 0; margin: 0.2rem 0 0; line-height: 1.3; text-align: center; }
+        .score-method { max-width: 68ch; margin: 1.2rem auto 0; line-height: 1.55; }
+        .score-method p { margin: 0 0 0.7rem; }
+        .score-method .formula { margin: 0.8rem 0; text-align: center; }
+        .score-method .katex-display { margin: 0; }
         .result-card .rows { margin-top: 0.8rem; text-align: left; font-size: var(--fs-small); table-layout: fixed; }
         .result-card .rows td { overflow-wrap: anywhere; }
         .result-card .rows th.num, .result-card .rows td.num { width: 2.8rem; }
@@ -158,14 +178,19 @@
         .board tr.me td { background: var(--paper-deep); font-weight: 700; }
         .pagination { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.7rem; margin: 1.2rem auto; }
         .bluesky-sign-in.btn { background: #0560FF; color: #fff; display: inline-flex; align-items: center; justify-content: center;
-                               gap: 0.5rem; max-width: 100%; text-decoration: none; white-space: normal; }
+                               gap: 0.5rem; min-height: 44px; padding: 0.35rem 0.65rem; max-width: 100%;
+                               font-style: normal; text-decoration: none; white-space: normal; }
         .bluesky-sign-in img { width: 20px; height: 20px; flex: none; }
         .bluesky-sign-in.btn:hover, .bluesky-sign-in.btn:focus-visible { background: #0560FF; color: #fff; }
-        .account { display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-size: var(--fs-small); color: var(--ink-soft); margin-bottom: 0.4rem; }
+        .account { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.5rem; font-size: var(--fs-small); color: var(--ink-soft); margin-bottom: 0.4rem; }
         .account a, .sign-out { font: inherit; color: var(--ink-soft); background: none; border: 0; padding: 0; cursor: pointer;
                                 text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        .account .bluesky-sign-in.btn { background: #0560FF; color: #fff; min-height: 44px; padding: 0.35rem 0.65rem;
+                                      font-style: normal; text-decoration: none; }
         .avatar { width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; }
-        .share-note { display: block; text-align: center; font-size: var(--fs-small); font-style: italic; color: var(--lane-green); }
+        .share-note { position: absolute; left: 50%; bottom: 0.6rem; transform: translateX(-50%); max-width: calc(100% - 1rem);
+                      padding: 0 0.2rem; background: var(--paper); pointer-events: none; white-space: nowrap;
+                      text-align: center; font-size: var(--fs-small); font-style: italic; color: var(--lane-green); }
         .past-vote { padding: 1.2rem; text-align: center; }
         .past-vote .past p { margin: 0.4rem 0; }
 
@@ -197,7 +222,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/eupoiia-index/mark.svg?v=86651771" alt="" class="logo">
+            <img src="/eupoiia-index/mark.svg?v=9576e3e3" alt="" class="logo">
             <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
         </div>
     </header>
@@ -227,7 +252,7 @@
             <h2 class="question">Who has done more for the common good?</h2>
         </div>
 
-        <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app" data-mode="pair" data-home="/eupoiia-index/">
+        <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app" data-mode="pair" data-home="/eupoiia-index/" data-public-home="https://sphericalharmonics.org/eupoiia-index/">
             
             <div class="progress" hidden><div class="progress-bar"><span></span></div><p class="progress-label"></p></div>
             <div class="deck" aria-live="polite"><p class="note">Loading…</p></div>
@@ -285,6 +310,6 @@
             });
         })();
     </script>
-    <script src="/eupoiia-index/20-play-the-cards.js?v=86651771"></script>
+    <script src="/eupoiia-index/20-play-the-cards.js?v=9576e3e3"></script>
 </body>
 </html>

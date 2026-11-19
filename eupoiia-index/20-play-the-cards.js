@@ -16,8 +16,10 @@
     var mode = game.dataset.mode;
     var query = new URLSearchParams(location.search);
     var day = query.get('d') || query.get('daily') || '';
+    var seed = query.get('seed') || '';
 
     var home = game.dataset.home;
+    var publicHome = game.dataset.publicHome || new URL(home, location.href).href;
     function cookie(name, value, seconds) {
         document.cookie = name + '=' + value + '; Path=' + home + '; Max-Age=' + seconds + '; SameSite=Lax' +
             (location.protocol === 'https:' ? '; Secure' : '');
@@ -51,33 +53,82 @@
 
     function get(path) {
         return send(path).then(function (response) {
-            if (!response.ok && response.status !== 400 && response.status !== 429) throw new Error(response.status);
+            if (!response.ok && response.status !== 400 && response.status !== 409 && response.status !== 429) throw new Error(response.status);
             return response.text();
         });
     }
 
-    // Share a link: the phone's share sheet where there is one, else copy it; if neither works (some
-    // browsers refuse once the tap is a few moments old), show the link to select by hand.
-    function shareLink(form, where) {
-        var url;
-        function copy() {
-            return navigator.clipboard.writeText(url)
-                .then(function () { where.textContent = 'Link copied'; })
-                .catch(function () { where.textContent = url; });
+    // Sharing copies a public URL immediately, preserving the tap's clipboard permission.
+    function publicShare(form) {
+        var target = new URL(form.kind === 'result' ? 'daily-10/' : 'pair/', publicHome);
+        if (form.kind === 'result') {
+            if (!form.p || !form.seed) throw new Error('Missing shared result');
+            target.searchParams.set('d', form.day);
+            target.searchParams.set('p', form.p);
+            target.searchParams.set('seed', form.seed);
+        } else {
+            target.searchParams.set('p', form.p);
+            if (form.daily) target.searchParams.set('daily', form.daily);
+            if (form.seed) target.searchParams.set('seed', form.seed);
         }
-        return send('/share', { method: 'POST', body: new URLSearchParams(form) })
-            .then(function (response) {
-                if (!response.ok) throw new Error(response.status);
-                return response.json();
-            })
-            .then(function (answer) {
-                url = answer.url;
-                if (!navigator.share) return copy();
-                return navigator.share({ url: url }).catch(function (error) {
-                    if (error && error.name !== 'AbortError') return copy();  // a cancelled sheet is not an error
+        return target.href;
+    }
+    function legacyCopy(url) {
+        var active = document.activeElement, x = window.scrollX, y = window.scrollY;
+        var selection = window.getSelection(), ranges = [];
+        if (selection) for (var i = 0; i < selection.rangeCount; i++) ranges.push(selection.getRangeAt(i).cloneRange());
+        var field = document.createElement('textarea');
+        field.value = url; field.readOnly = true; field.tabIndex = -1; field.setAttribute('aria-hidden', 'true');
+        field.style.cssText = 'position:fixed;left:-10000px;top:0;width:1px;height:1px;font-size:16px;';
+        document.body.appendChild(field);
+        try {
+            field.focus({ preventScroll: true }); field.select(); field.setSelectionRange(0, field.value.length);
+            if (!document.execCommand('copy')) throw new Error('Copy refused');
+        } finally {
+            field.remove();
+            if (active && active.isConnected) active.focus({ preventScroll: true });
+            if (selection) { selection.removeAllRanges(); ranges.forEach(function (range) { selection.addRange(range); }); }
+            window.scrollTo({ left: x, top: y, behavior: 'instant' });
+        }
+    }
+    function copyNotice(where, message) {
+        clearTimeout(where.copyTimer); where.textContent = message;
+        where.copyTimer = setTimeout(function () { where.textContent = ''; }, 2500);
+    }
+    function shareLink(form, where) {
+        var copied;
+        try {
+            var url = publicShare(form);
+            try {
+                copied = navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(url) : Promise.reject(new Error('Clipboard unavailable'));
+            } catch (error) { copied = Promise.reject(error); }
+            return Promise.resolve(copied).catch(function () { legacyCopy(url); })
+                .then(function () { copyNotice(where, 'Link copied'); })
+                .catch(function () { copyNotice(where, "Couldn't copy link. Try again."); });
+        } catch (error) { copyNotice(where, "Couldn't copy link. Try again."); return Promise.resolve(); }
+    }
+
+    // Maths assets start only after a leaderboard has reached a painted frame.
+    var mathsReady;
+    function boardMath(root) {
+        requestAnimationFrame(function () { requestAnimationFrame(function () {
+            if (!root.querySelector('[data-tex]')) return;
+            performance.mark('leaderboard-list-painted');
+            if (!mathsReady) mathsReady = new Promise(function (resolve, reject) {
+                performance.mark('leaderboard-maths-requested');
+                var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = home + 'katex/katex.min.css';
+                document.head.appendChild(css);
+                var script = document.createElement('script'); script.async = true; script.src = home + 'katex/katex.min.js';
+                script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
+            });
+            mathsReady.then(function () {
+                root.querySelectorAll('[data-tex]').forEach(function (element) {
+                    if (element.dataset.mathDone) return;
+                    window.katex.render(element.dataset.tex, element, { displayMode: true, throwOnError: false });
+                    element.dataset.mathDone = 'true';
                 });
-            })
-            .catch(function () { where.textContent = 'Couldn\'t make a link'; });
+            }).catch(function () { /* The literal formula text remains readable if the asset is unavailable. */ });
+        }); });
     }
 
     // Signing in: X sends the visitor back with ?login=<one-time code>; trade it for a session token, keep the
@@ -86,33 +137,44 @@
     function signInLink(provider) {
         return api + '/auth/' + provider + '/start?session=' + encodeURIComponent(tab) + '&return=' + encodeURIComponent(location.href.split('?')[0] + location.search.replace(/[?&]login=[^&]*/, ''));
     }
+    var signInProviders = [], failedSignIn;
+    function blueskyButton(label) {
+        var link = document.createElement('a'); link.className = 'btn bluesky-sign-in';
+        link.dataset.signIn = 'bluesky'; link.href = signInLink('bluesky');
+        var icon = document.createElement('img'); icon.src = publicHome + 'bluesky-butterfly-white.svg';
+        icon.alt = ''; icon.width = 20; icon.height = 20;
+        var text = document.createElement('span'); text.textContent = label;
+        link.append(icon, text); return link;
+    }
+    function retrySignIn() {
+        if (!failedSignIn || failedSignIn.querySelector('[data-sign-in]')) return;
+        if (signInProviders.some(function (p) { return p.name === 'bluesky'; })) {
+            failedSignIn.append(' ', blueskyButton('Try Bluesky sign-in again'));
+        }
+    }
     function showAccount(me) {
         if (!account) return;
-        account.innerHTML = '';
+        account.innerHTML = ''; signInProviders = me.sign_in || [];
         if (me.player) {
             var img = document.createElement('img');
             img.src = me.player.avatar; img.alt = ''; img.className = 'avatar'; img.referrerPolicy = 'no-referrer';
-            var who = document.createElement('span');
-            who.textContent = '@' + me.player.username;
-            var out = document.createElement('button');
-            out.type = 'button'; out.className = 'sign-out'; out.textContent = 'Sign out';
+            var who = document.createElement('span'); who.textContent = '@' + me.player.username;
+            var out = document.createElement('button'); out.type = 'button'; out.className = 'sign-out'; out.textContent = 'Sign out';
             account.append(img, who, out);
-        } else if (me.sign_in && me.sign_in.length) {  // one link per provider that is on
-            account.append('Sign in with ');
-            me.sign_in.forEach(function (p, i) {
-                var link = document.createElement('a');
-                link.href = signInLink(p.name); link.textContent = p.label;
-                account.append(i ? ' or ' : '', link);
-            });
-        }
-        account.hidden = !account.childNodes.length;
+        } else signInProviders.forEach(function (p, i) {
+            if (i) account.append(' or ');
+            if (p.name === 'bluesky') account.append(blueskyButton('Sign in with Bluesky'));
+            else {
+                var link = document.createElement('a'); link.href = signInLink(p.name); link.textContent = p.label;
+                account.append('Sign in with ', link);
+            }
+        });
+        account.hidden = !account.childNodes.length; retrySignIn();
     }
     function loginFailure(message) {
         if (!account) return;
-        var failed = document.createElement('p');
-        failed.className = 'note'; failed.setAttribute('role', 'status');
-        failed.textContent = message;
-        account.insertAdjacentElement('afterend', failed);
+        var failed = document.createElement('p'); failed.className = 'note'; failed.setAttribute('role', 'status');
+        failed.textContent = message; account.insertAdjacentElement('afterend', failed); failedSignIn = failed; retrySignIn();
     }
     if (query.get('login') === 'failed') loginFailure("Bluesky sign-in didn't finish. Try again.");
     var authenticated = (function () {
@@ -139,19 +201,22 @@
 
     if (mode === 'board') {  // the People & groups table, or one contender's matches (?c=<id>)
         get(query.get('c') ? '/contender?c=' + encodeURIComponent(query.get('c')) : '/leaderboard?page=' + encodeURIComponent(query.get('page') || '1'))
-            .then(function (html) { game.innerHTML = html; }, function () { game.innerHTML = offline(); });
+            .then(function (html) { game.innerHTML = html; boardMath(game); }, function () { game.innerHTML = offline(); });
         return;
     }
-    if (mode === 'result') {  // a shared Daily 10 result: that player's live score, title and rank
-        authenticated.then(function () { return get('/result?day=' + encodeURIComponent(day) + '&p=' + encodeURIComponent(query.get('p') || ''))
-; }).then(function (html) { game.innerHTML = html; }, function () { game.innerHTML = offline(); });
-        return;
+    if (mode === 'result') {  // Legacy static result pages now open the Daily 10 with the shared overlay.
+        var legacy = new URL(home + 'daily-10/', location.href);
+        if (day) legacy.searchParams.set('d', day);
+        if (query.get('p')) legacy.searchParams.set('p', query.get('p'));
+        if (seed) legacy.searchParams.set('seed', seed);
+        legacy.hash = location.hash;
+        location.replace(legacy.href); return;
     }
     if (mode === 'players') {  // the Players table: Today or All time
         var box = game.querySelector('.board-box');
         var showBoard = function (which) {
             game.querySelectorAll('[data-board]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.board === which); });
-            get('/players?board=' + which + '&page=' + encodeURIComponent(query.get('page') || '1') + '&day=' + encodeURIComponent(query.get('day') || '')).then(function (html) { box.innerHTML = html; }, function () { box.innerHTML = offline(); });
+            get('/players?board=' + which + '&page=' + encodeURIComponent(query.get('page') || '1') + '&day=' + encodeURIComponent(query.get('day') || '')).then(function (html) { box.innerHTML = html; boardMath(box); }, function () { box.innerHTML = offline(); });
         };
         game.querySelectorAll('[data-board]').forEach(function (b) { b.addEventListener('click', function () { query.set('board', b.dataset.board); query.delete('page'); history.pushState(null, '', '?' + query); showBoard(b.dataset.board); }); });
         window.addEventListener('popstate', function () { query = new URLSearchParams(location.search); showBoard(query.get('board') === 'all' ? 'all' : 'today'); });
@@ -165,6 +230,8 @@
     var progress = game.querySelector('.progress');
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var KEEP = 'common-good-deck', HINTED = 'common-good-hinted';
+    var sharedActive = false, deferredOwnResult = null;
+    var sharedOwner = mode === 'daily' ? query.get('p') : '';
     var busy = false;  // one vote at a time: a fast double gesture can't spend two tickets
 
     // localStorage can be missing or throw (a private window): then the page simply draws new pairs.
@@ -183,14 +250,33 @@
         progress.querySelector('.progress-label').textContent = done + ' / 10 done';
     }
 
-    // The finished Daily 10, in a modal. Closing it goes on to infinite mode.
-    function showResult(card) {
+    function sharedNotice(message, label) {
+        var card = modal.querySelector('[data-shared-result]');
+        if (!card) return;
+        var note = card.querySelector('.shared-notice');
+        if (!note) { note = document.createElement('p'); note.className = 'note shared-notice'; card.insertBefore(note, card.querySelector('.actions')); }
+        note.textContent = message;
+        var play = card.querySelector('[data-play-shared]'); if (play && label) play.textContent = label;
+    }
+    // A shared score never becomes the recipient's completion or changes their progress to ten.
+    function showShared(card) {
+        sharedActive = true;
         modal.querySelector('.modal-body').innerHTML = '';
         modal.querySelector('.modal-body').appendChild(card);
-        modal.hidden = false;
-        modal.querySelector('.modal-close').focus();
+        modal.hidden = false; modal.querySelector('.modal-close').focus();
+    }
+    function showResult(card) {
+        if (sharedActive) {
+            deferredOwnResult = card; showProgress(10);
+            sharedNotice("You already finished this day's Daily 10. Continue to see your saved result.", 'See your Daily 10');
+            if (!top()) deck.innerHTML = '<p class="note">Done for this day.</p>';
+            return;
+        }
+        modal.querySelector('.modal-body').innerHTML = '';
+        modal.querySelector('.modal-body').appendChild(card);
+        modal.hidden = false; modal.querySelector('.modal-close').focus();
         showProgress(10);
-        if (!top()) deck.innerHTML = '<p class="note">Done for today.</p>';
+        if (!top()) deck.innerHTML = '<p class="note">Done for this day.</p>';
     }
 
     // Add the cards in a fragment to the back of the deck, and show what it says was counted or refused, the
@@ -204,8 +290,8 @@
         var now = box.querySelector('.progress-now');
         var finished = box.querySelector('[data-finished]');
         if (message && !message.closest('.card')) result.innerHTML = message.innerHTML;
-        if (now) { mode = 'daily'; day = now.dataset.day; showProgress(Number(now.dataset.done)); }
-        if (finished) { mode = 'daily'; day = finished.dataset.day; showResult(finished); return; }
+        if (now) { mode = 'daily'; day = now.dataset.day; seed = now.dataset.seed || seed; showProgress(Number(now.dataset.done)); }
+        if (finished) { mode = 'daily'; day = finished.dataset.day; seed = finished.dataset.seed || seed; showResult(finished); return; }
         if (!top()) deck.innerHTML = slow ? slow.outerHTML : offline();
         keepDeck();
     }
@@ -222,7 +308,7 @@
     // one). Returns false if nothing was sent.
     function choose(choice, card) {
         card = card || top();
-        if (!card || card !== top() || busy) return false;
+        if (!card || card !== top() || busy || !modal.hidden) return false;
         busy = true;
         var body = new URLSearchParams({ matchup: card.dataset.token });
         if (choice !== 'skip') body.set('choice', choice === 'tie' ? 'tie' : card.querySelector('.half-' + choice).dataset.qid);
@@ -255,15 +341,29 @@
     function load(first) {
         var path;
         if (mode === 'daily') {
-            path = '/daily?day=' + encodeURIComponent(day);
+            path = '/daily?day=' + encodeURIComponent(day) + (seed ? '&seed=' + encodeURIComponent(seed) : '');
         } else if (mode === 'pair') {
-            path = '/pair?p=' + encodeURIComponent(query.get('p') || '') + (day ? '&daily=' + encodeURIComponent(day) : '');
+            path = '/pair?p=' + encodeURIComponent(query.get('p') || '') + (day ? '&daily=' + encodeURIComponent(day) : '') + (seed ? '&seed=' + encodeURIComponent(seed) : '');
         } else {
             var keep = (first ? [first] : []).concat((recall(KEEP) || '').split(',')).filter(Boolean).slice(0, 3);
             path = '/deck?keep=' + encodeURIComponent(keep.join(','));
         }
         return get(path)
-            .then(function (html) { deck.innerHTML = ''; take(html); hint(); }, function () { if (!top()) deck.innerHTML = offline(); });
+            .then(function (html) {
+                var fragment = document.createElement('div'); fragment.innerHTML = html;
+                var conflict = fragment.querySelector('[data-daily-conflict]');
+                if (conflict && conflict.dataset.seed && seed !== conflict.dataset.seed) {
+                    mode = 'daily'; seed = conflict.dataset.seed; day = conflict.dataset.day || day;
+                    if (!sharedActive) {
+                        query.delete('p'); query.delete('daily'); query.set('d', day); query.set('seed', seed);
+                        history.replaceState(null, '', home + 'daily-10/?' + query + location.hash);
+                    }
+                    result.textContent = "You already started this day's Daily 10. Your original set is kept.";
+                    sharedNotice("You already started this day's Daily 10. Continue with your original set.", 'Continue your Daily 10');
+                    return load();
+                }
+                deck.innerHTML = ''; take(html); hint();
+            }, function () { if (!top()) deck.innerHTML = offline(); });
     }
 
     // Once per browser: wiggle the card and drop a ballot on both sides, to show what the page does.
@@ -393,7 +493,7 @@
         var share = event.target.closest('.share');
         if (share) {
             var card = share.closest('.card'), note = card.querySelector('.share-note');
-            shareLink({ kind: 'pair', p: card.dataset.pair, daily: card.dataset.day || '' }, note);
+            shareLink({ kind: 'pair', p: card.dataset.pair, daily: card.dataset.day || '', seed: card.dataset.seed || '' }, note);
         }
         var past = event.target.closest('[data-continue]') && event.target.closest('[data-past]');
         if (past) {  // after a shared pair already voted on: on in the mode the service said
@@ -403,17 +503,28 @@
         }
     });
 
-    function closeResult() {  // done with the Daily 10: on to infinite mode (reloading /daily-10/ reopens the result)
+    function closeResult() {
         modal.hidden = true;
+        if (sharedActive) {
+            sharedActive = false; sharedOwner = '';
+            query.delete('p'); query.set('d', day); if (seed) query.set('seed', seed);
+            history.replaceState(null, '', location.pathname + '?' + query + location.hash);
+            if (deferredOwnResult) { var own = deferredOwnResult; deferredOwnResult = null; showResult(own); }
+            else { var first = top(); if (first) first.querySelector('[data-choice]').focus({ preventScroll: true }); }
+            return;
+        }
         location.href = game.dataset.home;
     }
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape' && !modal.hidden) closeResult();
     });
     document.addEventListener('click', function (event) {  // the result modal and its buttons
-        if (event.target.closest('.modal-close') || event.target === modal) closeResult();
+        if (event.target.closest('.modal-close, [data-play-shared]') || event.target === modal) closeResult();
         var shareResult = event.target.closest('[data-share-result]');
-        if (shareResult) shareLink({ kind: 'result', day: day }, shareResult.parentNode.querySelector('.copied'));
+        if (shareResult) {
+            var owner = shareResult.closest('.result-card');
+            shareLink({ kind: 'result', day: owner.dataset.day, p: owner.dataset.handle, seed: owner.dataset.seed }, shareResult.parentNode.querySelector('.copied'));
+        }
     });
 
     var KEYS = { ArrowLeft: 'a', ArrowRight: 'b', ArrowDown: 'skip', '=': 'tie', ' ': 'tie' };
@@ -426,5 +537,21 @@
         choose(choice);
     });
 
-    authenticated.then(function () { load(); });
+    authenticated.then(function () {
+        if (!sharedOwner) return load();
+        var path = '/result?day=' + encodeURIComponent(day) + '&p=' + encodeURIComponent(sharedOwner) + (seed ? '&seed=' + encodeURIComponent(seed) : '');
+        return send(path).then(function (response) { return response.text(); }).then(function (html) {
+            var fragment = document.createElement('div'); fragment.innerHTML = html;
+            var shared = fragment.querySelector('[data-shared-result]');
+            if (shared) {
+                day = shared.dataset.day || day; seed = shared.dataset.seed || seed; showShared(shared);
+            } else {
+                var missing = document.createElement('div'); missing.className = 'result-card'; missing.dataset.sharedResult = '';
+                var message = document.createElement('p'); message.className = 'note'; message.textContent = 'This shared result is unavailable.';
+                var play = document.createElement('button'); play.className = 'btn'; play.dataset.playShared = ''; play.textContent = 'Play to find out your own score';
+                missing.append(message, play); showShared(missing);
+            }
+            return load();
+        }).catch(function () { result.innerHTML = offline(); return load(); });
+    });
 })();
