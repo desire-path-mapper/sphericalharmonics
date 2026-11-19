@@ -15,6 +15,7 @@
     var api = game.dataset.api;
     var mode = game.dataset.mode;
     var query = new URLSearchParams(location.search);
+    var early = window.cgiEarlyDeck;
     var day = query.get('d') || query.get('daily') || '';
     var seed = query.get('seed') || '';
 
@@ -30,6 +31,7 @@
         return found ? found[1] : '';
     }
     var tab = (function () {
+        if (early) return early.tab;
         var id = null;
         try { id = sessionStorage.getItem('cgi_tab'); } catch (e) { /* no storage: an id for this page only */ }
         if (!id) { id = crypto.randomUUID(); try { sessionStorage.setItem('cgi_tab', id); } catch (e) { /* kept in memory */ } }
@@ -52,7 +54,11 @@
     }
 
     function get(path) {
-        return send(path).then(function (response) {
+        var request;
+        if (early && early.request && early.path === path) {
+            request = early.request; early.request = null;
+        } else request = send(path);
+        return request.then(function (response) {
             if (!response.ok && response.status !== 400 && response.status !== 409 && response.status !== 429) throw new Error(response.status);
             return response.text();
         });
@@ -240,6 +246,12 @@
 
     function cards() { return Array.prototype.slice.call(deck.querySelectorAll('.card:not(.leaving)')); }
     function top() { return cards()[0] || null; }
+    function showPictures(card) {
+        if (!card) return;
+        card.querySelectorAll('.picture img').forEach(function (picture) {
+            picture.fetchPriority = 'high'; picture.loading = 'eager';
+        });
+    }
     function keepDeck() {  // only infinite mode keeps its queue; a Daily 10 is kept by the service
         if (mode === 'infinite') remember(KEEP, cards().map(function (card) { return card.dataset.token; }).join(','));
     }
@@ -285,6 +297,7 @@
         var box = document.createElement('div');
         box.innerHTML = html;
         box.querySelectorAll('.card').forEach(function (card) { deck.appendChild(card); });
+        showPictures(top());
         var message = box.querySelector('.note:not(.result-card .note)');
         var slow = box.querySelector('[data-slow]');
         var now = box.querySelector('.progress-now');
@@ -309,6 +322,7 @@
     function choose(choice, card) {
         card = card || top();
         if (!card || card !== top() || busy || !modal.hidden) return false;
+        clearGlow();  // keyboard/button submission can retire a card before its pointer is released
         busy = true;
         var body = new URLSearchParams({ matchup: card.dataset.token });
         if (choice !== 'skip') body.set('choice', choice === 'tie' ? 'tie' : card.querySelector('.half-' + choice).dataset.qid);
@@ -317,6 +331,7 @@
         // comes up from below into its place (CSS: .card.leaving + .card). Reduced motion swaps in place.
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });  // back to the top: the next card starts under the header
         card.classList.add('leaving', 'leave-' + choice);
+        showPictures(top());
         card.style.transform = '';
         setTimeout(function () { cardSizes.unobserve(card); card.remove(); }, reduced ? 0 : 360);
         keepDeck();
@@ -410,12 +425,26 @@
 
     // Capture only an actual drag; taps keep working on every button, summary and link.
     var drag = null, dragged = false;
+    // Body-level fixed edges stay at the viewport while the card moves or clips its contents.
+    var edgeGlows = {};
+    ['left', 'right'].forEach(function (side) {
+        var edge = document.createElement('div');
+        edge.className = 'swipe-glow swipe-glow-' + side;
+        edge.setAttribute('aria-hidden', 'true');
+        edge.style.setProperty('--glow-strength', 0);
+        document.body.appendChild(edge);
+        edgeGlows[side] = edge;
+    });
+    function clearGlow() {
+        edgeGlows.left.style.setProperty('--glow-strength', 0);
+        edgeGlows.right.style.setProperty('--glow-strength', 0);
+    }
     function threshold(card) { return Math.max(80, card.offsetWidth * 0.28); }  // past this the vote commits
-    function lean(card, dx, dy) {  // highlight the half being moved toward, in proportion to the distance
-        var sideways = Math.abs(dx) >= -dy;  // an upward drag is a skip: no half is highlighted
+    function lean(card, dx, dy) {
+        var sideways = Math.abs(dx) >= Math.abs(dy);
         var strength = sideways ? Math.min(Math.abs(dx) / threshold(card), 1) : 0;
-        card.style.setProperty('--lean-a', dx < 0 ? strength : 0);
-        card.style.setProperty('--lean-b', dx > 0 ? strength : 0);
+        edgeGlows.left.style.setProperty('--glow-strength', dx < 0 ? strength : 0);
+        edgeGlows.right.style.setProperty('--glow-strength', dx > 0 ? strength : 0);
     }
     function aim(dx, dy, limit) {
         if (-dy > limit && -dy > Math.abs(dx)) return 'skip';
@@ -426,6 +455,7 @@
     deck.addEventListener('pointerdown', function (event) {
         var card = top();
         if (!event.isPrimary || event.button !== 0) return;
+        clearGlow();  // every fresh primary gesture starts with both viewport edges dark
         if (!card || busy || !card.contains(event.target)) return;
         var bounds = card.getBoundingClientRect();
         if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) return;
@@ -435,6 +465,8 @@
         dragged = false;  // a press only becomes a drag once it moves; until then a tap stays a tap on its button
     });
     function moveDrag(x, y) {
+        // A keyboard vote can retire a card while its original finger is still down.
+        if (drag.card !== top()) { release({ pointerId: drag.id, type: 'pointercancel' }); return; }
         drag.dx = x - drag.x;
         drag.dy = y - drag.y;
         if (drag.state === 'scroll' || drag.state === 'blocked') return;
@@ -463,11 +495,11 @@
         if (!drag || event.pointerId !== drag.id) return;
         var done = drag;
         drag = null;
+        clearGlow();  // cancel/lost capture and non-drag releases must clear feedback too
         if (done.card.hasPointerCapture(done.id)) done.card.releasePointerCapture(done.id);
         if (done.state !== 'dragging') return;  // a tap: its click does the work
         done.card.classList.remove('dragging');
         var choice = event.type === 'pointerup' ? aim(done.dx, done.dy, threshold(done.card)) : '';
-        lean(done.card, 0, 0);  // the highlight fades back
         if (!choice || !choose(choice, done.card)) {  // a short drag snaps back and casts nothing
             done.card.style.transform = '';
         }

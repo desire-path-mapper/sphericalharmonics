@@ -3,9 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+<script>
+(function () {
+    if (new URLSearchParams(location.search).has('login')) return;
+    var id, kept = '', auth = document.cookie.match(/(?:^|; )cgi_session=([A-Za-z0-9_-]+)/);
+    try { id = sessionStorage.getItem('cgi_tab'); } catch (e) {}
+    if (!id) {
+        id = crypto.randomUUID();
+        try { sessionStorage.setItem('cgi_tab', id); } catch (e) {}
+    }
+    try { kept = (localStorage.getItem('common-good-deck') || '').split(',').filter(Boolean).slice(0, 3).join(','); } catch (e) {}
+    var path = '/deck?keep=' + encodeURIComponent(kept);
+    var headers = { 'X-Session': id };
+    if (auth) headers['X-Auth'] = auth[1];
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, 10000);
+    var request = fetch("https://common-good-katze52zaq-uc.a.run.app" + path, { headers: headers, signal: controller.signal })
+        .finally(function () { clearTimeout(timer); });
+    request.catch(function () {}); // Main JS consumes the result/error once it is ready.
+    window.cgiEarlyDeck = { tab: id, path: path, request: request };
+})();
+</script>
     <title>Vote · Eupoiia Index</title>
-    <link rel="preload" href="/assets/fonts/cmu-serif-500-roman.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/assets/fonts/cmu-serif-700-roman.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/lmroman12-regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/assets/site.css?v=20261027a">
     <link rel="preconnect" href="https://common-good-katze52zaq-uc.a.run.app" crossorigin>
     <meta name="description" content="Who has done more for the common good? Pick between two people or groups at a time; everyone is ranked by Elo.">
@@ -34,8 +55,21 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=9576e3e3">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=7d3e1a09">
     <style>
+        :root, :root[data-theme="dark"] {
+            --serif: "LM Roman 12", Georgia, serif;
+            --display: var(--serif);
+            --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+            --sienna: #0560FF;
+            --lane-green: #0560FF;
+            --sienna-deep: var(--ink);
+            --control-radius: 0.6rem;
+        }
+        :root { --ink: #1b1b1b; --ink-soft: #4f4f4f; --ink-faint: #737373; --paper-deep: #eee; }
+        :root[data-theme="dark"] { --ink: #ececec; --ink-soft: #c2c2c2; --ink-faint: #999; --paper-deep: #222; }
+        .logo, .ballot svg { filter: grayscale(1); }
+        details.sec > summary::before { font-family: inherit; }
         .masthead h1 a { text-decoration: none; }
         #main.container { padding-top: 0.2rem; }
         .section-head { text-align: center; margin-bottom: 1.2rem; }
@@ -46,11 +80,12 @@
         /* The feed: one card at a time, each with its own buttons. The next two are already loaded (hidden).
            A skip scrolls the card up and the next comes up from below, like a reel; a vote sends the card
            toward the chosen side and the next comes up from below the same way. Nothing fades. */
-        body { overflow-x: clip; }
+        /* Clip at the viewport: transformed cards must not widen mobile fixed positioning. */
+        html, body { overflow-x: clip; }
         #game { overflow: visible; }
         .deck { display: grid; max-width: 44rem; margin: 0 auto; }
-        .card { grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--rule);
-                border-radius: 0; overflow: clip; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; transition: transform 0.35s ease; }
+        .card { grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; background: var(--paper); border: 1px solid #000;
+                border-radius: var(--control-radius); overflow: clip; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; transition: transform 0.35s ease; }
         .card:not(:first-child) { display: none; }
         .card.leaving + .card { display: flex; animation: arrive 0.35s ease; }
         @keyframes arrive { from { transform: translateY(calc(100% + 2rem)); } to { transform: none; } }
@@ -59,18 +94,23 @@
         .card.leave-b { transform: translateX(130%) rotate(12deg); }
         .card.leave-skip { transform: translateY(calc(-100% - 2rem)); }
         .card.leave-tie { transform: translateY(calc(-100% - 2rem)); }
-        .halves { display: flex; align-items: stretch; }
-        .half { flex: 1 1 0; min-width: 0; padding: 0.8rem 0.7rem 0.6rem; text-align: center; position: relative; isolation: isolate;
-                display: flex; flex-direction: column; }
-        .half .more-line { margin-top: 0; }  /* expanding the other half never pushes this control down */
+        /* Shared rows align controls without moving them when either introduction opens. */
+        .halves { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .half { min-width: 0; padding: 0.8rem 0.7rem 0.6rem; text-align: center;
+                display: grid; grid-template-rows: subgrid; grid-row: 1 / span 4; }
+        .half-a { grid-column: 1; }
+        .half-b { grid-column: 2; }
+        .half .picture { grid-row: 1; }
+        .half h3 { grid-row: 2; align-self: start; }
+        .half .gist { grid-row: 3; align-self: start; }
+        .half .more-line { grid-row: 4; margin-top: 0; }
         .half + .half { border-left: 0.5px solid var(--hairline); }
-        /* While dragging, the half you move toward is highlighted in proportion to the distance: --lean-a and
-           --lean-b go from 0 at rest to 1 at the swipe threshold (set by the script). The halves never resize. */
-        .half::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--paper-deep);
-                        box-shadow: inset 0 0 0 2px var(--sienna); opacity: 0; transition: opacity 0.2s ease; }
-        .half-a::before { opacity: var(--lean-a, 0); }
-        .half-b::before { opacity: var(--lean-b, 0); }
-        .card.dragging .half::before { transition: none; }
+        .swipe-glow { position: fixed; top: 0; bottom: 0;
+                      width: calc(12px + 60px * var(--glow-strength, 0)); max-width: 20vw;
+                      opacity: var(--glow-strength, 0); z-index: 10; pointer-events: none;
+                      transition: none; animation: none; }
+        .swipe-glow-left { left: 0; background: linear-gradient(to right, rgba(5, 96, 255, 0.55), rgba(5, 96, 255, 0)); }
+        .swipe-glow-right { right: 0; background: linear-gradient(to left, rgba(5, 96, 255, 0.55), rgba(5, 96, 255, 0)); }
         .picture { height: clamp(120px, 30vw, 260px); display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
         .picture img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
         .half h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
@@ -124,7 +164,8 @@
         .deck.hint .card:first-child { animation: wiggle 0.9s ease; }
         @keyframes wiggle { 25% { transform: translateX(-10px) rotate(-2deg); } 75% { transform: translateX(10px) rotate(2deg); } }
         @media (prefers-reduced-motion: reduce) {
-            .card, .half::before { transition: none !important; }
+            .card, .swipe-glow { transition: none !important; }
+            .swipe-glow { animation: none; }
             .card.leaving + .card, .ballot.drop .paper, .deck.hint .card:first-child { animation: none !important; }
         }
         .result:empty, .share-note:empty { margin: 0; }
@@ -179,14 +220,15 @@
         .pagination { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.7rem; margin: 1.2rem auto; }
         .bluesky-sign-in.btn { background: #0560FF; color: #fff; display: inline-flex; align-items: center; justify-content: center;
                                gap: 0.5rem; min-height: 44px; padding: 0.35rem 0.65rem; max-width: 100%;
-                               font-style: normal; text-decoration: none; white-space: normal; }
+                               font-style: normal; text-decoration: none; white-space: normal; border: 1px solid #000; border-radius: var(--control-radius); }
         .bluesky-sign-in img { width: 20px; height: 20px; flex: none; }
         .bluesky-sign-in.btn:hover, .bluesky-sign-in.btn:focus-visible { background: #0560FF; color: #fff; }
-        .account { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.5rem; font-size: var(--fs-small); color: var(--ink-soft); margin-bottom: 0.4rem; }
+        .account { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.5rem; font-size: var(--fs-small); color: var(--ink-soft); margin: 0.5rem 0 0; }
+        @media (min-width: 541px) { .account { justify-content: flex-end; } }
         .account a, .sign-out { font: inherit; color: var(--ink-soft); background: none; border: 0; padding: 0; cursor: pointer;
                                 text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
         .account .bluesky-sign-in.btn { background: #0560FF; color: #fff; min-height: 44px; padding: 0.35rem 0.65rem;
-                                      font-style: normal; text-decoration: none; }
+                                      font-style: normal; text-decoration: none; border: 1px solid #000; border-radius: var(--control-radius); }
         .avatar { width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; }
         .share-note { position: absolute; left: 50%; bottom: 0.6rem; transform: translateX(-50%); max-width: calc(100% - 1rem);
                       padding: 0 0.2rem; background: var(--paper); pointer-events: none; white-space: nowrap;
@@ -222,7 +264,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/eupoiia-index/mark.svg?v=9576e3e3" alt="" class="logo">
+            <img src="/eupoiia-index/mark.svg?v=7d3e1a09" alt="" class="logo">
             <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
         </div>
     </header>
@@ -231,7 +273,6 @@
 
     <main class="container" id="main">
         <div class="section-head">
-            <p class="account" hidden></p>
             
             <nav class="tabs" aria-label="Sections">
                 <div class="tab-group open">
@@ -250,6 +291,7 @@
                 </div>
             </nav>
             <h2 class="question">Who has done more for the common good?</h2>
+            <p class="account" hidden></p>
         </div>
 
         <div id="game" data-api="https://common-good-katze52zaq-uc.a.run.app" data-mode="infinite" data-home="/eupoiia-index/" data-public-home="https://sphericalharmonics.org/eupoiia-index/">
@@ -316,6 +358,6 @@
             });
         })();
     </script>
-    <script src="/eupoiia-index/20-play-the-cards.js?v=9576e3e3"></script>
+    <script src="/eupoiia-index/20-play-the-cards.js?v=7d3e1a09"></script>
 </body>
 </html>
