@@ -34,7 +34,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=de61ea52">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=85a995d2">
     <style>
         :root, :root[data-theme="dark"] {
             --serif: "LM Roman 12", Georgia, serif;
@@ -43,6 +43,10 @@
             --control-radius: 0.6rem;
         }
         details.sec > summary::before { font-family: inherit; }
+        .masthead { padding: 0.5rem 0 0.7rem; }
+        .header-tools { max-width: var(--page); margin: 0 auto; padding: 0 var(--gutter); display: flex; justify-content: flex-end; align-items: flex-start; gap: 0.5rem; min-height: 96px; font-size: 0.85rem; line-height: 1.25; }
+        .header-tools .theme-toggle { position: static; flex: none; margin-top: 4px; }
+        .masthead-lockup { margin-top: 0.75rem; padding: 0 var(--gutter); }
         .masthead h1 a { text-decoration: none; }
         #main.container { padding-top: 0.2rem; }
         .section-head { text-align: center; margin-bottom: 1.2rem; }
@@ -152,7 +156,7 @@
         .result:has(.counted-status) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
                                      overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 
-        /* The account shares the primary 44px tab row; sub-tabs stay below it inside the active outline. */
+        /* Only the centered tabs occupy this row; the active outline meets the content-width rule. */
         .tab-account-row { position: relative; display: flex; align-items: flex-start; justify-content: center;
                            gap: 0; margin: 0 0 0.6rem; font-size: var(--fs-small); line-height: 1.25; }
         .tab-account-row::after { content: ""; position: absolute; left: 50%; bottom: 0;
@@ -172,7 +176,7 @@
         .tab-group.open .sub-tabs a { color: var(--ink-soft); }
         .sub-tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--sienna); }
         .tabs a:hover { color: var(--ink); }
-        .account-menu { position: absolute; right: 0; top: 0; padding-top: 1px; }
+        .account-menu { position: relative; padding: 0; }
         #account-toggle { display: none; min-width: 44px; min-height: 44px; padding: 0 0.4rem;
                           font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule);
                           border-radius: var(--control-radius); cursor: pointer; }
@@ -181,7 +185,7 @@
             #account-toggle { display: inline-flex; align-items: center; justify-content: center; width: 44px; padding: 0; }
             #account-toggle .account-icon { width: 22px; height: 22px; }
             #account-toggle .avatar { width: 24px; height: 24px; }
-            #account-panel { display: none; position: absolute; top: calc(44px + 0.5rem); right: 0;
+            #account-panel { display: none; position: absolute; top: calc(44px + 0.5rem); right: calc(-2.25rem - 0.5rem);
                              width: 17rem; max-width: calc(100vw - 40px); padding: 0.6rem;
                              background: var(--paper); border: 1px solid var(--rule); border-radius: var(--control-radius); z-index: 11; }
             .account-menu.is-open #account-panel { display: block; }
@@ -190,8 +194,8 @@
             #account-panel .account > span { max-width: 100%; overflow-wrap: anywhere; }
         }
         @media (max-width: 760px) {
-            .tab-account-row { justify-content: flex-start; padding-right: calc(44px + 0.4rem); }
-            .tabs { flex: 1; min-width: 0; margin-left: 0.3rem; }
+            .tab-account-row { justify-content: center; padding-right: 0; }
+            .tabs { min-width: 0; margin-left: 0; }
             .tab-group { flex: 1; padding: 0 0.2rem 0.35rem; }
             .sub-tabs { gap: 0.35rem; font-size: 0.7rem; }
         }
@@ -314,21 +318,33 @@
         .history { max-width: 46rem; margin: 0 auto; }
         .history .back a, .history .note a { color: var(--lane-green); }
         .history h3 { font-family: var(--display); font-weight: 500; font-size: 1.6rem; margin: 0.4rem 0 0.2rem; }
-        .how { margin: 0.2rem auto 0; padding-top: 0; border-top: 0; }
+        .how { margin: 1rem auto 0; padding-top: 0; border-top: 0; }
         .how p { margin-bottom: 0.6rem; }
-        @media (max-width: 540px) { .half { padding: 0.6rem 0.45rem; } .half h3 { font-size: var(--fs-body); } .half .gist { font-size: var(--fs-small); } .board { font-size: var(--fs-small); } }
+        footer { margin-top: 0.5rem; }
+        .how p:last-child { margin-bottom: 0; }
+        @media (max-width: 1023px) { .header-tools { min-height: 44px; } }
+        @media (max-width: 540px) { #account-panel { right: calc(-2rem - 0.5rem); } .half { padding: 0.6rem 0.45rem; } .half h3 { font-size: var(--fs-body); } .half .gist { font-size: var(--fs-small); } .board { font-size: var(--fs-small); } }
     </style>
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="masthead">
-        <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Dark mode" title="Dark mode">
-            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
-            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
-        </button>
+        <div class="header-tools">
+            <div class="account-menu">
+                <button type="button" id="account-toggle" aria-expanded="false" aria-controls="account-panel" aria-label="Sign in"><svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg></button>
+                <div id="account-panel" role="group" aria-label="Account">
+                    <div id="sign-in-row" class="sign-in-row" hidden></div>
+                    <p class="account" hidden></p>
+                </div>
+            </div>
+            <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Dark mode" title="Dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
+            </button>
+        </div>
         <div class="masthead-lockup">
-            <img src="/eupoiia-index/mark.svg?v=de61ea52" alt="" class="logo">
+            <img src="/eupoiia-index/mark.svg?v=85a995d2" alt="" class="logo">
             <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
         </div>
     </header>
@@ -354,13 +370,6 @@
                     </span>
                 </div>
             </nav>
-            <div class="account-menu">
-                <button type="button" id="account-toggle" aria-expanded="false" aria-controls="account-panel" aria-label="Sign in"><svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg></button>
-                <div id="account-panel" role="group" aria-label="Account">
-                    <div id="sign-in-row" class="sign-in-row" hidden></div>
-                    <p class="account" hidden></p>
-                </div>
-            </div>
             </div>
             
         </div>
@@ -422,6 +431,6 @@
             });
         })();
     </script>
-    <script src="/eupoiia-index/20-play-the-cards.js?v=de61ea52"></script>
+    <script src="/eupoiia-index/20-play-the-cards.js?v=85a995d2"></script>
 </body>
 </html>
