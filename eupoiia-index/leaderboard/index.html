@@ -34,7 +34,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=e5a37f21">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=de61ea52">
     <style>
         :root, :root[data-theme="dark"] {
             --serif: "LM Roman 12", Georgia, serif;
@@ -155,7 +155,8 @@
         /* The account shares the primary 44px tab row; sub-tabs stay below it inside the active outline. */
         .tab-account-row { position: relative; display: flex; align-items: flex-start; justify-content: center;
                            gap: 0; margin: 0 0 0.6rem; font-size: var(--fs-small); line-height: 1.25; }
-        .tab-account-row::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+        .tab-account-row::after { content: ""; position: absolute; left: 50%; bottom: 0;
+                                 width: min(100%, 46rem); transform: translateX(-50%);
                                  border-bottom: 1px solid var(--rule); pointer-events: none; }
         .tabs { position: relative; z-index: 1; display: flex; justify-content: flex-start; border: 0; margin: 0; }
         .tab-group { display: flex; flex-direction: column; align-items: stretch; min-width: 0;
@@ -163,7 +164,7 @@
         .tab-group.open { border-color: var(--rule); background: var(--paper); }
         .tabs a { text-decoration: none; }
         .tab { display: flex; align-items: center; justify-content: center; min-height: 44px;
-               font-size: inherit; line-height: inherit; color: var(--ink-faint); letter-spacing: 0.01em; }
+               font-size: 1.125rem; line-height: inherit; color: var(--ink-faint); letter-spacing: 0.01em; }
         .tab-group.open .tab { color: var(--ink); }
         .sub-tabs { display: flex; justify-content: center; align-items: center; min-height: 44px;
                     gap: 0.9rem; margin-top: 0.5rem; font-size: inherit; }
@@ -327,7 +328,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/eupoiia-index/mark.svg?v=e5a37f21" alt="" class="logo">
+            <img src="/eupoiia-index/mark.svg?v=de61ea52" alt="" class="logo">
             <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
         </div>
     </header>
@@ -420,6 +421,6 @@
             });
         })();
     </script>
-    <script src="/eupoiia-index/20-play-the-cards.js?v=e5a37f21"></script>
+    <script src="/eupoiia-index/20-play-the-cards.js?v=de61ea52"></script>
 </body>
 </html>
