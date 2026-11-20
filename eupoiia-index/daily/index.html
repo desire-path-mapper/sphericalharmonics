@@ -34,7 +34,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=9499999e">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=1e2e8982">
     <style>
         :root, :root[data-theme="dark"] {
             --serif: "LM Roman 12", Georgia, serif;
@@ -83,17 +83,25 @@
         .half .gist { grid-row: 3; align-self: start; }
         .half .more-line { grid-row: 4; margin-top: 0; }
         .half + .half { border-left: 0.5px solid var(--hairline); }
-        /* A viewport backdrop stays behind the text while its centre and radius follow the drag. */
-        .swipe-glow { position: fixed; inset: 0; width: 100vw; height: 100vh;
-                      --glow-radius: calc(6vmin + 145vmax * var(--glow-strength, 0));
-                      --glow-y: calc(50vh * var(--glow-strength, 0));
-                      background: radial-gradient(circle var(--glow-radius) at var(--glow-x) var(--glow-y),
-                                  color-mix(in srgb, var(--sienna) 55%, transparent), transparent 100%);
-                      opacity: var(--glow-strength, 0); z-index: -1; pointer-events: none;
-                      transition: none; animation: none; }
-        .swipe-glow-left { --glow-x: calc(50vw * var(--glow-strength, 0)); }
-        .swipe-glow-right { --glow-x: calc(100vw - 50vw * var(--glow-strength, 0)); }
-        .card.leaving, .card.leaving + .card { background: var(--paper); }
+        /* Fixed half-screen clips cap a prepainted radial layer; drag frames only composite it. */
+.card { background: var(--paper); }
+.card.dragging { will-change: transform; }
+.swipe-glow { position: fixed; top: 0; bottom: 0; width: 50vw; height: 100vh;
+    overflow: clip; contain: paint; pointer-events: none; z-index: -1;
+    opacity: 1; transition: none; animation: none; }
+.swipe-glow-left { left: 0; }
+.swipe-glow-right { right: 0; }
+.swipe-glow::before { content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 100% 70% at 0 50%, color-mix(in srgb, var(--sienna) 55%, transparent), transparent 100%);
+    transform-origin: 0 50%;
+    transform: translateY(calc((var(--glow-strength, 0) - 1) * 50vh)) scale(calc(.08 + .92 * var(--glow-strength, 0)));
+    opacity: var(--glow-strength, 0); will-change: transform, opacity; }
+.swipe-glow-right::before { background: radial-gradient(ellipse 100% 70% at 100% 50%, color-mix(in srgb, var(--sienna) 55%, transparent), transparent 100%);
+    transform-origin: 100% 50%; }
+.swipe-glow.is-releasing { transition: opacity 180ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+    .swipe-glow::before { transform: scale(calc(.08 + .92 * var(--glow-strength, 0))); }
+}
         .picture { height: clamp(120px, 30vw, 260px); display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
         .picture img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
         .half h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
@@ -147,8 +155,7 @@
         .deck.hint .card:first-child { animation: wiggle 0.9s ease; }
         @keyframes wiggle { 25% { transform: translateX(-10px) rotate(-2deg); } 75% { transform: translateX(10px) rotate(2deg); } }
         @media (prefers-reduced-motion: reduce) {
-            .card, .swipe-glow { transition: none !important; }
-            .swipe-glow { --glow-x: 50vw; --glow-y: 50vh; animation: none; }
+            .card { transition: none !important; }
             .card.leaving + .card, .ballot.drop .paper, .deck.hint .card:first-child { animation: none !important; }
         }
         .result:empty, .share-note:empty { margin: 0; }
@@ -344,7 +351,7 @@
             </button>
         </div>
         <div class="masthead-lockup">
-            <img src="/eupoiia-index/mark.svg?v=9499999e" alt="" class="logo">
+            <img src="/eupoiia-index/mark.svg?v=1e2e8982" alt="" class="logo">
             <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
         </div>
     </header>
@@ -431,10 +438,10 @@
         })();
     </script>
     
-    <script type="application/json" id="cgi-static-bootstrap">{"manifest":{"built_at":1795146388,"catalog":["catalog-00-fd13b37eea8de732.json","catalog-01-b9c65dc58fe11007.json","catalog-02-a042e427f19f8e2f.json","catalog-03-d66dd871392af84e.json","catalog-04-2fc8e996eff2ae5a.json","catalog-05-bf638acc46195384.json","catalog-06-ad126d90f70a086c.json","catalog-07-48a1deb1b2e44608.json","catalog-08-f2e58ad37d0e233e.json","catalog-09-ea6b5a913eca5eda.json","catalog-10-73570eda1bd53330.json","catalog-11-39212b8cebe2b261.json","catalog-12-c042d46af29f75fc.json","catalog-13-5a45f24ac808269b.json","catalog-14-07a46a8efefc19af.json","catalog-15-b77d6666fd96a93b.json","catalog-16-3bb85c1d5577e0c9.json","catalog-17-4b349557a7304f01.json","catalog-18-6e7bce70cd2533d7.json","catalog-19-73ed3f1d497b7f06.json","catalog-20-1707a010624f47b6.json","catalog-21-d5d154e59a97ae92.json","catalog-22-a369bfaabb07a951.json","catalog-23-73643b44f66b058f.json","catalog-24-121cc26dc184ec06.json","catalog-25-92876bb625139559.json","catalog-26-cd957d02a5fb870d.json","catalog-27-2a01707dcf3afee0.json","catalog-28-abcca3ea2b52672e.json","catalog-29-bd4abe3c4e16ea87.json","catalog-30-8b7aef91e0fe75d5.json","catalog-31-5ba31b6a6ea53955.json"],"daily":{"2026-11-17":"daily-2026-11-17-d9ec2d033076372e.json","2026-11-18":"daily-2026-11-18-ede94093288df6c4.json","2026-11-19":"daily-2026-11-19-7bba25d344d643f8.json","2026-11-20":"daily-2026-11-20-879fe73ad41868a7.json"},"files":{"contenders":"contenders-1ae1cd86a5d0de68.json","deck_first":"deck-first-fdfdfb5a37531245.json","deck_pool":"deck-pool-a58e0006b2739bbd.json","players_all":"players-all-7bdb11ac2bacd59e.json","players_today":"players-today-3e997667ff1bc3bc.json","top":"top-727ef3e7c08f0d04.json"},"results":{"2026-11-17":"results-2026-11-17-e191a275487feedd.json","2026-11-18":"results-2026-11-18-f0fda01dff5b71a5.json","2026-11-19":"results-2026-11-19-e75f42ec4f1d2a9e.json"},"revision":238893,"today":"2026-11-19","v":1},"files":{}}</script>
-    <script defer src="/eupoiia-index/22-static-data.js?v=9499999e"></script>
-    <script defer src="/eupoiia-index/25-search-the-boards.js?v=9499999e"></script>
+    <script type="application/json" id="cgi-static-bootstrap">{"manifest":{"built_at":1795153319,"catalog":["catalog-00-fd13b37eea8de732.json","catalog-01-b9c65dc58fe11007.json","catalog-02-a042e427f19f8e2f.json","catalog-03-d66dd871392af84e.json","catalog-04-2fc8e996eff2ae5a.json","catalog-05-bf638acc46195384.json","catalog-06-ad126d90f70a086c.json","catalog-07-48a1deb1b2e44608.json","catalog-08-f2e58ad37d0e233e.json","catalog-09-ea6b5a913eca5eda.json","catalog-10-73570eda1bd53330.json","catalog-11-39212b8cebe2b261.json","catalog-12-c042d46af29f75fc.json","catalog-13-5a45f24ac808269b.json","catalog-14-07a46a8efefc19af.json","catalog-15-b77d6666fd96a93b.json","catalog-16-3bb85c1d5577e0c9.json","catalog-17-4b349557a7304f01.json","catalog-18-6e7bce70cd2533d7.json","catalog-19-73ed3f1d497b7f06.json","catalog-20-1707a010624f47b6.json","catalog-21-d5d154e59a97ae92.json","catalog-22-a369bfaabb07a951.json","catalog-23-73643b44f66b058f.json","catalog-24-121cc26dc184ec06.json","catalog-25-92876bb625139559.json","catalog-26-cd957d02a5fb870d.json","catalog-27-2a01707dcf3afee0.json","catalog-28-abcca3ea2b52672e.json","catalog-29-bd4abe3c4e16ea87.json","catalog-30-8b7aef91e0fe75d5.json","catalog-31-5ba31b6a6ea53955.json"],"daily":{"2026-11-17":"daily-2026-11-17-d9ec2d033076372e.json","2026-11-18":"daily-2026-11-18-ede94093288df6c4.json","2026-11-19":"daily-2026-11-19-7bba25d344d643f8.json","2026-11-20":"daily-2026-11-20-879fe73ad41868a7.json","2026-11-21":"daily-2026-11-21-a1d385ff798e49f3.json"},"files":{"contenders":"contenders-1ae1cd86a5d0de68.json","deck_first":"deck-first-1bd128404b7af7d5.json","deck_pool":"deck-pool-85e74c2bd282744d.json","players_all":"players-all-7bdb11ac2bacd59e.json","players_today":"players-today-d2abe451dcc8c3e8.json","top":"top-3bb65ba3df2df40b.json"},"results":{"2026-11-17":"results-2026-11-17-e191a275487feedd.json","2026-11-18":"results-2026-11-18-f0fda01dff5b71a5.json","2026-11-19":"results-2026-11-19-e75f42ec4f1d2a9e.json","2026-11-20":"results-2026-11-20-15ab3c1d220417b1.json"},"revision":262005,"today":"2026-11-20","v":1},"files":{}}</script>
+    <script defer src="/eupoiia-index/22-static-data.js?v=1e2e8982"></script>
+    <script defer src="/eupoiia-index/25-search-the-boards.js?v=1e2e8982"></script>
     
-    <script defer src="/eupoiia-index/20-play-the-cards.js?v=9499999e"></script>
+    <script defer src="/eupoiia-index/20-play-the-cards.js?v=1e2e8982"></script>
 </body>
 </html>

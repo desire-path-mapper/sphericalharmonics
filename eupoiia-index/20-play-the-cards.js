@@ -651,10 +651,10 @@
 
     // Vote 'a', 'b' or 'tie', or 'skip', on the top card (and only if `card`, when given, is still the top
     // one). Returns false if nothing was sent.
-    function choose(choice, card) {
+    function choose(choice, card, fromRelease) {
         card = card || top();
         if (!card || !card.querySelector('[data-choice]') || card !== top() || busy || !modal.hidden) return false;
-        clearGlow();  // keyboard/button submission can retire a card before its pointer is released
+        if (!fromRelease) clearGlow();  // keyboard/buttons reset feedback; a released swipe keeps its fade
         busy = true;
         var body = new URLSearchParams({ matchup: card.dataset.token });
         if (choice !== 'skip') body.set('choice', choice === 'tie' ? 'tie' : card.querySelector('.half-' + choice).dataset.qid);
@@ -797,16 +797,34 @@
         document.body.appendChild(edge);
         edgeGlows[side] = edge;
     });
-    function clearGlow() {
-        edgeGlows.left.style.setProperty('--glow-strength', 0);
-        edgeGlows.right.style.setProperty('--glow-strength', 0);
+    var feedbackFrame = 0, glowRelease = 0;
+    function clearGlow(fade) {
+        cancelAnimationFrame(feedbackFrame); feedbackFrame = 0;
+        clearTimeout(glowRelease); glowRelease = 0;
+        ['left', 'right'].forEach(function (side) {
+            var edge = edgeGlows[side];
+            edge.classList.toggle('is-releasing', !!fade);
+            if (fade) edge.style.opacity = '0';
+            else { edge.style.opacity = ''; edge.style.setProperty('--glow-strength', 0); }
+        });
+        if (fade) glowRelease = setTimeout(function () { clearGlow(); }, 180);
     }
     function threshold(card) { return Math.max(80, card.offsetWidth * 0.28); }  // past this the vote commits
     function lean(card, dx, dy) {
         var sideways = Math.abs(dx) >= Math.abs(dy);
-        var strength = sideways ? Math.min(Math.abs(dx) / threshold(card), 1) : 0;
+        var progress = sideways ? Math.min(Math.abs(dx) / threshold(card), 1) : 0;
+        var strength = 1 - Math.pow(1 - progress, 2);
         edgeGlows.left.style.setProperty('--glow-strength', dx < 0 ? strength : 0);
         edgeGlows.right.style.setProperty('--glow-strength', dx > 0 ? strength : 0);
+    }
+    function scheduleFeedback() {
+        if (feedbackFrame) return;
+        feedbackFrame = requestAnimationFrame(function () {
+            feedbackFrame = 0;
+            if (!drag || drag.state !== 'dragging' || drag.card !== top()) return;
+            drag.card.style.transform = reduced ? '' : 'translate(' + drag.dx + 'px, ' + Math.min(drag.dy, 0) + 'px) rotate(' + drag.dx / 25 + 'deg)';
+            lean(drag.card, drag.dx, drag.dy);
+        });
     }
     function aim(dx, dy, limit) {
         if (-dy > limit && -dy > Math.abs(dx)) return 'skip';
@@ -841,8 +859,7 @@
             drag.card.classList.add('dragging');
         }
         if (!dragged) return;
-        drag.card.style.transform = 'translate(' + drag.dx + 'px, ' + Math.min(drag.dy, 0) + 'px) rotate(' + drag.dx / 25 + 'deg)';
-        lean(drag.card, drag.dx, drag.dy);
+        scheduleFeedback();
     }
     deck.addEventListener('pointermove', function (event) {
         if (drag && event.pointerId === drag.id) moveDrag(event.clientX, event.clientY);
@@ -857,12 +874,12 @@
         if (!drag || event.pointerId !== drag.id) return;
         var done = drag;
         drag = null;
-        clearGlow();  // cancel/lost capture and non-drag releases must clear feedback too
+        clearGlow(done.state === 'dragging');  // hold the last geometry while a released glow fades
         if (done.card.hasPointerCapture(done.id)) done.card.releasePointerCapture(done.id);
         if (done.state !== 'dragging') return;  // a tap: its click does the work
         done.card.classList.remove('dragging');
         var choice = event.type === 'pointerup' ? aim(done.dx, done.dy, threshold(done.card)) : '';
-        if (!choice || !choose(choice, done.card)) {  // a short drag snaps back and casts nothing
+        if (!choice || !choose(choice, done.card, true)) {  // a short drag snaps back and casts nothing
             done.card.style.transform = '';
         }
     }
