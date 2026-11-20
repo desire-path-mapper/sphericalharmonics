@@ -155,7 +155,8 @@
     var accountMenu = document.querySelector('.account-menu'), accountPanel = document.getElementById('account-panel');
     var accountToggle = document.getElementById('account-toggle');
     var accountIcon = accountToggle && accountToggle.querySelector('svg') ? accountToggle.querySelector('svg').cloneNode(true) : null;
-    var authState = 'idle', currentPlayer = null, signInProviders = [], emailForm, nameForm, inboxBox, failedSignIn;
+    var returningToAccount = !!new URLSearchParams(location.hash.slice(1)).get('email') || (!!query.get('login') && query.get('login') !== 'failed');
+    var authState = returningToAccount ? 'redirect' : 'idle', currentPlayer = null, signInProviders = [], emailForm, nameForm, inboxBox, failedSignIn;
     var returnModal = null, deferredAuthResult = false, authEpoch = 0, accountRequest = 0, dismissedName = false;
     function menuOpen(open, focus) {
         if (!accountMenu) return;
@@ -299,7 +300,38 @@
         }
         if (signInProviders.some(function (p) { return p.name === 'bluesky'; })) actions.append(blueskyButton(failedSignIn.dataset.provider === 'bluesky' ? 'Try Bluesky sign-in again' : 'Sign in with Bluesky'));
     }
-    function showAccount(me) {
+    var accountConfirmed = 0, displayCacheKey = 'cgi-account-display-v1';
+    var defaultSignIn = [{name:'bluesky',label:'Bluesky'},{name:'email',label:'Email'}];
+    function accountCredential(token) {
+        return crypto.subtle.digest('SHA-256', new TextEncoder().encode(token)).then(function (bytes) {
+            return Array.from(new Uint8Array(bytes)).map(function (n) { return n.toString(16).padStart(2,'0'); }).join('');
+        });
+    }
+    function cacheAccount(player, token) {
+        if (!token || !player) { try { localStorage.removeItem(displayCacheKey); } catch (e) {} return; }
+        // Public display fields only; a one-way fingerprint binds them to this cookie without storing it.
+        var confirmed = accountConfirmed;
+        var display = {name:player.name,handle:player.handle,provider:player.provider,avatar:player.avatar};
+        accountCredential(token).then(function (stamp) {
+            if (sessionToken() !== token || accountConfirmed !== confirmed) return;
+            try { localStorage.setItem(displayCacheKey,JSON.stringify({credential:stamp,player:display})); } catch (e) {}
+        }).catch(function () {});
+    }
+    function paintKnownAccount() {
+        var token = sessionToken(), confirmed = accountConfirmed;
+        showAccount({player:token ? {name:'Unnamed player'} : null,sign_in:defaultSignIn}, true);
+        if (!token) return;
+        var candidates = [];
+        [displayCacheKey,'eupoiia-public-account-v1'].forEach(function (key) {
+            try { var value = JSON.parse(localStorage.getItem(key)); if (value) candidates.push(value); } catch (e) {}
+        });
+        accountCredential(token).then(function (stamp) {
+            if (sessionToken() !== token || accountConfirmed !== confirmed) return;
+            var cached = candidates.find(function (value) { return value.credential === stamp && value.player; });
+            if (cached) showAccount({player:cached.player,sign_in:defaultSignIn}, true);
+        }).catch(function () {});
+    }
+    function showAccount(me, provisional) {
         if (!account) return;
         var prior = currentPlayer; currentPlayer = me.player || null;
         account.replaceChildren(); if (signInRow) signInRow.replaceChildren(); signInProviders = me.sign_in || [];
@@ -317,9 +349,9 @@
                 } else if (accountIcon) accountToggle.append(accountIcon.cloneNode(true));
                 else accountToggle.textContent = 'Account';
             }
-            if (currentPlayer.needs_name && !dismissedName) askName();
+            if (!provisional && currentPlayer.needs_name && !dismissedName) askName();
         } else {
-            if (prior || authState === 'redirect') state('idle');
+            if (!provisional && (prior || authState === 'redirect')) state('idle');
             if (accountToggle) {
                 accountToggle.replaceChildren(); accountToggle.setAttribute('aria-label', 'Sign in');
                 if (accountIcon) accountToggle.append(accountIcon.cloneNode(true)); else accountToggle.textContent = 'Sign in';
@@ -353,8 +385,11 @@
         return get('/me').then(function (text) {
             if (request !== accountRequest) return;
             if (requestToken !== sessionToken()) return refreshAccount(reactive);
-            var me = JSON.parse(text), next = me.player;
-            showAccount(me);
+            var me = JSON.parse(text);
+            if (!Object.prototype.hasOwnProperty.call(me,'player') || !Array.isArray(me.sign_in)) return;
+            var next = me.player; accountConfirmed++;
+            if (!next && requestToken) { cookie('cgi_session','',0); requestToken = ''; }
+            showAccount(me); cacheAccount(next,requestToken);
             if (staticClient) {
                 var priorDaily = staticClient.state();
                 staticClient.identity(me).then(function () {
@@ -374,6 +409,7 @@
                 (prior && prior.name) !== (next && next.name) || (prior && prior.needs_name) !== (next && next.needs_name))) location.reload();
         }, function () {});
     }
+    paintKnownAccount();
     if (query.get('login') === 'failed') loginFailure("Bluesky sign-in didn't finish. Try again.", 'bluesky');
     function exchangeCode(code) {
         return send('/auth/login', { method: 'POST', body: new URLSearchParams({ code: code }) })
