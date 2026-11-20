@@ -284,7 +284,7 @@
         if (signInProviders.some(function (p) { return p.name === 'email'; })) {
             var renew = formButton('Send a new link', emailSignIn); renew.classList.add('sign-in-button'); actions.append(renew);
         }
-        if (signInProviders.some(function (p) { return p.name === 'bluesky'; })) actions.append(blueskyButton('Try Bluesky sign-in again'));
+        if (signInProviders.some(function (p) { return p.name === 'bluesky'; })) actions.append(blueskyButton(failedSignIn.dataset.provider === 'bluesky' ? 'Try Bluesky sign-in again' : 'Sign in with Bluesky'));
     }
     function showAccount(me) {
         if (!account) return;
@@ -323,7 +323,7 @@
         }
         retrySignIn(); authViews();
     }
-    function loginFailure(message) {
+    function loginFailure(message, provider) {
         if (!accountPanel) return;
         if (!failedSignIn) {
             failedSignIn = document.createElement('div'); failedSignIn.className = 'note account-error';
@@ -331,6 +331,7 @@
             var actions = document.createElement('div'); actions.className = 'sign-in-actions';
             failedSignIn.append(note, actions); accountPanel.append(failedSignIn);
         }
+        failedSignIn.dataset.provider = provider || '';
         failedSignIn.querySelector('[role="status"]').textContent = message;
         state('error'); retrySignIn(); menuOpen(true);
     }
@@ -344,7 +345,7 @@
                 (prior && prior.name) !== (next && next.name) || (prior && prior.needs_name) !== (next && next.needs_name))) location.reload();
         }, function () {});
     }
-    if (query.get('login') === 'failed') loginFailure("Bluesky sign-in didn't finish. Try again.");
+    if (query.get('login') === 'failed') loginFailure("Bluesky sign-in didn't finish. Try again.", 'bluesky');
     function exchangeCode(code) {
         return send('/auth/login', { method: 'POST', body: new URLSearchParams({ code: code }) })
             .then(function (r) { if (!r.ok) throw new Error('login'); return r.json(); })
@@ -364,14 +365,14 @@
                                 expired: 'This link has expired. Send a new one?',
                                 invalid: "This link isn't valid. Send a new one?"
                             };
-                            loginFailure(messages[answer.error] || "This link couldn't be checked. Try again or send a new one.");
+                            loginFailure(messages[answer.error] || "This link couldn't be checked. Try again or send a new one.", 'email');
                             return null;
                         }
                         return answer;
                     });
                 })
                 .then(function (answer) { if (answer && !answer.already_signed_in) return exchangeCode(answer.code); })
-                .catch(function () { loginFailure("This link couldn't be checked. Try again or send a new one."); });
+                .catch(function () { loginFailure("This link couldn't be checked. Try again or send a new one.", 'email'); });
         }
         var code = query.get('login');
         if (!code) return Promise.resolve();

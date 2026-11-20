@@ -34,7 +34,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=62ac8151">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=e5a37f21">
     <style>
         :root, :root[data-theme="dark"] {
             --serif: "LM Roman 12", Georgia, serif;
@@ -55,9 +55,10 @@
            toward the chosen side and the next comes up from below the same way. Nothing fades. */
         /* Clip at the viewport: transformed cards must not widen mobile fixed positioning. */
         html, body { overflow-x: clip; }
+        body { isolation: isolate; }
         #game { overflow: visible; }
         .deck { display: grid; max-width: 44rem; margin: 0 auto; }
-        .card { grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; background: var(--paper); border: 1px solid #000;
+        .card { grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; background: transparent; border: 1px solid #000;
                 border-radius: var(--control-radius); overflow: clip; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; transition: transform 0.35s ease; }
         .card:not(:first-child) { display: none; }
         .card.leaving + .card { display: flex; animation: arrive 0.35s ease; }
@@ -78,12 +79,17 @@
         .half .gist { grid-row: 3; align-self: start; }
         .half .more-line { grid-row: 4; margin-top: 0; }
         .half + .half { border-left: 0.5px solid var(--hairline); }
-        .swipe-glow { position: fixed; top: 0; bottom: 0;
-                      width: calc(12px + 60px * var(--glow-strength, 0)); max-width: 20vw;
-                      opacity: var(--glow-strength, 0); z-index: 10; pointer-events: none;
+        /* A viewport backdrop stays behind the text while its centre and radius follow the drag. */
+        .swipe-glow { position: fixed; inset: 0; width: 100vw; height: 100vh;
+                      --glow-radius: calc(6vmin + 145vmax * var(--glow-strength, 0));
+                      --glow-y: calc(50vh * var(--glow-strength, 0));
+                      background: radial-gradient(circle var(--glow-radius) at var(--glow-x) var(--glow-y),
+                                  color-mix(in srgb, var(--sienna) 55%, transparent), transparent 100%);
+                      opacity: var(--glow-strength, 0); z-index: -1; pointer-events: none;
                       transition: none; animation: none; }
-        .swipe-glow-left { left: 0; background: linear-gradient(to right, color-mix(in srgb, var(--sienna) 55%, transparent), transparent); }
-        .swipe-glow-right { right: 0; background: linear-gradient(to left, color-mix(in srgb, var(--sienna) 55%, transparent), transparent); }
+        .swipe-glow-left { --glow-x: calc(50vw * var(--glow-strength, 0)); }
+        .swipe-glow-right { --glow-x: calc(100vw - 50vw * var(--glow-strength, 0)); }
+        .card.leaving, .card.leaving + .card { background: var(--paper); }
         .picture { height: clamp(120px, 30vw, 260px); display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
         .picture img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
         .half h3 { font-size: var(--fs-large); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
@@ -138,7 +144,7 @@
         @keyframes wiggle { 25% { transform: translateX(-10px) rotate(-2deg); } 75% { transform: translateX(10px) rotate(2deg); } }
         @media (prefers-reduced-motion: reduce) {
             .card, .swipe-glow { transition: none !important; }
-            .swipe-glow { animation: none; }
+            .swipe-glow { --glow-x: 50vw; --glow-y: 50vh; animation: none; }
             .card.leaving + .card, .ballot.drop .paper, .deck.hint .card:first-child { animation: none !important; }
         }
         .result:empty, .share-note:empty { margin: 0; }
@@ -149,7 +155,9 @@
         /* The account shares the primary 44px tab row; sub-tabs stay below it inside the active outline. */
         .tab-account-row { position: relative; display: flex; align-items: flex-start; justify-content: center;
                            gap: 0; margin: 0 0 0.6rem; font-size: var(--fs-small); line-height: 1.25; }
-        .tabs { display: flex; justify-content: flex-start; border: 0; margin: 0; }
+        .tab-account-row::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+                                 border-bottom: 1px solid var(--rule); pointer-events: none; }
+        .tabs { position: relative; z-index: 1; display: flex; justify-content: flex-start; border: 0; margin: 0; }
         .tab-group { display: flex; flex-direction: column; align-items: stretch; min-width: 0;
                      padding: 0 0.7rem 0.4rem; border: 1px solid transparent; border-bottom: 0; border-radius: 5px 5px 0 0; }
         .tab-group.open { border-color: var(--rule); background: var(--paper); }
@@ -157,8 +165,9 @@
         .tab { display: flex; align-items: center; justify-content: center; min-height: 44px;
                font-size: inherit; line-height: inherit; color: var(--ink-faint); letter-spacing: 0.01em; }
         .tab-group.open .tab { color: var(--ink); }
-        .sub-tabs { display: flex; justify-content: center; gap: 0.9rem; font-size: var(--fs-small); }
-        .sub-tabs a { color: var(--ink-faint); padding-bottom: 0.1rem; border-bottom: 1.5px solid transparent; white-space: nowrap; }
+        .sub-tabs { display: flex; justify-content: center; align-items: center; min-height: 44px;
+                    gap: 0.9rem; margin-top: 0.5rem; font-size: inherit; }
+        .sub-tabs a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-faint); padding-bottom: 0.1rem; border-bottom: 1.5px solid transparent; white-space: nowrap; }
         .tab-group.open .sub-tabs a { color: var(--ink-soft); }
         .sub-tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--sienna); }
         .tabs a:hover { color: var(--ink); }
@@ -181,7 +190,7 @@
         }
         @media (max-width: 760px) {
             .tab-account-row { justify-content: flex-start; padding-right: calc(44px + 0.4rem); }
-            .tabs { flex: 1; min-width: 0; }
+            .tabs { flex: 1; min-width: 0; margin-left: 0.3rem; }
             .tab-group { flex: 1; padding: 0 0.2rem 0.35rem; }
             .sub-tabs { gap: 0.35rem; font-size: 0.7rem; }
         }
@@ -261,6 +270,28 @@
         }
         .account a, .sign-out { font: inherit; color: var(--ink-soft); background: none; border: 0; padding: 0; cursor: pointer;
                                 text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 0.18em; }
+        @media (min-width: 1024px) {
+            .tab-account-row { font-size: 0.85rem; }
+            #account-panel .sign-in-row { flex-direction: column; align-items: stretch; font-size: inherit; }
+            #account-panel .sign-in-button { padding: 0.3rem 0.55rem; }
+            .account { display: grid; grid-template-columns: 24px auto; grid-template-rows: 44px 44px;
+                       column-gap: 0.5rem; row-gap: 0.5rem; justify-items: end; }
+            .account .avatar { grid-column: 1; grid-row: 1; }
+            .account .account-name { grid-column: 2; grid-row: 1; display: block; line-height: 44px; }
+            .account .sign-out { grid-column: 1 / -1; grid-row: 2; min-width: 44px; justify-content: flex-end; }
+        }
+        .account .account-name { text-overflow: ellipsis; }
+        .board-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.35rem 0.5rem;
+                        width: 100%; max-width: 46rem; margin: 0 auto 0.6rem; font-size: var(--fs-small); text-align: left; }
+        .board-search, .board-search * { box-sizing: border-box; }
+        .board-search label, .board-search-status { grid-column: 1 / -1; }
+        .board-search input, .board-search button { min-width: 0; min-height: 44px; padding: 0.35rem 0.6rem;
+            font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--ink-soft);
+            border-radius: var(--control-radius); }
+        .board-search button { cursor: pointer; }
+        .board-search button:disabled { color: var(--ink-faint); cursor: default; }
+        .board-search input::-webkit-search-cancel-button { appearance: none; }
+        .board-search-status { min-height: 1.25em; color: var(--ink-soft); }
         .avatar { width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; }
         .share-note { position: absolute; left: 50%; bottom: 0.6rem; transform: translateX(-50%); max-width: calc(100% - 1rem);
                       padding: 0 0.2rem; background: var(--paper); pointer-events: none; white-space: nowrap;
@@ -296,7 +327,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
         </button>
         <div class="masthead-lockup">
-            <img src="/eupoiia-index/mark.svg?v=62ac8151" alt="" class="logo">
+            <img src="/eupoiia-index/mark.svg?v=e5a37f21" alt="" class="logo">
             <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
         </div>
     </header>
@@ -390,6 +421,6 @@
             });
         })();
     </script>
-    <script src="/eupoiia-index/20-play-the-cards.js?v=62ac8151"></script>
+    <script src="/eupoiia-index/20-play-the-cards.js?v=e5a37f21"></script>
 </body>
 </html>
