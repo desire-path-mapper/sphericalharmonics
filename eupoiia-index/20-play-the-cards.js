@@ -6,9 +6,9 @@
 // - daily: the Daily 10, the same cards with a progress bar, then the result in a modal.
 // - pair: a shared card first, then the Daily 10 it came from, or infinite mode.
 // - board, players, result: the tables, and a shared Daily 10 result.
-// Players sign in with X or Bluesky. The only lasting cookie is the sign-in session (cgi_session, set here, first-party),
-// sent as X-Auth. A signed-out tab has a per-tab id (sessionStorage, no cookie), sent as X-Session, so its
-// votes can join the account when it signs in.
+// Players sign in with email or Bluesky. The first-party sign-in cookie stays out of public snapshots and
+// persistent vote queues. Static pages send credentials in form bodies; older pages retain their headers.
+// A signed-out tab has a per-tab id so its eligible votes can join the account when it signs in.
 (function () {
     'use strict';
     var game = document.getElementById('game');
@@ -18,6 +18,7 @@
     var early = window.cgiEarlyDeck;
     var day = query.get('d') || query.get('daily') || '';
     var seed = query.get('seed') || '';
+    var staticMode = !!(game.dataset.staticBase && window.eupoiiaStatic), staticClient;
 
     var home = game.dataset.home;
     var publicHome = game.dataset.publicHome || new URL(home, location.href).href;
@@ -47,15 +48,27 @@
         var controller = new AbortController();
         var timer = setTimeout(function () { controller.abort(); }, 10000);
         options = Object.assign({ signal: controller.signal }, options);
-        var who = { 'X-Session': tab };
-        if (sessionToken()) who['X-Auth'] = sessionToken();
-        options.headers = Object.assign(who, options.headers);
+        if (staticMode) {
+            options.method = options.method || 'POST';
+            var form = new URLSearchParams(options.body || '');
+            if (!form.has('session')) form.set('session', tab);
+            if (sessionToken()) form.set('auth', sessionToken());
+            options.body = form;
+        } else {
+            var who = { 'X-Session': tab };
+            if (sessionToken()) who['X-Auth'] = sessionToken();
+            options.headers = Object.assign(who, options.headers);
+        }
         return fetch(api + path, options).finally(function () { clearTimeout(timer); });
     }
 
     function get(path) {
         var request;
-        if (early && early.request && early.path === path) {
+        if (staticMode && path === '/me') {
+            request = send(path, { body: new URLSearchParams({context:'static', day:day || window.eupoiiaStatic.today(), seed:seed,
+                p:query.get('p') || '', daily:mode === 'daily' || mode === 'pair' && day ? '1' : '',
+                board:mode === 'players' ? query.get('board') || 'today' : ''}) });
+        } else if (early && early.request && early.path === path) {
             request = early.request; early.request = null;
         } else request = send(path);
         return request.then(function (response) {
@@ -336,11 +349,27 @@
         state('error'); retrySignIn(); menuOpen(true);
     }
     function refreshAccount(reactive) {
-        var request = ++accountRequest, prior = currentPlayer;
+        var request = ++accountRequest, prior = currentPlayer, requestToken = sessionToken();
         return get('/me').then(function (text) {
             if (request !== accountRequest) return;
+            if (requestToken !== sessionToken()) return refreshAccount(reactive);
             var me = JSON.parse(text), next = me.player;
             showAccount(me);
+            if (staticClient) {
+                var priorDaily = staticClient.state();
+                staticClient.identity(me).then(function () {
+                    if (requestToken !== sessionToken()) return;
+                    if (sharedActive && sharedOwner && Object.prototype.hasOwnProperty.call(me,'shared_result')) {
+                        sharedFromAccount = true; applyShared(me.shared_result && me.shared_result.html,false);
+                    }
+                    var nextDaily = staticClient.state();
+                    if (!deck || busy) return;
+                    if ((mode === 'daily' || mode === 'pair' && day) &&
+                        (nextDaily && (!priorDaily || priorDaily.seed !== nextDaily.seed || priorDaily.done !== nextDaily.done) ||
+                         me.daily && me.daily.requested && (!priorDaily || priorDaily.seed !== me.daily.requested.seed))) load();
+                    else if (top() && (me.voted || []).includes(top().dataset.pair)) load();
+                });
+            }
             if (reactive && ((prior && prior.handle) !== (next && next.handle) ||
                 (prior && prior.name) !== (next && next.name) || (prior && prior.needs_name) !== (next && next.needs_name))) location.reload();
         }, function () {});
@@ -408,7 +437,40 @@
         }
     });
 
+    if (staticMode) {
+        var bootstrapNode = document.getElementById('cgi-static-bootstrap');
+        staticClient = window.eupoiiaStatic.create({base:game.dataset.staticBase, fallback:game.dataset.staticFallback,
+            bootstrap:bootstrapNode ? JSON.parse(bootstrapNode.textContent) : null, home:home, tab:tab, token:sessionToken, send:send,
+            refresh:function () { refreshAccount(false); }, notice:staticNotice,
+            saved:function (answer) {
+                if (!deck) return;
+                if (answer.counted_html) result.innerHTML = answer.counted_html;
+                var state = staticClient.state();
+                if (state && mode === 'daily') {
+                    showProgress(state.done);
+                    if (state.result_html) take(state.result_html);
+                }
+            },
+            refused:function (answer) {
+                if (answer.reason === 'seed_conflict' && deck) {
+                    result.textContent = "You already started this day's Daily 10. Your original set is kept.";
+                    sharedNotice("You already started this day's Daily 10. Continue with your original set.", 'Continue your Daily 10');
+                    load();
+                } else staticNotice(answer.message || "This vote couldn't be saved. Please try another card.");
+            }});
+    }
+    function staticNotice(message) {
+        var note = accountPanel.querySelector('.vote-error');
+        if (!note) { note = document.createElement('p'); note.className = 'note vote-error'; note.setAttribute('role','status'); accountPanel.append(note); }
+        note.textContent = message; menuOpen(true);
+    }
+
     if (mode === 'board') {  // the People & groups table, or one contender's matches (?c=<id>)
+        if (staticClient) {
+            if (query.get('c')) staticClient.contender(query.get('c')).then(function (html) { game.innerHTML = html; boardMath(game); });
+            else staticClient.board(game, false, ['person','group'].includes(query.get('kind')) ? query.get('kind') : 'all', boardMath);
+            return;
+        }
         get(query.get('c') ? '/contender?c=' + encodeURIComponent(query.get('c')) : '/leaderboard?page=' + encodeURIComponent(query.get('page') || '1'))
             .then(function (html) { game.innerHTML = html; boardMath(game); }, function () { game.innerHTML = offline(); });
         return;
@@ -426,13 +488,19 @@
         var showBoard = function (which) {
             game.querySelectorAll('[data-board]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.board === which); });
             var request = ++boardRequest;
+            if (staticClient) {
+                if (showBoard.stop) showBoard.stop();
+                showBoard.stop = staticClient.board(box,true,which,boardMath);
+                return;
+            }
             get('/players?board=' + which + '&page=' + encodeURIComponent(query.get('page') || '1') + '&day=' + encodeURIComponent(query.get('day') || ''))
                 .then(function (html) { if (request === boardRequest) { box.innerHTML = html; boardMath(box); } },
                       function () { if (request === boardRequest) box.innerHTML = offline(); });
         };
         game.querySelectorAll('[data-board]').forEach(function (b) { b.addEventListener('click', function () { query.set('board', b.dataset.board); query.delete('page'); history.pushState(null, '', '?' + query); showBoard(b.dataset.board); }); });
         window.addEventListener('popstate', function () { query = new URLSearchParams(location.search); showBoard(query.get('board') === 'all' ? 'all' : 'today'); });
-        authenticated.then(function () { showBoard(query.get('board') === 'all' ? 'all' : 'today'); });
+        if (staticClient) showBoard(query.get('board') === 'all' ? 'all' : 'today');
+        else authenticated.then(function () { showBoard(query.get('board') === 'all' ? 'all' : 'today'); });
         return;
     }
 
@@ -442,7 +510,7 @@
     var progress = game.querySelector('.progress');
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var KEEP = 'common-good-deck', HINTED = 'common-good-hinted';
-    var sharedActive = false, deferredOwnResult = null;
+    var sharedActive = false, deferredOwnResult = null, sharedFromAccount = false;
     var sharedOwner = mode === 'daily' ? query.get('p') : '';
     var busy = false;  // one vote at a time: a fast double gesture can't spend two tickets
 
@@ -459,7 +527,7 @@
         });
     }
     function keepDeck() {  // only infinite mode keeps its queue; a Daily 10 is kept by the service
-        if (mode === 'infinite') remember(KEEP, cards().map(function (card) { return card.dataset.token; }).join(','));
+        if (mode === 'infinite' && !staticClient) remember(KEEP, cards().map(function (card) { return card.dataset.token; }).join(','));
     }
 
     function showProgress(done) {
@@ -485,6 +553,18 @@
         if (modal.hidden) { returnModal = modal; deferredAuthResult = true; }
         else modal.querySelector('.modal-close').focus();
         authViews();
+    }
+    function applyShared(html, waiting) {
+        if (!sharedActive || !sharedOwner) return;
+        var fragment = document.createElement('div'); fragment.innerHTML = html || '';
+        var shared = fragment.querySelector('[data-shared-result]');
+        if (!shared) {
+            shared = document.createElement('div'); shared.className = 'result-card'; shared.dataset.sharedResult = '';
+            var note = document.createElement('p'); note.className = 'note'; note.textContent = waiting ? 'Loading this shared result…' : 'This shared result is unavailable.';
+            var play = document.createElement('button'); play.className = 'btn'; play.dataset.playShared = ''; play.textContent = 'Play to find out your own score';
+            shared.append(note,play);
+        }
+        showShared(shared);
     }
     function showResult(card) {
         if (sharedActive) {
@@ -517,7 +597,11 @@
         if (message && !message.closest('.card')) result.innerHTML = message.innerHTML;
         if (now) { mode = 'daily'; day = now.dataset.day; seed = now.dataset.seed || seed; showProgress(Number(now.dataset.done)); }
         if (finished) { mode = 'daily'; day = finished.dataset.day; seed = finished.dataset.seed || seed; showResult(finished); return; }
-        if (!top()) deck.innerHTML = slow ? slow.outerHTML : offline();
+        if (!top()) {
+            if (slow) deck.innerHTML = slow.outerHTML;
+            else if (staticClient) { var empty = document.createElement('p'); empty.className = 'note'; empty.textContent = message ? message.textContent : 'Saving your Daily 10 result…'; deck.replaceChildren(empty); }
+            else deck.innerHTML = offline();
+        }
         keepDeck();
     }
 
@@ -533,7 +617,7 @@
     // one). Returns false if nothing was sent.
     function choose(choice, card) {
         card = card || top();
-        if (!card || card !== top() || busy || !modal.hidden) return false;
+        if (!card || !card.querySelector('[data-choice]') || card !== top() || busy || !modal.hidden) return false;
         clearGlow();  // keyboard/button submission can retire a card before its pointer is released
         busy = true;
         var body = new URLSearchParams({ matchup: card.dataset.token });
@@ -547,6 +631,13 @@
         card.style.transform = '';
         setTimeout(function () { cardSizes.unobserve(card); card.remove(); }, reduced ? 0 : 360);
         keepDeck();
+        if (staticClient) {
+            Promise.all([staticClient.choose(choice, card), new Promise(function (resolve) { setTimeout(resolve, reduced ? 0 : 360); })])
+                .then(function () { if (mode === 'pair') mode = day ? 'daily' : 'infinite'; return load(); })
+                .catch(function () { staticNotice("This vote couldn't be kept. Please try again."); })
+                .finally(function () { busy = false; });
+            return true;
+        }
         var token = card.dataset.token;
         send(choice === 'skip' ? '/skip' : '/vote', { method: 'POST', body: body, keepalive: true })
             .then(function (response) {
@@ -565,7 +656,30 @@
         return true;
     }
 
+    var staticLoad = 0;
     function load(first) {
+        if (staticClient) {
+            var request = ++staticLoad;
+            return staticClient.load(mode,day,seed,query.get('p')).then(function (html) {
+                if (request !== staticLoad) return;
+                var current = staticClient.state();
+                if (current && (mode === 'daily' || mode === 'pair' && day)) {
+                    var changedSeed = seed && seed !== current.seed;
+                    day = current.day; seed = current.seed;
+                    if (changedSeed) {
+                        if (mode === 'pair') mode = 'daily';
+                        result.textContent = "You already started this day's Daily 10. Your original set is kept.";
+                        sharedNotice("You already started this day's Daily 10. Continue with your original set.",'Continue your Daily 10');
+                    }
+                    showProgress(current.done);
+                    if (!sharedActive && mode === 'daily') {
+                        query.delete('p'); query.delete('daily'); query.set('d',day); query.set('seed',seed);
+                        history.replaceState(null,'',home+'daily-10/?'+query+location.hash);
+                    }
+                }
+                deck.innerHTML = ''; take(html); hint();
+            }).catch(function () { if (!top()) deck.innerHTML = '<p class="note">This saved round is unavailable. Try Random or today’s Daily 10.</p>'; });
+        }
         var path;
         if (mode === 'daily') {
             path = '/daily?day=' + encodeURIComponent(day) + (seed ? '&seed=' + encodeURIComponent(seed) : '');
@@ -782,10 +896,16 @@
         choose(choice);
     });
 
-    authenticated.then(function () {
+    function startCards() {
         if (!sharedOwner) return load();
+        if (staticClient) {
+            sharedActive = true; applyShared(null,true);
+            staticClient.shared(day,sharedOwner,seed).then(function (html) { if (!sharedFromAccount) applyShared(html,!html); });
+            return load();
+        }
         var path = '/result?day=' + encodeURIComponent(day) + '&p=' + encodeURIComponent(sharedOwner) + (seed ? '&seed=' + encodeURIComponent(seed) : '');
-        return send(path).then(function (response) { return response.text(); }).then(function (html) {
+        var sharedRequest = staticClient ? staticClient.shared(day,sharedOwner,seed) : send(path).then(function (response) { return response.text(); });
+        return sharedRequest.then(function (html) {
             var fragment = document.createElement('div'); fragment.innerHTML = html;
             var shared = fragment.querySelector('[data-shared-result]');
             if (shared) {
@@ -797,6 +917,8 @@
                 missing.append(message, play); showShared(missing);
             }
             return load();
-        }).catch(function () { result.innerHTML = offline(); return load(); });
-    });
+        }).catch(function () { if (!staticClient) result.innerHTML = offline(); return load(); });
+    }
+    if (staticClient) startCards();
+    else authenticated.then(startCards);
 })();
