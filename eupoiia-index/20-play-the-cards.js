@@ -347,14 +347,16 @@
                 if (currentPlayer.avatar) {
                     var avatar = document.createElement('img'); avatar.src = currentPlayer.avatar; avatar.alt = ''; avatar.className = 'avatar'; avatar.referrerPolicy = 'no-referrer'; accountToggle.append(avatar);
                 } else if (accountIcon) accountToggle.append(accountIcon.cloneNode(true));
-                else accountToggle.textContent = 'Account';
+                var label = document.createElement('span'); label.className = 'account-label';
+                label.textContent = publicName(currentPlayer); label.title = publicName(currentPlayer); accountToggle.append(label);
             }
             if (!provisional && currentPlayer.needs_name && !dismissedName) askName();
         } else {
             if (!provisional && (prior || authState === 'redirect')) state('idle');
             if (accountToggle) {
                 accountToggle.replaceChildren(); accountToggle.setAttribute('aria-label', 'Sign in');
-                if (accountIcon) accountToggle.append(accountIcon.cloneNode(true)); else accountToggle.textContent = 'Sign in';
+                if (accountIcon) accountToggle.append(accountIcon.cloneNode(true));
+                var label = document.createElement('span'); label.className = 'account-label'; label.textContent = 'Sign in'; accountToggle.append(label);
             }
             signInProviders.forEach(function (p) {
                 if (p.name === 'bluesky') signInRow.append(blueskyButton('Sign in with Bluesky'));
