@@ -1,6 +1,6 @@
 {
- "build": "20261121T020339Z-6522484",
- "entry": "assets/index-Ckmq0qWK.js",
+ "build": "20261121T022154Z-ca2d107",
+ "entry": "assets/index-DrcxtwaI.js",
  "css": [
   "assets/index-C4UuAvsO.css"
  ],
@@ -8,10 +8,10 @@
   "assets/06-answer-in-the-worker--2R7ANvB.js": "sha384-3XzLROceCwrCoGXq1k/+lQgzNOr+PUzCeygrba5pBDDkS952w6TQfouO8jT7eASO",
   "assets/20-route-in-a-worker-CmZduLVZ.js": "sha384-SLTXsisqjj4TY8/+Q0iEg1QhLpVSB4eoyrbRcWJ6tKL3X2OgDFwC5B65dCsneRMV",
   "assets/index-C4UuAvsO.css": "sha384-lAvSA/Ge1IhGuY5a8FW3SFGgqeLA6kmyN0qC+8lSyZLW9tt8a+6krFXepQ0wd8rf",
-  "assets/index-Ckmq0qWK.js": "sha384-OLo7mPSaVqPrgsJPprFrt6HVKdV8cu/5iWmDDN3B2PXKbnpjnMrWysSkKQYrARLf"
+  "assets/index-DrcxtwaI.js": "sha384-a3NNO9h9908YKVocoW1wHhRunwFZ0j145tPzjDURG2hYSWEuAVw28NQYKB/rIeFL"
  },
- "content": "13d54525c18aa18611777eff6c644410f86cef577eaedeaab614a0ee3e8a85f9",
+ "content": "f6e25b022cf84664b1829ab68443da1d2705d424ba0e8ac43e98ad920a66431d",
  "env": "staging",
- "commit": "6522484d4e77f692f7da4ac61c131857cee1c94f",
+ "commit": "ca2d10772e89fecf5d7d3a1a461ff6ad7fc7e4cb",
  "area": ""
 }
