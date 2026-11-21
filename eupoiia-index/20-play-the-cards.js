@@ -170,6 +170,38 @@
     function publicName(player) {
         return player && player.name || 'Unnamed player';
     }
+    // Result HTML may have been generated before the account response arrived.  Only an
+    // own completion gets this local identity; a shared result always keeps its owner's copy.
+    function showScoreIdentity(card) {
+        if (!card) return;
+        // The marker distinguishes our local identity from any owner information in a shared result.
+        var identity = card.querySelector('[data-score-identity]');
+        if (!card.hasAttribute('data-shared-result')) {
+            var explainer = card.querySelector('.score-explainer');
+            if (explainer) explainer.textContent = 'Your votes are recalculated using current Elo ratings. Your score can change as those ratings change.';
+        }
+        if (card.hasAttribute('data-shared-result') || !currentPlayer) {
+            if (identity) identity.remove();
+            return;
+        }
+        if (!identity) {
+            identity = document.createElement('p'); identity.className = 'score-identity';
+            identity.dataset.scoreIdentity = '';
+            card.insertBefore(identity, card.firstChild);
+        }
+        identity.replaceChildren();
+        if (currentPlayer.avatar) {
+            var avatar = document.createElement('img'); avatar.src = currentPlayer.avatar; avatar.alt = '';
+            avatar.className = 'score-avatar'; avatar.referrerPolicy = 'no-referrer'; identity.append(avatar);
+        } else if (accountIcon) {
+            var fallback = accountIcon.cloneNode(true); fallback.classList.add('score-avatar'); identity.append(fallback);
+        }
+        var name = document.createElement('strong'); name.textContent = publicName(currentPlayer); name.title = publicName(currentPlayer);
+        identity.append(name);
+    }
+    function refreshScoreIdentities() {
+        document.querySelectorAll('.result-card').forEach(showScoreIdentity);
+    }
     function authViews() {
         if (!accountMenu) return;
         accountMenu.dataset.authState = authState;
@@ -368,7 +400,7 @@
                 }
             });
         }
-        retrySignIn(); authViews();
+        refreshScoreIdentities(); retrySignIn(); authViews();
     }
     function loginFailure(message, provider) {
         if (!accountPanel) return;
@@ -611,6 +643,7 @@
             if (!top()) deck.innerHTML = '<p class="note">Done for this day.</p>';
             return;
         }
+        showScoreIdentity(card);
         modal.querySelector('.modal-body').innerHTML = '';
         modal.querySelector('.modal-body').appendChild(card);
         modal.hidden = ['email', 'name', 'inbox', 'error', 'redirect'].includes(authState);
@@ -754,7 +787,8 @@
         setTimeout(function () { dropBallot(top(), 'a'); dropBallot(top(), 'b'); }, 300);
     }
 
-    // Read through every visible scroll container before a fresh gesture may drag the card.
+    // Touch gestures must read through every visible scroll container before they may drag the card.
+    // A mouse or trackpad is a deliberate desktop drag at every viewport size, including on a hybrid laptop.
     function visibleViewport() {
         var view = window.visualViewport;
         var top = view ? Math.max(0, view.offsetTop || 0) : 0;
@@ -834,6 +868,11 @@
         if (dx < -limit) return 'a';
         return '';
     }
+    function readingText(target) {
+        // A vertical pan in the prose is always reading, even after the card is armed.
+        // Picture and control surfaces remain available for the intentional swipe-up shortcut.
+        return !!target.closest('h3, .gist, .intro');
+    }
     deck.addEventListener('pointerdown', function (event) {
         var card = top();
         if (!event.isPrimary || event.button !== 0) return;
@@ -842,7 +881,8 @@
         var bounds = card.getBoundingClientRect();
         if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) return;
         drag = { card: card, id: event.pointerId, x: event.clientX, y: event.clientY, dx: 0, dy: 0,
-                 eligible: mayDrag(card),
+                 eligible: event.pointerType === 'mouse' || mayDrag(card),
+                 reading: event.pointerType !== 'mouse' && readingText(event.target),
                  state: 'pending' };
         dragged = false;  // a press only becomes a drag once it moves; until then a tap stays a tap on its button
     });
@@ -853,10 +893,10 @@
         drag.dy = y - drag.y;
         if (drag.state === 'scroll' || drag.state === 'blocked') return;
         if (drag.state === 'pending' && Math.hypot(drag.dx, drag.dy) >= 10) {
-            dragged = true;
-            if (drag.dy > 0 && Math.abs(drag.dy) >= Math.abs(drag.dx)) { drag.state = 'scroll'; return; }
+            if ((drag.dy > 0 || drag.reading) && Math.abs(drag.dy) >= Math.abs(drag.dx)) { drag.state = 'scroll'; return; }
             if (!drag.eligible) { drag.state = Math.abs(drag.dy) >= Math.abs(drag.dx) ? 'scroll' : 'blocked'; return; }
             drag.state = 'dragging';
+            dragged = true;  // page scrolling is not a card drag and must not suppress its next tap
             drag.card.setPointerCapture(drag.id);
             drag.card.classList.add('dragging');
         }
@@ -882,6 +922,11 @@
         done.card.classList.remove('dragging');
         var choice = event.type === 'pointerup' ? aim(done.dx, done.dy, threshold(done.card)) : '';
         if (!choice || !choose(choice, done.card, true)) {  // a short drag snaps back and casts nothing
+            if (!reduced && done.card.style.transform) {
+                done.card.classList.add('returning');
+                clearTimeout(done.card.returningTimer);
+                done.card.returningTimer = setTimeout(function () { done.card.classList.remove('returning'); }, 360);
+            }
             done.card.style.transform = '';
         }
     }

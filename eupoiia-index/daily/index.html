@@ -34,7 +34,7 @@
             }
         })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=85b4ba77">
+    <link rel="icon" type="image/svg+xml" href="/eupoiia-index/mark-small.svg?v=bf6a65af">
     <style>
         :root, :root[data-theme="dark"] {
             --serif: "LM Roman 12", Georgia, serif;
@@ -45,12 +45,13 @@
         details.sec > summary::before { font-family: inherit; }
         .masthead { padding: 0.5rem 0 0.7rem; }
         .masthead-lockup { max-width: var(--page); margin: 0 auto; padding: 0 var(--gutter);
-                           display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
-        .masthead-brand { display: flex; align-items: center; gap: 1.25rem; flex: none; }
+                           display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+                           align-items: center; column-gap: 4px; }
+        .masthead-brand { display: flex; align-items: center; gap: 1.25rem; grid-column: 2; }
         .masthead h1 { white-space: nowrap; }
-        /* Reserve the same space for every identity; only the account label can shrink. */
+        /* Equal side columns center the brand independently of account identity. */
         .header-tools { display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem;
-                        width: 15rem; min-width: 0; flex: none; font-size: 0.85rem; line-height: 1.25; }
+                        width: 15rem; max-width: 100%; min-width: 0; justify-self: end; font-size: 0.85rem; line-height: 1.25; }
         .header-tools .theme-toggle { position: static; flex: none; margin: 0; }
         @media (max-width: 1023px) {
             .masthead-brand { gap: 0.8rem; }
@@ -65,7 +66,9 @@
             .header-tools { width: 8.75rem; }
         }
         @media (max-width: 359px) {
-            .masthead .logo { width: 24px; }
+            .masthead-brand { gap: 4px; }
+            .masthead .logo { width: 20px; }
+            .masthead h1 { font-size: 0.8rem; }
             .header-tools { width: 7.25rem; }
         }
         .masthead h1 a { text-decoration: none; }
@@ -83,6 +86,9 @@
         body { isolation: isolate; }
         #game { overflow: visible; }
         .deck { display: grid; max-width: 44rem; margin: 0 auto; }
+        /* A transformed card needs a deck layer above every page layer, including the result modal, while it is
+           actively dragged, springs back, or flies away. */
+        .deck:has(.card.leaving, .card.dragging, .card.returning) { position: relative; z-index: 21; }
         .card { grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; background: transparent; border: 1px solid #000;
                 border-radius: var(--control-radius); overflow: clip; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; transition: transform 0.35s ease; }
         .card:not(:first-child) { display: none; }
@@ -93,6 +99,7 @@
         .card.leave-b { transform: translateX(130%) rotate(12deg); }
         .card.leave-skip { transform: translateY(calc(-100% - 2rem)); }
         .card.leave-tie { transform: translateY(calc(-100% - 2rem)); }
+        .card.leaving, .card.dragging, .card.returning { z-index: 1; }
         /* Shared rows align controls without moving them when either introduction opens. */
         .halves { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .half { min-width: 0; padding: 0.8rem 0.7rem 0.6rem; text-align: center;
@@ -236,10 +243,16 @@
         .modal-box { position: relative; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; max-width: 36rem; width: 100%; padding: 1.4rem 1.2rem; }
         .modal-close { position: absolute; top: 0.4rem; right: 0.6rem; font: inherit; font-size: 1.6rem; line-height: 1; background: none; border: 0; cursor: pointer; color: var(--ink-soft); }
         .result-card { text-align: center; }
-        .result-card .score { font-family: var(--display); font-size: 2.6rem; line-height: 1.1; margin: 0.4rem 0; }
-        .result-card .score .title { display: block; font-size: 1.6rem; }
-        .result-card .description { font-style: italic; color: var(--ink-soft); }
-        .result-card .rank { margin: 0.4rem 0 0.2rem; }
+        .result-card .score-identity { display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+                                       min-width: 0; margin: 0.1rem 0 0.7rem; color: var(--ink-soft); }
+        .result-card .score-identity strong { display: block; min-width: 0; max-width: min(100%, 26rem); overflow: hidden;
+                                              text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+        .result-card .score-avatar { width: 24px; height: 24px; flex: none; border-radius: 50%; vertical-align: middle; }
+        .result-card .score { font-family: var(--display); font-size: 3rem; line-height: 1; margin: 0.2rem 0 0.6rem; }
+        .result-card .score .number { font-variant-numeric: lining-nums tabular-nums; }
+        .result-card .score .title { display: block; margin-top: 0.15rem; font-family: var(--serif); font-size: var(--fs-large); font-weight: 400; }
+        .result-card .description { margin: 0.4rem 0; font-size: var(--fs-small); font-style: italic; color: var(--ink-soft); }
+        .result-card .score-explainer, .result-card .rank { margin: 0.4rem 0 0.2rem; font-size: var(--fs-small); color: var(--ink-soft); }
         .result-card .actions { position: relative; margin: 0.2rem 0; }
         .result-card .actions .copied { position: absolute; top: 100%; left: 0; right: 0; margin: 0.2rem 0 0; line-height: 1.3; text-align: center; }
         .score-method { max-width: 68ch; margin: 1.2rem auto 0; line-height: 1.55; }
@@ -352,7 +365,7 @@
     <header class="masthead">
         <div class="masthead-lockup">
             <div class="masthead-brand">
-                <img src="/eupoiia-index/mark.svg?v=85b4ba77" alt="" class="logo">
+                <img src="/eupoiia-index/mark.svg?v=bf6a65af" alt="" class="logo">
                 <h1><a href="/eupoiia-index/">Eupoiia Index</a></h1>
             </div>
             <div class="header-tools">
@@ -453,10 +466,10 @@
         })();
     </script>
     
-    <script type="application/json" id="cgi-static-bootstrap">{"manifest":{"built_at":1795222883,"catalog":["catalog-00-fd13b37eea8de732.json","catalog-01-b9c65dc58fe11007.json","catalog-02-a042e427f19f8e2f.json","catalog-03-d66dd871392af84e.json","catalog-04-2fc8e996eff2ae5a.json","catalog-05-bf638acc46195384.json","catalog-06-ad126d90f70a086c.json","catalog-07-48a1deb1b2e44608.json","catalog-08-f2e58ad37d0e233e.json","catalog-09-ea6b5a913eca5eda.json","catalog-10-73570eda1bd53330.json","catalog-11-39212b8cebe2b261.json","catalog-12-c042d46af29f75fc.json","catalog-13-5a45f24ac808269b.json","catalog-14-07a46a8efefc19af.json","catalog-15-b77d6666fd96a93b.json","catalog-16-3bb85c1d5577e0c9.json","catalog-17-4b349557a7304f01.json","catalog-18-6e7bce70cd2533d7.json","catalog-19-73ed3f1d497b7f06.json","catalog-20-1707a010624f47b6.json","catalog-21-d5d154e59a97ae92.json","catalog-22-a369bfaabb07a951.json","catalog-23-73643b44f66b058f.json","catalog-24-121cc26dc184ec06.json","catalog-25-92876bb625139559.json","catalog-26-cd957d02a5fb870d.json","catalog-27-2a01707dcf3afee0.json","catalog-28-abcca3ea2b52672e.json","catalog-29-bd4abe3c4e16ea87.json","catalog-30-8b7aef91e0fe75d5.json","catalog-31-5ba31b6a6ea53955.json"],"daily":{"2026-11-17":"daily-2026-11-17-d9ec2d033076372e.json","2026-11-18":"daily-2026-11-18-ede94093288df6c4.json","2026-11-19":"daily-2026-11-19-7bba25d344d643f8.json","2026-11-20":"daily-2026-11-20-879fe73ad41868a7.json","2026-11-21":"daily-2026-11-21-a1d385ff798e49f3.json"},"files":{"contenders":"contenders-1ae1cd86a5d0de68.json","deck_first":"deck-first-e3b26d7e86f13b4e.json","deck_pool":"deck-pool-f723680053b75955.json","players_all":"players-all-7bdb11ac2bacd59e.json","players_today":"players-today-d2abe451dcc8c3e8.json","top":"top-3bb65ba3df2df40b.json"},"results":{"2026-11-17":"results-2026-11-17-e191a275487feedd.json","2026-11-18":"results-2026-11-18-f0fda01dff5b71a5.json","2026-11-19":"results-2026-11-19-e75f42ec4f1d2a9e.json","2026-11-20":"results-2026-11-20-15ab3c1d220417b1.json"},"revision":277413,"today":"2026-11-20","v":1},"files":{}}</script>
-    <script defer src="/eupoiia-index/22-static-data.js?v=85b4ba77"></script>
-    <script defer src="/eupoiia-index/25-search-the-boards.js?v=85b4ba77"></script>
+    <script type="application/json" id="cgi-static-bootstrap">{"manifest":{"built_at":1795226130,"catalog":["catalog-00-fd13b37eea8de732.json","catalog-01-b9c65dc58fe11007.json","catalog-02-a042e427f19f8e2f.json","catalog-03-d66dd871392af84e.json","catalog-04-2fc8e996eff2ae5a.json","catalog-05-bf638acc46195384.json","catalog-06-84b37cb59636b6bf.json","catalog-07-48a1deb1b2e44608.json","catalog-08-20cae3cb951e704e.json","catalog-09-e8c2245a22bcbb6a.json","catalog-10-225b46b407c860df.json","catalog-11-94d1a34da5f823ce.json","catalog-12-92c8c8d7de483c05.json","catalog-13-5a45f24ac808269b.json","catalog-14-6f1bf5918237a7df.json","catalog-15-b77d6666fd96a93b.json","catalog-16-3bb85c1d5577e0c9.json","catalog-17-746f615189ca7900.json","catalog-18-331176606e81dabe.json","catalog-19-73ed3f1d497b7f06.json","catalog-20-3a537c9e4bb62ab2.json","catalog-21-165c260b2e3c6310.json","catalog-22-a369bfaabb07a951.json","catalog-23-73643b44f66b058f.json","catalog-24-121cc26dc184ec06.json","catalog-25-92876bb625139559.json","catalog-26-cd957d02a5fb870d.json","catalog-27-b576adb7e2a41534.json","catalog-28-abcca3ea2b52672e.json","catalog-29-bd4abe3c4e16ea87.json","catalog-30-78db217a18ebeb81.json","catalog-31-5ba31b6a6ea53955.json"],"daily":{"2026-11-17":"daily-2026-11-17-d9ec2d033076372e.json","2026-11-18":"daily-2026-11-18-ede94093288df6c4.json","2026-11-19":"daily-2026-11-19-7bba25d344d643f8.json","2026-11-20":"daily-2026-11-20-879fe73ad41868a7.json","2026-11-21":"daily-2026-11-21-a1d385ff798e49f3.json"},"files":{"contenders":"contenders-d336694248462890.json","deck_first":"deck-first-169c00c942aee4e6.json","deck_pool":"deck-pool-174abac126356382.json","players_all":"players-all-985bd5ddb8fc4b91.json","players_today":"players-today-26fe914d1477a6c4.json","top":"top-5074f7ceaad5ea52.json"},"results":{"2026-11-17":"results-2026-11-17-e191a275487feedd.json","2026-11-18":"results-2026-11-18-f0fda01dff5b71a5.json","2026-11-19":"results-2026-11-19-d85f07e8c0af0bf5.json","2026-11-20":"results-2026-11-20-dbd1b313d7982c89.json"},"revision":292851,"today":"2026-11-20","v":1},"files":{}}</script>
+    <script defer src="/eupoiia-index/22-static-data.js?v=bf6a65af"></script>
+    <script defer src="/eupoiia-index/25-search-the-boards.js?v=bf6a65af"></script>
     
-    <script defer src="/eupoiia-index/20-play-the-cards.js?v=85b4ba77"></script>
+    <script defer src="/eupoiia-index/20-play-the-cards.js?v=bf6a65af"></script>
 </body>
 </html>
