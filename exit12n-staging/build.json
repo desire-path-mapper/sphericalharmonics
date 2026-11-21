@@ -1,17 +1,17 @@
 {
- "build": "20261121T022154Z-ca2d107",
- "entry": "assets/index-DrcxtwaI.js",
+ "build": "20261121T022452Z-28c9d1f",
+ "entry": "assets/index-BGUMoNsa.js",
  "css": [
   "assets/index-C4UuAvsO.css"
  ],
  "integrity": {
   "assets/06-answer-in-the-worker--2R7ANvB.js": "sha384-3XzLROceCwrCoGXq1k/+lQgzNOr+PUzCeygrba5pBDDkS952w6TQfouO8jT7eASO",
   "assets/20-route-in-a-worker-CmZduLVZ.js": "sha384-SLTXsisqjj4TY8/+Q0iEg1QhLpVSB4eoyrbRcWJ6tKL3X2OgDFwC5B65dCsneRMV",
-  "assets/index-C4UuAvsO.css": "sha384-lAvSA/Ge1IhGuY5a8FW3SFGgqeLA6kmyN0qC+8lSyZLW9tt8a+6krFXepQ0wd8rf",
-  "assets/index-DrcxtwaI.js": "sha384-a3NNO9h9908YKVocoW1wHhRunwFZ0j145tPzjDURG2hYSWEuAVw28NQYKB/rIeFL"
+  "assets/index-BGUMoNsa.js": "sha384-OTLDGSmYbTyNEeTSEnnYuQQzN8U7bt+60s2uS1nQuu3jawGGXh1+UKFBvupRo1aY",
+  "assets/index-C4UuAvsO.css": "sha384-lAvSA/Ge1IhGuY5a8FW3SFGgqeLA6kmyN0qC+8lSyZLW9tt8a+6krFXepQ0wd8rf"
  },
- "content": "f6e25b022cf84664b1829ab68443da1d2705d424ba0e8ac43e98ad920a66431d",
+ "content": "d3317cd8c274ddc59282b7c5c21d730b4dd929c6efbdf359da03a9402a20a0e3",
  "env": "staging",
- "commit": "ca2d10772e89fecf5d7d3a1a461ff6ad7fc7e4cb",
+ "commit": "28c9d1f06fae7fa681b5661d581fe63836ea0b1a",
  "area": ""
 }
