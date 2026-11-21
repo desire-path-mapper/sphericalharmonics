@@ -9,9 +9,14 @@
 // Players sign in with email or Bluesky. The first-party sign-in cookie stays out of public snapshots and
 // persistent vote queues. Static pages send credentials in form bodies; older pages retain their headers.
 // A signed-out tab has a per-tab id so its eligible votes can join the account when it signs in.
-(function () {
+(async function () {
     'use strict';
+    if (window.eupoiiaHandoff) await window.eupoiiaHandoff;
     var game = document.getElementById('game');
+    if (window.eupoiiaHandoffFailed) {
+        var prompt = document.createElement('p'); prompt.className = 'note'; prompt.textContent = 'Please sign in to continue.';
+        game.before(prompt);
+    }
     var api = game.dataset.api;
     var mode = game.dataset.mode;
     var query = new URLSearchParams(location.search);

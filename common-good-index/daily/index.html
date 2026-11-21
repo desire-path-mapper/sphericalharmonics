@@ -1,25 +1,10 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Eupoiia Index has moved</title>
-<link rel="canonical" href="https://sphericalharmonics.org/eupoiia-index/daily/">
-<meta name="robots" content="noindex">
-<script>
-(function () {  // the same page at the new path, query and fragment kept; a sign-in session moves with it
-    var old = '/common-good-index/', now = '/eupoiia-index/';
-    var found = document.cookie.match(/(?:^|; )cgi_session=([A-Za-z0-9_-]+)/);
-    if (found) {
-        var secure = location.protocol === 'https:' ? '; Secure' : '';
-        document.cookie = 'cgi_session=' + found[1] + '; Path=' + now + '; Max-Age=2592000; SameSite=Lax' + secure;
-        document.cookie = 'cgi_session=; Path=' + old + '; Max-Age=0; SameSite=Lax' + secure;
-    }
-    location.replace(location.pathname.replace(old, now) + location.search + location.hash);
-})();
-</script>
-<meta http-equiv="refresh" content="0; url=https://sphericalharmonics.org/eupoiia-index/daily/">
-</head>
-<body data-moved-to="/eupoiia-index/">
-<p>Eupoiia Index has moved to <a href="https://sphericalharmonics.org/eupoiia-index/daily/">https://sphericalharmonics.org/eupoiia-index/daily/</a>.</p>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="origin"><meta name="robots" content="noindex">
+<link rel="canonical" href="https://eupoiia.org/daily/"><title>Eupoiia Index has moved</title>
+<style>body{font-family:serif;max-width:70ch;margin:3rem auto;padding:0 1.25rem;line-height:1.5}button{font:inherit}</style>
+</head><body data-migration="eupoiia"><p id="migration-status" role="status">Preparing your move to Eupoiia.</p>
+<button id="migration-retry" type="button" hidden>Retry</button>
+<p><a href="/common-good-index/stay/">Sign in on the original site</a></p>
+<script src="/common-good-index/19-move-to-domain.js" data-api="https://common-good-katze52zaq-uc.a.run.app" data-destination="https://eupoiia.org/" data-old-path="/common-good-index/"></script>
+</body></html>
