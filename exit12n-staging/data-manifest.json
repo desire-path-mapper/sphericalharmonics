@@ -12,8 +12,8 @@
   "sha256": "c74fccd6ba6500b3214ae9197ba63ca669520df70d8dcd72db627b1b0133e461"
  },
  "10-fetch-the-ground/data/heights.json": {
-  "bytes": 954,
-  "sha256": "078c326228ffdcea64b43081de0977a54f3d6d93617309f97bca7961d6924e20"
+  "bytes": 804,
+  "sha256": "b560aca604d8fa25de89d4edec07a10f5231af78e55ce425d2e65210f83b4a5f"
  },
  "10-fetch-the-ground/data/ortho-middle-web.jpg": {
   "bytes": 189095,
@@ -24,28 +24,28 @@
   "sha256": "5ff6401c7270817b9ad4e92cbd10b21793552b39e4fca89c17a2b8647c2a46a8"
  },
  "10-fetch-the-ground/data/region.json": {
-  "bytes": 20014,
-  "sha256": "d09bdcbae0eff54244e4ef3317997c719a9333ea7cb4a2bfb4f91077f96b6e69"
+  "bytes": 21749,
+  "sha256": "8fd2e778ed7f0b61120918777efcb45391600d3928b50a168d3af5cacb8ce64d"
  },
  "10-fetch-the-ground/data/site-features.geojson": {
   "bytes": 42,
   "sha256": "ed778c73ea51338d6576fb5992b189f2b94d9f3d5e199f46c1af520d6b0b3e6c"
  },
- "10-fetch-the-ground/data/site.json": {
-  "bytes": 2032108,
-  "sha256": "897eb22f9bd5f100c45d7a96735e17f91fba3d1e89faa19137aa67086d44c4c6"
+ "10-fetch-the-ground/data/site-view.json": {
+  "bytes": 163078,
+  "sha256": "82abdbeea58c9e34150336f785094b34445a305b816cb83a542938a8ae118d91"
  },
- "10-fetch-the-ground/data/streets.json": {
-  "bytes": 1683433,
-  "sha256": "239a30a33eb0e496e34de26e632df78494c1e1cca2d03bdc626b3852ebb39d3f"
+ "10-fetch-the-ground/data/streets-view.json": {
+  "bytes": 234724,
+  "sha256": "250236093c9ba8bfae74ae4bf414219924ca97e09b321e75bc9e85c9864b3fc8"
  },
  "15-scan-the-structures/data/buildings-web.json": {
-  "bytes": 251974,
-  "sha256": "3ae8672191430545abb83436560b656ccc564864f96efc34b226a0f70fa77a2d"
+  "bytes": 1539,
+  "sha256": "de39c02c52d0ededd5160523d5d62256822a12ab2f262b54174909b58be7c46d"
  },
  "15-scan-the-structures/data/buildings.i16.gz": {
-  "bytes": 2276903,
-  "sha256": "940455dbd8c9b98d9d1bf28782e5b8b012ec53345429b498183843d9740dd828"
+  "bytes": 33423,
+  "sha256": "7e0455a5b5913a7afd7b4f32daf439634bcf35f66b27a10aed993d02a3c5d7b9"
  },
  "15-scan-the-structures/data/decks.json": {
   "bytes": 182600,
@@ -68,35 +68,35 @@
   "sha256": "9b2d5f2f5d3060ec6ee40b2d423b80a54217bad2aaa785d9fe42009fa7e77f33"
  },
  "15-scan-the-structures/data/surfaces-ground.i16.gz": {
-  "bytes": 3249148,
-  "sha256": "8f48a2a6d0ef750e716e217a0166ff7fd6d895599bb8263b78d6707ad7d0f5f9"
+  "bytes": 1135968,
+  "sha256": "8ed45dc104250990c79898129d5a05fedf19d5073791401c201da3e03a971812"
  },
  "15-scan-the-structures/data/surfaces-ground.json": {
-  "bytes": 27511,
-  "sha256": "ea350e18b0947aa0e9f5bc43463f78c635675dc7b1bbaa8367cccfd025e5ac32"
+  "bytes": 4947,
+  "sha256": "48f2082b96bc600067080fcd4f0a74929edd7e6aac5d8adbf5281ef72b701f30"
  },
  "15-scan-the-structures/data/surfaces-ground.u16.gz": {
-  "bytes": 1575654,
-  "sha256": "9d8fa2fab9e42f5968c363e3417ba607fcbddb03a2113016b9568e3eb50dc3cb"
+  "bytes": 594363,
+  "sha256": "f8d9211645597f243309ed6f4d51a0714ea14c6581d9d0514b01e2d027146eaa"
  },
  "15-scan-the-structures/data/surfaces-lines.i16.gz": {
-  "bytes": 572026,
-  "sha256": "d5a276e3b9f23950bc432a8533828b0a0e97d0cac286a90c1b12b11ebdb1db0b"
+  "bytes": 210113,
+  "sha256": "d387db23d68aceb7d68ea1eea648a45bd798e5400c9c668609328c9778995516"
  },
  "15-scan-the-structures/data/surfaces-lines.json": {
-  "bytes": 16732,
-  "sha256": "1a345dc107708d3f0b80b23c6a3cde122d0d3589271f0138747d7689f4b90f89"
+  "bytes": 3294,
+  "sha256": "04eb79aa79d3bb9ed1115276943d5547b344faf618c4c910e220bc1d0326f2fc"
  },
  "15-scan-the-structures/data/surfaces-lines.u16.gz": {
-  "bytes": 15895,
-  "sha256": "28e99239400a0ee1032a020180e73894d680cf6f82a78a4d006dd31a5ced1de7"
+  "bytes": 5703,
+  "sha256": "7f2a954a604073f9e5a735cc52cc4431ed293513abfd9af36cf369268f740a19"
  },
  "15-scan-the-structures/data/trees-web.json": {
-  "bytes": 7170,
-  "sha256": "8bc7c1968e7d029bf083e144b4da2902c8c1737303cbb1585d106d3343de7f2f"
+  "bytes": 7168,
+  "sha256": "85562b734847a7825de5d7b006c5b7a93f221fca409083c08c3a233789b230f4"
  },
  "15-scan-the-structures/data/trees.i16.gz": {
-  "bytes": 264619,
-  "sha256": "11988dd8ae827e1ae30034f1ffad02ab4fb30725daacff59ce9e9064e92269ad"
+  "bytes": 9414,
+  "sha256": "df360e79051595135086a44d8e6800cdf4379a0e4da921a02b1f481475daeb9a"
  }
 }
