@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="referrer" content="origin"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found</title></head><body><p>Page not found. <a href="/">Spherical Harmonics</a></p><script>
+if (location.pathname.startsWith('/exit12n/') && !/^\/exit12n\/legacy(?:\/|$)/.test(location.pathname)) {
+(function sender(destination, oldPath, max, idPattern, keys) {
+  const original = location.hash;
+  const safeHash = original.startsWith("#handoff=") ? "" : original;
+  const relative = location.pathname.startsWith(oldPath) ? location.pathname.slice(oldPath.length) : "";
+  const target = destination + "/" + relative + location.search;
+  let hasIdentity = false;
+  const stay = () => {
+    document.body.textContent = "Your saved data could not be transferred. ";
+    const link = document.createElement("a");
+    link.href = oldPath + "legacy/";
+    link.textContent = "Open the old site";
+    document.body.append(link);
+  };
+  try {
+    const values = /* @__PURE__ */ Object.create(null);
+    const id = localStorage.getItem("exit12n.deviceId");
+    if (!id || !new RegExp(idPattern, "i").test(id)) {
+      location.replace(target + safeHash);
+      return;
+    }
+    hasIdentity = true;
+    if (safeHash.length > 4096) {
+      stay();
+      return;
+    }
+    for (const key of keys) {
+      const value = localStorage.getItem(key);
+      if (value === null) continue;
+      if (key === "exit12n.voiceLog") {
+        const records = JSON.parse(value);
+        if (!Array.isArray(records)) throw new Error("invalid old queue");
+        const mine = records.filter((r) => r && typeof r === "object" && r.area === "");
+        if (mine.length) values[key] = JSON.stringify(mine);
+      } else values[key] = value;
+    }
+    const payload = JSON.stringify({ type: "exit12n-handoff", version: 1, at: Date.now(), hash: safeHash, values });
+    const bytes = new TextEncoder().encode(payload);
+    if (bytes.length > max) {
+      stay();
+      return;
+    }
+    let binary = "";
+    for (const b of bytes) binary += String.fromCharCode(b);
+    const encoded = btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    location.replace(target + "#handoff=" + encoded);
+  } catch {
+    if (hasIdentity) stay();
+    else location.replace(target + safeHash);
+  }
+})("https://exit12n.org","/exit12n/",400000,"^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",["exit12n.deviceId","exit12n.name","exit12n.name.asked","exit12n.name.asked.exit12n","exit12n.layers.trees","exit12n.layers.buildings","exit12n.camera-tip.dismissed","exit12n.hint.selected","exit12n.add-menu.open","exit12n.hidden","exit12n.voiceTold","exit12n.voiceDevice","exit12n.voiceLabel","exit12n.voiceLog","exit12n.voiceLog:https://exit12n-api-katze52zaq-uc.a.run.app/api"]);
+}
+</script></body></html>
