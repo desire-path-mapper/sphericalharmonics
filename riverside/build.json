@@ -1,16 +1,16 @@
 {
- "build": "20261124T214503Z-04884c4",
- "entry": "assets/index-BRIArBvK.js",
+ "build": "20261124T223802Z-382bc0b",
+ "entry": "assets/index-BaKVfnXC.js",
  "css": [
   "assets/index-B8h_QxVS.css"
  ],
  "integrity": {
   "assets/20-route-in-a-worker-B0UnfRj9.js": "sha384-mk4quRvHbHshlW6a7Xi+PosGnovm3LGG2XY2x5/7Q2nYDi5ORX12UBS2XoYA97iv",
   "assets/index-B8h_QxVS.css": "sha384-vyA9KTqm8Gkl4tJ3qacgWlMll5bxMEQg8GIJiFcLziGIq3je58yzyZtwrL1zvp0F",
-  "assets/index-BRIArBvK.js": "sha384-zb99kd0c8cFgiS0wQkXMJWqQOUoW8W6FiXddi9SNdx9xuRydw/VYY6JCpTd1xR2e"
+  "assets/index-BaKVfnXC.js": "sha384-4b+skd7b+H983JsPfYUh3tP7vnXRIlk4jPZ/CKIqJVuu2ioDILN9jIbeqflqQdXk"
  },
- "content": "7035fd7f850b7b6f65855e6381740026c13f09accea3e54b65c97065058cebe1",
+ "content": "5149632f268115a067b33936232f80a28010a8185b69a6f75202a8c5f3b3b9b6",
  "env": "riverside",
- "commit": "04884c4dac6f50beb6eca2b6689211dc4dbd2078",
+ "commit": "382bc0b62e1212b78321b331c4e00077b7da7fb0",
  "area": "riverside-85-120"
 }
