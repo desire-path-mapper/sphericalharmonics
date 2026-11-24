@@ -1,16 +1,16 @@
 {
- "build": "20261124T210941Z-1a4f3cb",
- "entry": "assets/index-BKKd1CkP.js",
+ "build": "20261124T214503Z-04884c4",
+ "entry": "assets/index-BRIArBvK.js",
  "css": [
-  "assets/index-CymDAn3h.css"
+  "assets/index-B8h_QxVS.css"
  ],
  "integrity": {
   "assets/20-route-in-a-worker-B0UnfRj9.js": "sha384-mk4quRvHbHshlW6a7Xi+PosGnovm3LGG2XY2x5/7Q2nYDi5ORX12UBS2XoYA97iv",
-  "assets/index-BKKd1CkP.js": "sha384-FZFxI+MEWKebNRoSmuk1JIRJ72fkOf64+R6zSQZRpmN2bVDhV6m7ebP7D6Aercvq",
-  "assets/index-CymDAn3h.css": "sha384-oimbq5VoRs8c5rgMVu/gwwKDX17z4cSQDF6N8mCaCPZL2QlcqHYqOUth2dxvItSB"
+  "assets/index-B8h_QxVS.css": "sha384-vyA9KTqm8Gkl4tJ3qacgWlMll5bxMEQg8GIJiFcLziGIq3je58yzyZtwrL1zvp0F",
+  "assets/index-BRIArBvK.js": "sha384-zb99kd0c8cFgiS0wQkXMJWqQOUoW8W6FiXddi9SNdx9xuRydw/VYY6JCpTd1xR2e"
  },
- "content": "6f93957717166dff527fc09ea53006f444ce013038ab85e4d88aff0502d55a27",
+ "content": "7035fd7f850b7b6f65855e6381740026c13f09accea3e54b65c97065058cebe1",
  "env": "riverside",
- "commit": "1a4f3cbd18e7ef941569bb296056b0796142c33e",
+ "commit": "04884c4dac6f50beb6eca2b6689211dc4dbd2078",
  "area": "riverside-85-120"
 }
