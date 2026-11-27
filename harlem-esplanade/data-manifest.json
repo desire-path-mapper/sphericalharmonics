@@ -1,0 +1,106 @@
+{
+ "10-fetch-the-ground/data/harlem-esplanade/heights-middle.i16.gz": {
+  "bytes": 995039,
+  "sha256": "eae178791ecf05ebc6c62577e3f348657891a8ff749350bb59bd805859805edf"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/heights-middle.json": {
+  "bytes": 903,
+  "sha256": "d15ad3235dd3f052a961c257f387c8bdac668c5fe547c370cd4248aa536b6b28"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/heights.i16.gz": {
+  "bytes": 1518457,
+  "sha256": "0b083b3e310dd0e8b8e59233e520492ff0b9ff3f4c3440a791bca3a54c72ab6d"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/heights.json": {
+  "bytes": 951,
+  "sha256": "dfe3f2326cce778255f4ce8341c23540bcd6cce28d44210f5471d137ae5bb934"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/in-the-park.json": {
+  "bytes": 25537,
+  "sha256": "29fd9961f5b58e7d84ceab4b44d7f36511a2e737b6f51bbda4ac51e5d84a83ab"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/ortho-middle-web.jpg": {
+  "bytes": 110760,
+  "sha256": "deb3861b521f308ba31b50d3dcf607cfd8f708a84c68e6b2e1e2c460c3552691"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/ortho-web.jpg": {
+  "bytes": 484360,
+  "sha256": "800d082dcab4346eaba46d50ff6837df6fc0a0b916da021fe9126d8d62045c8b"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/region.json": {
+  "bytes": 7106,
+  "sha256": "9cc10049cbaae2b75405349ad387f21e8d9ffad08bbdf04b0c16b577097a4a51"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/site-features.geojson": {
+  "bytes": 42,
+  "sha256": "ed778c73ea51338d6576fb5992b189f2b94d9f3d5e199f46c1af520d6b0b3e6c"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/site.json": {
+  "bytes": 482331,
+  "sha256": "32a1df152176891ccd931e3724440d01fa0238b08d247836c236597760e49e15"
+ },
+ "10-fetch-the-ground/data/harlem-esplanade/streets.json": {
+  "bytes": 714717,
+  "sha256": "7263e70a7d0e14849b2454a407aa9abc2398d48a027046b429e4822d96f0f8b2"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/buildings-web.json": {
+  "bytes": 122420,
+  "sha256": "2e1fdfd92f2fb0fd15c3297bddca9d7fc8ec197c40ef6814e0467e6cd1b7f6d6"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/buildings.i16.gz": {
+  "bytes": 807106,
+  "sha256": "b845f9577577033ca677228a1ab275c2b8ddce0b164b72d558e6fce836b97fc6"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/decks.json": {
+  "bytes": 434291,
+  "sha256": "b635f92e6e5fb4182374ef92265208ab150938682dcc0895a72aa7364a794ee4"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/piers.json": {
+  "bytes": 126896,
+  "sha256": "234e0524af1041420194f1dafc5cac12adffbff0c6409f4b3482559d37c1bb37"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/play-areas.json": {
+  "bytes": 3623,
+  "sha256": "d5e67c5921051cf0104c0111dd1077b5d3f70c8f1d1aed0352dabdd26f80e699"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/scan.json": {
+  "bytes": 8774,
+  "sha256": "af7fe75753192b1b1fdeac17b6c6fb2501cde3ad3a265150d65b1f1ce75a00ad"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/street-names.json": {
+  "bytes": 15930,
+  "sha256": "46039d4a5b1fc326f552bd1f563e9f54cf4f370e0d50d5669d587d8c81a3bd5c"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/surfaces-ground.i16.gz": {
+  "bytes": 1475787,
+  "sha256": "6c837b9b8865ef490d7ed05fc7d561581b2957a62d456180fafa2a2b24155772"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/surfaces-ground.json": {
+  "bytes": 11817,
+  "sha256": "1782b45c7719a762342a699759803775a91d6a8f2174a9319f9cdc1adb1daac2"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/surfaces-ground.u16.gz": {
+  "bytes": 866380,
+  "sha256": "82018367751cb805b13d7b6206c9f121adbc1511822bb1513e0a29693745bd7b"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/surfaces-lines.i16.gz": {
+  "bytes": 388740,
+  "sha256": "81e61ed98d4ca770517cf093ad5905b172c595c10a6ae14bb5a7362d22769690"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/surfaces-lines.json": {
+  "bytes": 9610,
+  "sha256": "dbe5336ad70afede6f8e0c0f8fa36a4d7c4da64ce278a43a9240d9bb63d72639"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/surfaces-lines.u16.gz": {
+  "bytes": 10545,
+  "sha256": "e55d14586ad01abc0d4033aaf1c37365e9d21f10270a53aa2ab8d95203774f0d"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/trees-web.json": {
+  "bytes": 3339,
+  "sha256": "5d05c295b055734e57b8d0f2a4a2745658421ac3d3906ed07e2d3ceb3aa9445e"
+ },
+ "15-scan-the-structures/data/harlem-esplanade/trees.i16.gz": {
+  "bytes": 61371,
+  "sha256": "858d3d89cc2b5ee63c87c00342895669209e3f553a57e1db9663cc9cfe486b41"
+ }
+}

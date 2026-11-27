@@ -1,0 +1,405 @@
+{
+ "origin": {
+  "lat": 40.8115,
+  "lon": -73.934
+ },
+ "box": {
+  "south": 40.7975,
+  "north": 40.824,
+  "west": -73.944,
+  "east": -73.924
+ },
+ "grid": {
+  "cellM": 0.5,
+  "width": 3371,
+  "height": 5900,
+  "localBounds": [
+   -842.5408828870046,
+   -1558.5000000004745,
+   842.9591171129954,
+   1391.4999999995255
+  ]
+ },
+ "counts": {
+  "trees": 6461,
+  "treesMatched": 387,
+  "inventoryTrees": 7647,
+  "buildings": 2942,
+  "buildingTriangles": 169821,
+  "buildingsMissing": 105,
+  "footprints": 3312,
+  "decks": 43,
+  "portals": 1,
+  "piers": 3,
+  "seawalls": 15,
+  "shoreLines": 9,
+  "bridgeElevationPoints": 290
+ },
+ "tiles": {
+  "230": {
+   "points": 15243954,
+   "lasVersion": "1.4",
+   "pointFormat": 6,
+   "classes": {
+    "1": 2999589,
+    "2": 4309280,
+    "3": 124930,
+    "4": 576133,
+    "5": 2212538,
+    "6": 4433219,
+    "7": 58565,
+    "8": 335324,
+    "18": 194376
+   },
+   "flownFrom": "2021-05-15",
+   "flownTo": "2021-05-20",
+   "window": [
+    3933,
+    0,
+    4787,
+    1420
+   ],
+   "bytes": 458239749,
+   "downloadS": 71.9,
+   "rasteriseS": 4.0,
+   "frame": "EPSG:6539->EPSG:9057"
+  },
+  "232": {
+   "points": 16955170,
+   "lasVersion": "1.4",
+   "pointFormat": 6,
+   "classes": {
+    "1": 3233590,
+    "2": 4346798,
+    "3": 153859,
+    "4": 724334,
+    "5": 3327200,
+    "6": 4535348,
+    "7": 45121,
+    "8": 352737,
+    "9": 7207,
+    "18": 228976
+   },
+   "flownFrom": "2021-05-15",
+   "flownTo": "2021-05-20",
+   "window": [
+    2405,
+    0,
+    3937,
+    1421
+   ],
+   "bytes": 509601891,
+   "downloadS": 82.7,
+   "rasteriseS": 6.5,
+   "frame": "EPSG:6539->EPSG:9057"
+  },
+  "235": {
+   "points": 18598595,
+   "lasVersion": "1.4",
+   "pointFormat": 6,
+   "classes": {
+    "1": 3539418,
+    "2": 4925898,
+    "3": 120267,
+    "4": 537400,
+    "5": 3758119,
+    "6": 5055170,
+    "7": 30769,
+    "8": 362726,
+    "9": 472,
+    "18": 268356
+   },
+   "flownFrom": "2021-05-15",
+   "flownTo": "2021-05-20",
+   "window": [
+    877,
+    0,
+    2409,
+    1423
+   ],
+   "bytes": 558992637,
+   "downloadS": 74.1,
+   "rasteriseS": 3.1,
+   "frame": "EPSG:6539->EPSG:9057"
+  },
+  "237": {
+   "points": 17933521,
+   "lasVersion": "1.4",
+   "pointFormat": 6,
+   "classes": {
+    "1": 3456178,
+    "2": 4918895,
+    "3": 114735,
+    "4": 600302,
+    "5": 2828833,
+    "6": 5311605,
+    "7": 32190,
+    "8": 358547,
+    "9": 8710,
+    "18": 303526
+   },
+   "flownFrom": "2021-05-15",
+   "flownTo": "2021-05-20",
+   "window": [
+    0,
+    0,
+    881,
+    1424
+   ],
+   "bytes": 538990097,
+   "downloadS": 79.0,
+   "rasteriseS": 4.1,
+   "frame": "EPSG:6539->EPSG:9057"
+  },
+  "2230": {
+   "points": 11972037,
+   "lasVersion": "1.4",
+   "pointFormat": 6,
+   "classes": {
+    "1": 2131458,
+    "2": 4287009,
+    "3": 120146,
+    "4": 332857,
+    "5": 1858834,
+    "6": 2126237,
+    "7": 16939,
+    "8": 294895,
+    "9": 600859,
+    "18": 202803
+   },
+   "flownFrom": "2021-05-15",
+   "flownTo": "2021-05-20",
+   "window": [
+    3934,
+    1416,
+    4787,
+    2942
+   ],
+   "bytes": 359936279,
+   "downloadS": 57.2,
+   "rasteriseS": 4.3,
+   "frame": "EPSG:6539->EPSG:9057"
+  },
+  "2232": {
+   "points": 12344483,
+   "lasVersion": "1.4",
+   "pointFormat": 6,
+   "classes": {
+    "1": 2621317,
+    "2": 4275986,
+    "3": 121998,
+    "4": 310161,
+    "5": 975576,
+    "6": 3164901,
+    "7": 19139,
+    "8": 309179,
+    "9": 321945,
+    "18": 224281
+   },
+   "flownFrom": "2021-05-15",
+   "flownTo": "2021-05-20",
+   "window": [
+    2406,
+    1417,
+    3938,
+    2943
+   ],
+   "bytes": 371097313,
+   "downloadS": 59.4,
+   "rasteriseS": 3.0,
+   "frame": "EPSG:6539->EPSG:9057"
+  },
+  "2235": {
+   "points": 12176888,
+   "lasVersion": "1.4",
+   "pointFormat": 6,
+   "classes": {
+    "1": 2301291,
+    "2": 3972788,
+    "3": 116247,
+    "4": 285123,
+    "5": 869702,
+    "6": 3747519,
+    "7": 16484,
+    "8": 337306,
+    "9": 326691,
+    "18": 203737
+   },
+   "flownFrom": "2021-05-15",
+   "flownTo": "2021-05-20",
+   "window": [
+    878,
+    1418,
+    2410,
+    2945
+   ],
+   "bytes": 366104635,
+   "downloadS": 61.1,
+   "rasteriseS": 1.9,
+   "frame": "EPSG:6539->EPSG:9057"
+  },
+  "2237": {
+   "points": 13504295,
+   "lasVersion": "1.4",
+   "pointFormat": 6,
+   "classes": {
+    "1": 2354947,
+    "2": 4086689,
+    "3": 114484,
+    "4": 412452,
+    "5": 1604141,
+    "6": 4004222,
+    "7": 14283,
+    "8": 335150,
+    "9": 341905,
+    "18": 236022
+   },
+   "flownFrom": "2021-05-15",
+   "flownTo": "2021-05-20",
+   "window": [
+    0,
+    1420,
+    883,
+    2946
+   ],
+   "bytes": 405958059,
+   "downloadS": 59.2,
+   "rasteriseS": 2.0,
+   "frame": "EPSG:6539->EPSG:9057"
+  }
+ },
+ "flownOn": [
+  "2021-05-15",
+  "2021-05-20"
+ ],
+ "timingsS": {
+  "lidarTiles": 0.3,
+  "mosaic": 2.7,
+  "buildings": 27.7,
+  "crowns": 7.5,
+  "decks": 1.5,
+  "total": 60.9
+ },
+ "sanity": {
+  "decks": [
+   {
+    "label": "Amtrak portal at the ramp",
+    "kind": "tunnel-portal",
+    "at": [
+     40.82239,
+     -73.93468
+    ],
+    "groundZ": -0.37,
+    "dsmZ": -0.36,
+    "distanceFromRampM": 2280.6
+   }
+  ],
+  "riversideParkTrees96to125": 0,
+  "riversideParkMatched": 0,
+  "tallestTreeM": 51.8,
+  "treesOver35m": 6,
+  "grantsTomb": {
+   "bin": "1058208",
+   "roofZ": 26.45,
+   "groundZ": 7.82,
+   "heightM": 18.6,
+   "distanceM": 1601.7
+  },
+  "piers": 3,
+  "seawalls": 15
+ },
+ "fileBytes": {
+  "buildings-missing.json": 19618,
+  "buildings-web.json": 122420,
+  "buildings.f32": 6113556,
+  "buildings.i16": 3056778,
+  "buildings.i16.gz": 807106,
+  "buildings.json": 318015,
+  "chm.f32": 19883000,
+  "chm.json": 727,
+  "chm.png": 365705,
+  "decks.json": 434291,
+  "piers.json": 126896,
+  "play-areas.json": 3623,
+  "scan.json": 8746,
+  "scan.log": 7388,
+  "street-names.json": 15930,
+  "surfaces-ground.i16": 6130656,
+  "surfaces-ground.i16.gz": 1475787,
+  "surfaces-ground.json": 11817,
+  "surfaces-ground.u16": 6360384,
+  "surfaces-ground.u16.gz": 866380,
+  "surfaces-lines.i16": 2193048,
+  "surfaces-lines.i16.gz": 388740,
+  "surfaces-lines.json": 9610,
+  "surfaces-lines.u16": 1132128,
+  "surfaces-lines.u16.gz": 10545,
+  "surfaces-middle.png": 71207,
+  "surfaces-middle.png.gz": 71020,
+  "surfaces.json": 1552,
+  "surfaces.png": 129527,
+  "surfaces.png.gz": 129350,
+  "trees-web.json": 3339,
+  "trees.i16": 90454,
+  "trees.i16.gz": 61371,
+  "trees.json": 289250,
+  "tiles/": 44172182
+ },
+ "sources": {
+  "lidar": "ftp://ftp.gis.ny.gov/elevation/LIDAR/NYC_2021/",
+  "lidarIndex": "https://elevation.its.ny.gov/arcgis/rest/services/indexes/Historic_LiDAR_Collections/FeatureServer/0 (NYC 2021)",
+  "buildings": {
+   "url": "https://s-media.nyc.gov/agencies/oti/DA_WISE_GML.zip",
+   "dataset": "tnru-abg2",
+   "zipBytes": 916369666,
+   "lastModified": "Thu, 01 Dec 2022 18:35:16 GMT",
+   "member": "DA_WISE_GMLs/DA13_3D_Buildings_Merged.gml",
+   "compressedBytes": 44197658,
+   "xmlBytes": 618444705
+  },
+  "footprints": {
+   "dataset": "5zhs-2jue",
+   "url": "https://data.cityofnewyork.us/resource/5zhs-2jue.geojson"
+  },
+  "trees": {
+   "dataset": "hn5i-inap",
+   "url": "https://data.cityofnewyork.us/resource/hn5i-inap.geojson"
+  },
+  "transport": {
+   "dataset": "r9cu-9r7b",
+   "url": "https://data.cityofnewyork.us/resource/r9cu-9r7b.geojson"
+  },
+  "railroad": {
+   "dataset": "dwer-xbgx",
+   "url": "https://data.cityofnewyork.us/resource/dwer-xbgx.geojson"
+  },
+  "elevation": {
+   "dataset": "9uxf-ng6q",
+   "url": "https://data.cityofnewyork.us/resource/9uxf-ng6q.geojson"
+  },
+  "hydro": {
+   "dataset": "6hbv-tek4",
+   "url": "https://data.cityofnewyork.us/resource/6hbv-tek4.geojson"
+  },
+  "dcm": {
+   "dataset": "usmc-hn5p",
+   "url": "https://data.cityofnewyork.us/resource/usmc-hn5p.geojson"
+  },
+  "parks": {
+   "dataset": "enfh-gkve",
+   "url": "https://data.cityofnewyork.us/resource/enfh-gkve.geojson"
+  }
+ },
+ "conversions": {
+  "horizontal": "EPSG:2263 numbers read as EPSG:6539 (NAD83(2011) / NY Long Island, US ft, the LAS header's CRS) -> EPSG:9057 WGS 84 (G2139) with pyproj (about 0.9 m north, 0.1 m west of the NAD83 position) -> local metres: x = (lon - lon0)\u00b7111320\u00b7cos(lat0), y = (lat - lat0)\u00b7111320; LiDAR tiles use a quadratic fit to pyproj per tile (checked to 1 cm)",
+  "vertical": "NAVD88 US ft \u00d7 1200/3937 = NAVD88 m (GEOID18 per the vendor report); same datum as 3DEP",
+  "usSurveyFootM": 0.3048006096012192,
+  "lidarScale": "LAS scale \u00d7 X/Y/Z + offset, in US ft"
+ },
+ "notes": [
+  "DTM = class-2 mean per 0.5 m cell, class-9 water mean where no ground, gaps filled from the nearest measured cell then smoothed",
+  "CHM = class-5 max - DTM where 3x3 class-5 count >= 3, not on roofs",
+  "crowns: Gaussian sigma 1 cell, local maxima within a Popescu-Wynne window (min 3 m), watershed over CHM > 2 m, radius = sqrt(area/pi) >= 1 m and >= height/12",
+  "canopy masked by NYC footprints and LOD2 footprints widened 1 m"
+ ]
+}

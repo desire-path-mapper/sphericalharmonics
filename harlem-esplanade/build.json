@@ -1,0 +1,16 @@
+{
+ "build": "20261127T202152Z-0ad94cc",
+ "entry": "assets/index-CIDf2ww1.js",
+ "css": [
+  "assets/index-DvNeBVub.css"
+ ],
+ "integrity": {
+  "assets/20-route-in-a-worker-B0UnfRj9.js": "sha384-mk4quRvHbHshlW6a7Xi+PosGnovm3LGG2XY2x5/7Q2nYDi5ORX12UBS2XoYA97iv",
+  "assets/index-CIDf2ww1.js": "sha384-DUF4Hdm6d6/1E7/kxOx4dwhKieJ4pvdLdk278WFDXLoHLHVCzd4i0ZgYYq+P2wkc",
+  "assets/index-DvNeBVub.css": "sha384-iSaJ5mSC2n8yWUqrkG2YnJzVUVNegpmjjR3J+OBwDJvjc32a6iDvDLsFABAZkHTv"
+ },
+ "content": "74e3279ef858881f6d8a1390b3720ad0f160254c81774dae3743fde1b0e8d248",
+ "env": "harlem-esplanade",
+ "commit": "0ad94cce5f7b4ae1e1bf3f86ce5bebf32015738f",
+ "area": "harlem-esplanade"
+}
